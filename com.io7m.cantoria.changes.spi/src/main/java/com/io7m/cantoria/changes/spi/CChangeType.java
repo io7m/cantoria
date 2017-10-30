@@ -19,8 +19,7 @@ package com.io7m.cantoria.changes.spi;
 import com.io7m.jnull.NullCheck;
 
 /**
- * The type of changes encountered when comparing versions of classes and
- * modules.
+ * The type of changes encountered when comparing modules.
  */
 
 public interface CChangeType
