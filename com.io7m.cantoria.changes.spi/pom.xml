@@ -16,7 +16,7 @@
   <packaging>jar</packaging>
 
   <name>com.io7m.cantoria.changes.spi</name>
-  <description>Semantic versioning checker (Changes SPI)</description>
+  <description>Java 9+ API Analysis tool (Changes SPI)</description>
   <url>http://io7m.github.io/cantoria/</url>
 
   <scm>

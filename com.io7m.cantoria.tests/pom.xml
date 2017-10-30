@@ -16,7 +16,7 @@
   <packaging>jar</packaging>
 
   <name>com.io7m.cantoria.tests</name>
-  <description>Semantic versioning checker (Test suite)</description>
+  <description>Java 9+ API Analysis tool (Test suite)</description>
   <url>http://io7m.github.io/cantoria/</url>
 
   <scm>

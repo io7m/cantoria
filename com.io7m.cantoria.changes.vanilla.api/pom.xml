@@ -16,7 +16,7 @@
   <packaging>jar</packaging>
 
   <name>com.io7m.cantoria.changes.vanilla.api</name>
-  <description>Semantic versioning checker (Default checks API and types)</description>
+  <description>Java 9+ API Analysis tool (Default checks API and types)</description>
   <url>http://io7m.github.io/cantoria/</url>
 
   <scm>

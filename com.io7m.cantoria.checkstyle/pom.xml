@@ -16,7 +16,7 @@
   <packaging>jar</packaging>
 
   <name>com.io7m.cantoria.checkstyle</name>
-  <description>Semantic versioning checker (Checkstyle policy)</description>
+  <description>Java 9+ API Analysis tool (Checkstyle policy)</description>
   <url>http://io7m.github.io/cantoria/</url>
 
   <scm>

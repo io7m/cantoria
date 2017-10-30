@@ -18,7 +18,7 @@
   <packaging>pom</packaging>
 
   <name>com.io7m.cantoria</name>
-  <description>Semantic versioning checker</description>
+  <description>Java 9+ API Analysis tool</description>
   <url>http://github.com/io7m/cantoria</url>
 
   <modules>

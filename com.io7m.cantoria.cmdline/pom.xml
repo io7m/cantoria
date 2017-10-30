@@ -16,7 +16,7 @@
   <packaging>jar</packaging>
 
   <name>com.io7m.cantoria.cmdline</name>
-  <description>Semantic versioning checker (Command-line tools)</description>
+  <description>Java 9+ API Analysis tool (Command-line tools)</description>
   <url>http://io7m.github.io/cantoria/</url>
 
   <scm>

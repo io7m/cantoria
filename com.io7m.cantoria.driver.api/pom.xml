@@ -16,7 +16,7 @@
   <packaging>jar</packaging>
 
   <name>com.io7m.cantoria.driver.api</name>
-  <description>Semantic versioning checker (Driver API)</description>
+  <description>Java 9+ API Analysis tool (Driver API)</description>
   <url>http://io7m.github.io/cantoria/</url>
 
   <scm>
