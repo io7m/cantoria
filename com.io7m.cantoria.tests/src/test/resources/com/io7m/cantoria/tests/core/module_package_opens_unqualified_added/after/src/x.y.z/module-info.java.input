@@ -1,0 +1,3 @@
+module x.y.z {
+  opens x.y.z.p;
+}

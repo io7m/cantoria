@@ -1,0 +1,3 @@
+module x.y.z {
+  provides java.io.Serializable with x.y.z.p.X;
+}

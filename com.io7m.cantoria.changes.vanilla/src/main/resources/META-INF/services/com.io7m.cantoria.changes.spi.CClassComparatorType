@@ -1,0 +1,6 @@
+com.io7m.cantoria.changes.vanilla.CClassChangedAbstractness
+com.io7m.cantoria.changes.vanilla.CClassChangedAccessibility
+com.io7m.cantoria.changes.vanilla.CClassChangedBytecodeVersion
+com.io7m.cantoria.changes.vanilla.CClassChangedEnum
+com.io7m.cantoria.changes.vanilla.CClassChangedFinality
+com.io7m.cantoria.changes.vanilla.CClassChangedInterfaceModifier

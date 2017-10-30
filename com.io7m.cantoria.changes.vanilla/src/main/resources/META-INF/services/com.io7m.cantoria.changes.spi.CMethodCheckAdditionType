@@ -1,0 +1,3 @@
+com.io7m.cantoria.changes.vanilla.CMethodAddedCheckStaticLinkage
+com.io7m.cantoria.changes.vanilla.CMethodAddedToClass
+com.io7m.cantoria.changes.vanilla.CMethodAddedToInterface

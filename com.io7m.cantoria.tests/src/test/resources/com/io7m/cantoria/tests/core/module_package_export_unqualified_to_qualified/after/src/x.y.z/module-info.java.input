@@ -1,0 +1,3 @@
+module x.y.z {
+  exports x.y.z.p to a.b.c;
+}
