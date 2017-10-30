@@ -43,6 +43,9 @@
     <io7m.checkstyle.path>/com/io7m/cantoria/checkstyle/checkstyle.xml</io7m.checkstyle.path>
     <io7m.api.previousVersion>0.0.1</io7m.api.previousVersion>
     <maven.plugin.version>3.5.0</maven.plugin.version>
+
+    <!-- Temporarily work around a lack of JDK 9 compatibility -->
+    <mdep.analyze.skip>true</mdep.analyze.skip>
   </properties>
 
   <inceptionYear>2017</inceptionYear>
