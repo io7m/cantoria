@@ -59,49 +59,6 @@ public final class CChangeDescriberTest
         .map(CModuleWeaklyCaching::wrap));
   }
 
-  /**
-   * XXX: This test is quite excessively brutal: it tries to use all available
-   * describers to describe all available changes. There is specifically no
-   * guarantee that any particular describer can describe any particular change,
-   * it's just a coincidence that the current single describer implementation
-   * can describe all of the vanilla changes.
-   */
-
-  @Test
-  public void testAllDescribers()
-    throws Exception
-  {
-    final List<String> lines = listComparisonModules();
-    final CModuleComparisons comp = CModuleComparisons.create();
-    final AtomicReference<Exception> ex = new AtomicReference<>();
-    final ServiceLoader<CChangeDescriberType> providers =
-      ServiceLoader.load(CChangeDescriberType.class);
-
-    lines.forEach(line -> {
-      try {
-        try (CModuleType module0 = CTestUtilities.module(line + "/before")) {
-          try (CModuleType module1 = CTestUtilities.module(line + "/after")) {
-            final CClassRegistryType er = classRegistry(module0, module1);
-            comp.compareModules(
-              (originator, change) ->
-                describe(providers, originator, change), er, module0, module1);
-          }
-        }
-      } catch (final Exception e) {
-        LOG.error("module comparison exception: ", e);
-        if (ex.get() != null) {
-          ex.get().addSuppressed(e);
-        } else {
-          ex.set(e);
-        }
-      }
-    });
-
-    if (ex.get() != null) {
-      throw ex.get();
-    }
-  }
-
   private static void describe(
     final ServiceLoader<CChangeDescriberType> providers,
     final CChangeCheckType originator,
@@ -145,5 +102,48 @@ public final class CChangeDescriberTest
       }
     }
     return lines;
+  }
+
+  /**
+   * XXX: This test is quite excessively brutal: it tries to use all available
+   * describers to describe all available changes. There is specifically no
+   * guarantee that any particular describer can describe any particular change,
+   * it's just a coincidence that the current single describer implementation
+   * can describe all of the vanilla changes.
+   */
+
+  @Test
+  public void testAllDescribers()
+    throws Exception
+  {
+    final List<String> lines = listComparisonModules();
+    final CModuleComparisons comp = CModuleComparisons.create();
+    final AtomicReference<Exception> ex = new AtomicReference<>();
+    final ServiceLoader<CChangeDescriberType> providers =
+      ServiceLoader.load(CChangeDescriberType.class);
+
+    lines.forEach(line -> {
+      try {
+        try (CModuleType module0 = CTestUtilities.module(line + "/before")) {
+          try (CModuleType module1 = CTestUtilities.module(line + "/after")) {
+            final CClassRegistryType er = classRegistry(module0, module1);
+            comp.compareModules(
+              (originator, change) ->
+                describe(providers, originator, change), er, module0, module1);
+          }
+        }
+      } catch (final Exception e) {
+        LOG.error("module comparison exception: ", e);
+        if (ex.get() != null) {
+          ex.get().addSuppressed(e);
+        } else {
+          ex.set(e);
+        }
+      }
+    });
+
+    if (ex.get() != null) {
+      throw ex.get();
+    }
   }
 }

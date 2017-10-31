@@ -24,17 +24,13 @@ import com.io7m.cantoria.api.CModuleType;
 import com.io7m.cantoria.api.CModuleWeaklyCaching;
 import com.io7m.cantoria.api.CModules;
 import com.io7m.cantoria.api.CVersion;
-import com.io7m.cantoria.api.CVersionType;
 import com.io7m.cantoria.api.CVersions;
-import com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility;
 import com.io7m.cantoria.changes.spi.CChangeCheckType;
 import com.io7m.cantoria.changes.spi.CChangeDescriberType;
-import com.io7m.cantoria.changes.spi.CChangeSemanticVersioning;
-import com.io7m.cantoria.changes.spi.CChangeSourceCompatibility;
 import com.io7m.cantoria.changes.spi.CChangeType;
+import com.io7m.cantoria.changes.spi.CCompatibilityTracker;
 import com.io7m.cantoria.driver.api.CComparisonDriverProviderType;
 import com.io7m.cantoria.driver.api.CComparisonDriverType;
-import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import org.slf4j.Logger;
@@ -58,11 +54,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
 import static com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility.BINARY_COMPATIBLE;
-import static com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility.BINARY_INCOMPATIBLE;
-import static com.io7m.cantoria.changes.spi.CChangeSemanticVersioning.SEMANTIC_NONE;
-import static com.io7m.cantoria.changes.spi.CChangeSemanticVersioning.maximum;
 import static com.io7m.cantoria.changes.spi.CChangeSourceCompatibility.SOURCE_COMPATIBLE;
-import static com.io7m.cantoria.changes.spi.CChangeSourceCompatibility.SOURCE_INCOMPATIBLE;
 import static com.io7m.cantoria.cmdline.CommandStatus.COMMAND_FAILURE;
 import static com.io7m.cantoria.cmdline.CommandStatus.COMMAND_SUCCESS;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -154,31 +146,18 @@ public final class CommandCompare implements CCommandType
       final ServiceLoader<CChangeDescriberType> providers =
         ServiceLoader.load(CChangeDescriberType.class);
 
-      CChangeSemanticVersioning semver_compatibility = SEMANTIC_NONE;
-      CChangeBinaryCompatibility binary_compatibility = BINARY_COMPATIBLE;
-      CChangeSourceCompatibility source_compatibility = SOURCE_COMPATIBLE;
+      final CCompatibilityTracker tracker = CCompatibilityTracker.create();
 
       final String format = "com.io7m.cantoria.format.text";
       for (final Tuple2<CChangeCheckType, CChangeType> change_pair : changes) {
         final CChangeType change = change_pair._2;
-
-        semver_compatibility =
-          maximum(semver_compatibility, change.semanticVersioning());
-
-        if (change.binaryCompatibility() == BINARY_INCOMPATIBLE) {
-          binary_compatibility = BINARY_INCOMPATIBLE;
-        }
-        if (change.sourceCompatibility() == SOURCE_INCOMPATIBLE) {
-          source_compatibility = SOURCE_INCOMPATIBLE;
-        }
+        tracker.onChange(change);
 
         boolean described = false;
         final Iterator<CChangeDescriberType> iter = providers.iterator();
         while (iter.hasNext()) {
           final CChangeDescriberType describer = iter.next();
-          if (Objects.equals(
-            describer.format(),
-            format)
+          if (Objects.equals(describer.format(), format)
             && describer.canDescribe(change)) {
             try {
               describer.describe(change_pair._1, change, System.out);
@@ -198,12 +177,7 @@ public final class CommandCompare implements CCommandType
         }
       }
 
-      writeVersionCompatibilityReport(
-        module_old_version,
-        module_new_version,
-        semver_compatibility,
-        binary_compatibility,
-        source_compatibility);
+      writeVersionCompatibilityReport(module_old_version, tracker);
 
       return COMMAND_SUCCESS;
     } catch (final IOException e) {
@@ -226,26 +200,23 @@ public final class CommandCompare implements CCommandType
 
   private static void writeVersionCompatibilityReport(
     final CVersion module_old_version,
-    final CVersion module_new_version,
-    final CChangeSemanticVersioning semver_compatibility,
-    final CChangeBinaryCompatibility binary_compatibility,
-    final CChangeSourceCompatibility source_compatibility)
+    final CCompatibilityTracker tracker)
     throws IOException
   {
     final BufferedWriter w =
       new BufferedWriter(new OutputStreamWriter(System.out, UTF_8));
 
     w.append("Modules are binary compatible: ");
-    w.append(binary_compatibility == BINARY_COMPATIBLE ? "Yes" : "No");
+    w.append(tracker.binaryCompatibility() == BINARY_COMPATIBLE ? "Yes" : "No");
     w.newLine();
 
     w.append("Modules are source compatible: ");
-    w.append(source_compatibility == SOURCE_COMPATIBLE ? "Yes" : "No");
+    w.append(tracker.sourceCompatibility() == SOURCE_COMPATIBLE ? "Yes" : "No");
     w.newLine();
 
     w.append("Required version change:       ");
 
-    switch (semver_compatibility) {
+    switch (tracker.semanticVersioning()) {
       case SEMANTIC_MAJOR: {
         w.append("Major increment");
         break;
@@ -262,44 +233,14 @@ public final class CommandCompare implements CCommandType
 
     w.newLine();
     w.append("Suggested new version:         ");
-    w.append(CVersions.showVersion(module_new_version));
+    w.append(CVersions.showVersion(module_old_version));
     w.append(" → ");
     w.append(CVersions.showVersion(
-      requiredVersionChange(module_old_version, semver_compatibility)));
+      tracker.suggestVersionNumber(module_old_version)));
     w.newLine();
     w.flush();
   }
 
-  private static CVersion requiredVersionChange(
-    final CVersionType version,
-    final CChangeSemanticVersioning compatibility)
-  {
-    switch (compatibility) {
-      case SEMANTIC_MAJOR: {
-        return CVersion.of(
-          version.major() + 1,
-          0,
-          0,
-          "");
-      }
-      case SEMANTIC_MINOR: {
-        return CVersion.of(
-          version.major(),
-          version.minor() + 1,
-          0,
-          "");
-      }
-      case SEMANTIC_NONE: {
-        return CVersion.of(
-          version.major(),
-          version.minor(),
-          version.patch() + 1,
-          "");
-      }
-    }
-
-    throw new UnreachableCodeException();
-  }
 
   @Override
   public CommandStatus run()

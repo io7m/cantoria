@@ -124,6 +124,19 @@ public final class CModuleComparisonsTest
         .map(CModuleWeaklyCaching::wrap));
   }
 
+  private static MethodNode anyMethod()
+  {
+    return new MethodNode(Opcodes.ASM6);
+  }
+
+  private static FieldNode field(
+    final String field_name,
+    final String field_desc)
+  {
+    return new FieldNode(
+      Opcodes.ACC_PUBLIC, field_name, field_desc, null, null);
+  }
+
   @Test
   public void testModuleRequiresTransitiveAdded(
     final @Mocked CChangeReceiverType receiver)
@@ -1007,11 +1020,6 @@ public final class CModuleComparisonsTest
       receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
       this.times = 6;
     }};
-  }
-
-  private static MethodNode anyMethod()
-  {
-    return new MethodNode(Opcodes.ASM6);
   }
 
   @Test
@@ -2097,14 +2105,6 @@ public final class CModuleComparisonsTest
       receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
       this.times = 1;
     }};
-  }
-
-  private static FieldNode field(
-    final String field_name,
-    final String field_desc)
-  {
-    return new FieldNode(
-      Opcodes.ACC_PUBLIC, field_name, field_desc, null, null);
   }
 
   @Test
