@@ -64,7 +64,19 @@ public enum CModifier
    * The "static" modifier
    */
 
-  STATIC("static");
+  STATIC("static"),
+
+  /**
+   * The "enum" modifier
+   */
+
+  ENUM("enum"),
+
+  /**
+   * The "interface" modifier
+   */
+
+  INTERFACE("interface");
 
   private final String keyword;
 

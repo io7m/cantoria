@@ -78,12 +78,10 @@ public interface CChangeEnumRemovedMembersType
     final Map<String, CEnumMember> members_now = this.enumType().members();
     final Map<String, CEnumMember> members_then = this.enumPrevious().members();
 
-    members_now.keySet().forEach(key -> {
-      if (!members_then.containsKey(key)) {
-        throw new IllegalArgumentException(
-          "Current enum members must be a proper subset of the previous members");
-      }
-    });
+    members_now.keySet().forEach(
+      key -> Preconditions.checkPrecondition(
+        members_then.containsKey(key),
+        "Current enum members must be a proper subset of the previous members"));
 
     Preconditions.checkPrecondition(
       Objects.equals(this.enumType().name(), this.enumPrevious().name()),

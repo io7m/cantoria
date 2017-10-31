@@ -16,6 +16,7 @@
 
 package com.io7m.cantoria.changes.vanilla;
 
+import com.io7m.cantoria.api.CAccessibility;
 import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CClassModifiers;
 import com.io7m.cantoria.api.CClassRegistryType;
@@ -61,8 +62,8 @@ public final class CClassChangedAbstractness implements CClassComparatorType
   public void compareClass(
     final CChangeReceiverType receiver,
     final CClassRegistryType registry,
-    final CClass clazz_old,
-    final CClass clazz_new)
+    final CClass class_old,
+    final CClass class_new)
   {
     /*
      * Ignore the abstractness of non-public classes; classes outside of the
@@ -70,29 +71,31 @@ public final class CClassChangedAbstractness implements CClassComparatorType
      * classes are interesting from an API perspective.
      */
 
-    if (!CClassModifiers.classIsPublic(clazz_new.node())) {
+    if (class_new.accessibility() != CAccessibility.PUBLIC) {
       return;
     }
 
     final boolean was_abstract =
-      CClassModifiers.classIsAbstract(clazz_old.node());
+      CClassModifiers.classIsAbstract(class_old.node());
     final boolean is_abstract =
-      CClassModifiers.classIsAbstract(clazz_new.node());
+      CClassModifiers.classIsAbstract(class_new.node());
 
     if (!was_abstract && is_abstract) {
       receiver.onChange(
         this,
-        CChangeClassBecameAbstract.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node())));
+        CChangeClassBecameAbstract.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
 
     if (was_abstract && !is_abstract) {
       receiver.onChange(
         this,
-        CChangeClassBecameNonAbstract.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node())));
+        CChangeClassBecameNonAbstract.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
   }
 

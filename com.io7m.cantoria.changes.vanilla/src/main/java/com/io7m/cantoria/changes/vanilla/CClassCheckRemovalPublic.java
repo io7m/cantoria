@@ -16,6 +16,7 @@
 
 package com.io7m.cantoria.changes.vanilla;
 
+import com.io7m.cantoria.api.CAccessibility;
 import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CClassModifiers;
 import com.io7m.cantoria.api.CClassRegistryType;
@@ -68,12 +69,12 @@ public final class CClassCheckRemovalPublic implements CClassCheckRemovalType
     final CClassRegistryType registry,
     final CClass clazz)
   {
+    if (clazz.accessibility() != CAccessibility.PUBLIC) {
+      return;
+    }
+
     if (CClassModifiers.classIsPublic(clazz.node())) {
-      receiver.onChange(
-        this,
-        CChangeClassRemovedPublic.of(
-          clazz.name(),
-          CClassModifiers.classModifiers(clazz.node())));
+      receiver.onChange(this, CChangeClassRemovedPublic.of(clazz));
     }
   }
 }

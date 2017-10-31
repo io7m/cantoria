@@ -16,14 +16,14 @@
 
 package com.io7m.cantoria.changes.vanilla.api;
 
-import com.io7m.cantoria.api.CClassName;
+import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CImmutableStyleType;
 import com.io7m.cantoria.api.CModifier;
 import com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility;
 import com.io7m.cantoria.changes.spi.CChangeClassType;
 import com.io7m.cantoria.changes.spi.CChangeSemanticVersioning;
 import com.io7m.cantoria.changes.spi.CChangeSourceCompatibility;
-import io.vavr.collection.Set;
+import com.io7m.jaffirm.core.Preconditions;
 import org.immutables.value.Value;
 import org.immutables.vavr.encodings.VavrEncodingEnabled;
 
@@ -46,11 +46,14 @@ public interface CChangeClassBecameAbstractType
 {
   @Override
   @Value.Parameter
-  CClassName className();
+  CClass classValue();
 
-  @Override
+  /**
+   * @return The previous state of the class
+   */
+
   @Value.Parameter
-  Set<CModifier> modifiers();
+  CClass classPrevious();
 
   /**
    * Check preconditions for the type.
@@ -59,9 +62,15 @@ public interface CChangeClassBecameAbstractType
   @Value.Check
   default void checkPreconditions()
   {
-    if (!this.modifiers().contains(CModifier.ABSTRACT)) {
-      throw new IllegalArgumentException("Modifiers must contain 'abstract'");
-    }
+    Preconditions.checkPrecondition(
+      this.classValue(),
+      this.classValue().modifiers().contains(CModifier.ABSTRACT),
+      c -> "Modifiers must contain 'abstract'");
+
+    Preconditions.checkPrecondition(
+      this.classPrevious(),
+      !this.classPrevious().modifiers().contains(CModifier.ABSTRACT),
+      c -> "Previous modifiers must not contain 'abstract'");
   }
 
   @Override

@@ -16,6 +16,7 @@
 
 package com.io7m.cantoria.api;
 
+import io.vavr.collection.Set;
 import org.immutables.value.Value;
 import org.immutables.vavr.encodings.VavrEncodingEnabled;
 import org.objectweb.asm.tree.ClassNode;
@@ -42,4 +43,25 @@ public interface CClassType extends CClassValuesType
   @Value.Parameter
   @Value.Auxiliary
   CModuleType module();
+
+  @Override
+  @Value.Parameter
+  Set<CModifier> modifiers();
+
+  @Override
+  @Value.Parameter
+  CAccessibility accessibility();
+
+  @Override
+  @Value.Parameter
+  int bytecodeVersion();
+
+  /**
+   * @return {@code true} if the class is an enum
+   */
+
+  default boolean isEnum()
+  {
+    return this.modifiers().contains(CModifier.ENUM);
+  }
 }

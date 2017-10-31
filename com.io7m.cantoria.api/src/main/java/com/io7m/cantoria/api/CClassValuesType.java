@@ -16,6 +16,7 @@
 
 package com.io7m.cantoria.api;
 
+import io.vavr.collection.Set;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -41,4 +42,22 @@ public interface CClassValuesType
    */
 
   CModuleType module();
+
+  /**
+   * @return The class modifiers
+   */
+
+  Set<CModifier> modifiers();
+
+  /**
+   * @return The class accessibility
+   */
+
+  CAccessibility accessibility();
+
+  /**
+   * @return The version of the bytecode for the class
+   */
+
+  int bytecodeVersion();
 }

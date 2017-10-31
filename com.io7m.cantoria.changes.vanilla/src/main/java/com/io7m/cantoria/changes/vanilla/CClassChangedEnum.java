@@ -16,8 +16,8 @@
 
 package com.io7m.cantoria.changes.vanilla;
 
+import com.io7m.cantoria.api.CAccessibility;
 import com.io7m.cantoria.api.CClass;
-import com.io7m.cantoria.api.CClassModifiers;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.changes.spi.CChangeReceiverType;
 import com.io7m.cantoria.changes.spi.CClassComparatorType;
@@ -59,32 +59,32 @@ public final class CClassChangedEnum implements CClassComparatorType
   public void compareClass(
     final CChangeReceiverType receiver,
     final CClassRegistryType registry,
-    final CClass clazz_old,
-    final CClass clazz_new)
+    final CClass class_old,
+    final CClass class_new)
   {
-    if (!CClassModifiers.classIsPublic(clazz_new.node())) {
+    if (class_new.accessibility() != CAccessibility.PUBLIC) {
       return;
     }
 
-    final boolean was_enum =
-      CClassModifiers.classIsEnum(clazz_old.node());
-    final boolean is_enum =
-      CClassModifiers.classIsEnum(clazz_new.node());
+    final boolean was_enum = class_old.isEnum();
+    final boolean is_enum = class_new.isEnum();
 
     if (!was_enum && is_enum) {
       receiver.onChange(
         this,
-        CChangeClassBecameEnum.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node())));
+        CChangeClassBecameEnum.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
 
     if (was_enum && !is_enum) {
       receiver.onChange(
         this,
-        CChangeClassBecameNonEnum.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node())));
+        CChangeClassBecameNonEnum.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
   }
 

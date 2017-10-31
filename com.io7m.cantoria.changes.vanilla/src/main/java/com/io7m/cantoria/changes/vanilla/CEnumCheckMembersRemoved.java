@@ -16,7 +16,7 @@
 
 package com.io7m.cantoria.changes.vanilla;
 
-import com.io7m.cantoria.api.CClassModifiers;
+import com.io7m.cantoria.api.CAccessibility;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CEnum;
 import com.io7m.cantoria.api.CEnumMember;
@@ -73,20 +73,23 @@ public final class CEnumCheckMembersRemoved implements CEnumComparatorType
   public void compareEnum(
     final CChangeReceiverType receiver,
     final CClassRegistryType registry,
-    final CEnum clazz_old,
-    final CEnum clazz_new)
+    final CEnum class_old,
+    final CEnum class_new)
   {
-    if (!CClassModifiers.classIsPublic(clazz_new.node())) {
+    if (class_new.accessibility() != CAccessibility.PUBLIC) {
       return;
     }
 
     final Map<String, CEnumMember> removed =
-      clazz_old.members().removeAll(clazz_new.members().keySet());
+      class_old.members().removeAll(class_new.members().keySet());
 
     if (!removed.isEmpty()) {
       receiver.onChange(
         this,
-        CChangeEnumRemovedMembers.of(clazz_new, clazz_old));
+        CChangeEnumRemovedMembers.builder()
+          .setEnumPrevious(class_old)
+          .setEnumType(class_new)
+          .build());
     }
   }
 }

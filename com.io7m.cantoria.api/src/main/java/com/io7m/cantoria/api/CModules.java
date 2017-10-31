@@ -374,7 +374,7 @@ public final class CModules
           final ClassNode node = loadClassNodeFromStream(stream);
           final CClassName name =
             CClassName.of(this.module_desc.name(), package_name, class_name);
-          return Optional.of(CClass.of(name, node, this));
+          return Optional.of(CClasses.classOf(name, this, node));
         }
       }
 
@@ -510,7 +510,7 @@ public final class CModules
           final ClassNode node = loadClassNodeFromStream(stream);
           final CClassName name =
             CClassName.of(this.module_desc.name(), package_name, class_name);
-          return Optional.of(CClass.of(name, node, this));
+          return Optional.of(CClasses.classOf(name, this, node));
         }
       }
 

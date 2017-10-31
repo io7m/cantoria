@@ -16,7 +16,9 @@
 
 package com.io7m.cantoria.api;
 
+import com.io7m.jaffirm.core.Preconditions;
 import io.vavr.collection.Map;
+import io.vavr.collection.Set;
 import org.immutables.value.Value;
 import org.immutables.vavr.encodings.VavrEncodingEnabled;
 import org.objectweb.asm.tree.ClassNode;
@@ -55,6 +57,24 @@ public interface CEnumType extends CClassValuesType
     return this.classValue().module();
   }
 
+  @Override
+  default Set<CModifier> modifiers()
+  {
+    return this.classValue().modifiers();
+  }
+
+  @Override
+  default CAccessibility accessibility()
+  {
+    return this.classValue().accessibility();
+  }
+
+  @Override
+  default int bytecodeVersion()
+  {
+    return this.classValue().bytecodeVersion();
+  }
+
   /**
    * @return The enum members
    */
@@ -69,9 +89,9 @@ public interface CEnumType extends CClassValuesType
   @Value.Check
   default void checkPreconditions()
   {
-    if (!CClassModifiers.classIsEnum(this.node())) {
-      throw new IllegalArgumentException(
-        "Class node must refer to an enum type");
-    }
+    Preconditions.checkPrecondition(
+      this.classValue(),
+      this.classValue().isEnum(),
+      c -> "Underlying class must be an enum");
   }
 }

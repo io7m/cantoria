@@ -16,14 +16,13 @@
 
 package com.io7m.cantoria.changes.vanilla;
 
+import com.io7m.cantoria.api.CAccessibility;
 import com.io7m.cantoria.api.CClass;
-import com.io7m.cantoria.api.CClassModifiers;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.changes.spi.CChangeReceiverType;
 import com.io7m.cantoria.changes.spi.CClassComparatorType;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassBytecodeVersionChanged;
 import io.vavr.collection.List;
-import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Determine if a class's bytecode version has changed.
@@ -58,27 +57,24 @@ public final class CClassChangedBytecodeVersion implements CClassComparatorType
   public void compareClass(
     final CChangeReceiverType receiver,
     final CClassRegistryType registry,
-    final CClass clazz_old,
-    final CClass clazz_new)
+    final CClass class_old,
+    final CClass class_new)
   {
     /*
      * Ignore the bytecode version of non-public classes.
      */
 
-    if (!CClassModifiers.classIsPublic(clazz_new.node())) {
+    if (class_new.accessibility() != CAccessibility.PUBLIC) {
       return;
     }
 
-    final ClassNode cn_new = clazz_new.node();
-    final ClassNode cn_old = clazz_old.node();
-    if (cn_new.version != cn_old.version) {
+    if (class_new.bytecodeVersion() != class_old.bytecodeVersion()) {
       receiver.onChange(
         this,
-        CChangeClassBytecodeVersionChanged.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node()),
-          cn_old.version,
-          cn_new.version));
+        CChangeClassBytecodeVersionChanged.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
   }
 

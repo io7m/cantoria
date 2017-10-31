@@ -16,9 +16,10 @@
 
 package com.io7m.cantoria.changes.vanilla;
 
+import com.io7m.cantoria.api.CAccessibility;
 import com.io7m.cantoria.api.CClass;
-import com.io7m.cantoria.api.CClassModifiers;
 import com.io7m.cantoria.api.CClassRegistryType;
+import com.io7m.cantoria.api.CModifier;
 import com.io7m.cantoria.changes.spi.CChangeReceiverType;
 import com.io7m.cantoria.changes.spi.CClassComparatorType;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassBecameInterface;
@@ -60,28 +61,34 @@ public final class CClassChangedInterfaceModifier implements
   public void compareClass(
     final CChangeReceiverType receiver,
     final CClassRegistryType registry,
-    final CClass clazz_old,
-    final CClass clazz_new)
+    final CClass class_old,
+    final CClass class_new)
   {
+    if (class_new.accessibility() != CAccessibility.PUBLIC) {
+      return;
+    }
+
     final boolean was_interface =
-      CClassModifiers.classIsInterface(clazz_old.node());
+      class_old.modifiers().contains(CModifier.INTERFACE);
     final boolean is_interface =
-      CClassModifiers.classIsInterface(clazz_new.node());
+      class_new.modifiers().contains(CModifier.INTERFACE);
 
     if (!was_interface && is_interface) {
       receiver.onChange(
         this,
-        CChangeClassBecameInterface.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node())));
+        CChangeClassBecameInterface.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
 
     if (was_interface && !is_interface) {
       receiver.onChange(
         this,
-        CChangeClassBecameNonInterface.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node())));
+        CChangeClassBecameNonInterface.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
   }
 

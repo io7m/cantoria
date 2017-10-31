@@ -16,9 +16,7 @@
 
 package com.io7m.cantoria.changes.spi;
 
-import com.io7m.cantoria.api.CClassName;
-import com.io7m.cantoria.api.CModifier;
-import io.vavr.collection.Set;
+import com.io7m.cantoria.api.CClass;
 
 /**
  * The type of changes related to entire classes.
@@ -33,14 +31,8 @@ public interface CChangeClassType extends CChangeType
   }
 
   /**
-   * @return The name of the class that changed
+   * @return The class that changed
    */
 
-  CClassName className();
-
-  /**
-   * @return The class modifiers
-   */
-
-  Set<CModifier> modifiers();
+  CClass classValue();
 }

@@ -16,6 +16,7 @@
 
 package com.io7m.cantoria.changes.vanilla;
 
+import com.io7m.cantoria.api.CAccessibility;
 import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CClassModifiers;
 import com.io7m.cantoria.api.CClassRegistryType;
@@ -61,8 +62,8 @@ public final class CClassChangedFinality implements CClassComparatorType
   public void compareClass(
     final CChangeReceiverType receiver,
     final CClassRegistryType registry,
-    final CClass clazz_old,
-    final CClass clazz_new)
+    final CClass class_old,
+    final CClass class_new)
   {
     /*
      * Ignore the finality of non-public classes; classes outside of the
@@ -70,29 +71,31 @@ public final class CClassChangedFinality implements CClassComparatorType
      * classes are interesting from an API perspective.
      */
 
-    if (!CClassModifiers.classIsPublic(clazz_new.node())) {
+    if (class_new.accessibility() != CAccessibility.PUBLIC) {
       return;
     }
 
     final boolean was_final =
-      CClassModifiers.classIsFinal(clazz_old.node());
+      CClassModifiers.classIsFinal(class_old.node());
     final boolean is_final =
-      CClassModifiers.classIsFinal(clazz_new.node());
+      CClassModifiers.classIsFinal(class_new.node());
 
     if (!was_final && is_final) {
       receiver.onChange(
         this,
-        CChangeClassBecameFinal.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node())));
+        CChangeClassBecameFinal.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
 
     if (was_final && !is_final) {
       receiver.onChange(
         this,
-        CChangeClassBecameNonFinal.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node())));
+        CChangeClassBecameNonFinal.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
   }
 

@@ -1096,11 +1096,11 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.newLine();
 
     w.append(fieldStart("Previous bytecode"));
-    w.append(bytecodeVersion(cc.oldVersion()));
+    w.append(bytecodeVersion(cc.classPrevious().bytecodeVersion()));
     w.newLine();
 
     w.append(fieldStart("Current bytecode"));
-    w.append(bytecodeVersion(cc.newVersion()));
+    w.append(bytecodeVersion(cc.classValue().bytecodeVersion()));
     w.newLine();
   }
 
@@ -1362,7 +1362,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
         final CChangeClassType c = (CChangeClassType) change;
 
         w.append(fieldStart("Class"));
-        w.append(CClassNames.show(c.className()));
+        w.append(CClassNames.show(c.classValue().name()));
         w.newLine();
         break;
       }

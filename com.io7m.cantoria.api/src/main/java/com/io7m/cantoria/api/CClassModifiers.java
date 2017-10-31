@@ -173,7 +173,36 @@ public final class CClassModifiers
     if (classIsStatic(clazz)) {
       m = m.add(CModifier.STATIC);
     }
+    if (classIsEnum(clazz)) {
+      m = m.add(CModifier.ENUM);
+    }
+    if (classIsInterface(clazz)) {
+      m = m.add(CModifier.INTERFACE);
+    }
 
     return m;
+  }
+
+  /**
+   * @param clazz The class
+   *
+   * @return The accessibility of the class
+   */
+
+  public static CAccessibility classAccessibility(
+    final ClassNode clazz)
+  {
+    NullCheck.notNull(clazz, "Class");
+
+    if (classIsPublic(clazz)) {
+      return CAccessibility.PUBLIC;
+    }
+    if (classIsProtected(clazz)) {
+      return CAccessibility.PROTECTED;
+    }
+    if (classIsPrivate(clazz)) {
+      return CAccessibility.PRIVATE;
+    }
+    return CAccessibility.PACKAGE_PRIVATE;
   }
 }

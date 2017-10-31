@@ -16,8 +16,8 @@
 
 package com.io7m.cantoria.changes.vanilla;
 
+import com.io7m.cantoria.api.CAccessibility;
 import com.io7m.cantoria.api.CClass;
-import com.io7m.cantoria.api.CClassModifiers;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.changes.spi.CChangeReceiverType;
 import com.io7m.cantoria.changes.spi.CClassComparatorType;
@@ -61,28 +61,30 @@ public final class CClassChangedAccessibility implements CClassComparatorType
   public void compareClass(
     final CChangeReceiverType receiver,
     final CClassRegistryType registry,
-    final CClass clazz_old,
-    final CClass clazz_new)
+    final CClass class_old,
+    final CClass class_new)
   {
     final boolean was_public =
-      CClassModifiers.classIsPublic(clazz_old.node());
+      class_old.accessibility() == CAccessibility.PUBLIC;
     final boolean is_public =
-      CClassModifiers.classIsPublic(clazz_new.node());
+      class_new.accessibility() == CAccessibility.PUBLIC;
 
     if (!was_public && is_public) {
       receiver.onChange(
         this,
-        CChangeClassBecamePublic.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node())));
+        CChangeClassBecamePublic.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
 
     if (was_public && !is_public) {
       receiver.onChange(
         this,
-        CChangeClassBecameNonPublic.of(
-          clazz_new.name(),
-          CClassModifiers.classModifiers(clazz_new.node())));
+        CChangeClassBecameNonPublic.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
     }
   }
 

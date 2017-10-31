@@ -105,6 +105,7 @@ import mockit.FullVerifications;
 import mockit.Mocked;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -114,6 +115,10 @@ public abstract class CDriverContract
 {
   private static final CClassName CLASS_NAME_X =
     CClassName.of("x.y.z", "x.y.z.p", "X");
+  public static final CClassName CLASS_NAME_Y = CClassName.of(
+    "x.y.z",
+    "x.y.z.p",
+    "Y");
 
   private static CClassRegistryType classRegistry(
     final CModuleType... modules)
@@ -696,6 +701,11 @@ public abstract class CDriverContract
     }};
   }
 
+  private static ClassNode anyClass()
+  {
+    return new ClassNode(Opcodes.ASM6);
+  }
+
   @Test
   public final void testClassAdded(
     final @Mocked CChangeReceiverType receiver)
@@ -713,8 +723,13 @@ public abstract class CDriverContract
       receiver.onChange(
         (CChangeCheckType) this.any,
         CChangeClassAddedPublic.of(
-          CClassName.of("x.y.z", "x.y.z.p", "Y"),
-          HashSet.empty()));
+          CClass.builder()
+            .setAccessibility(CAccessibility.PUBLIC)
+            .setBytecodeVersion(53)
+            .setModule(module0)
+            .setName(CLASS_NAME_Y)
+            .setNode(anyClass())
+            .build()));
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -743,8 +758,13 @@ public abstract class CDriverContract
       receiver.onChange(
         (CChangeCheckType) this.any,
         CChangeClassRemovedPublic.of(
-          CClassName.of("x.y.z", "x.y.z.p", "Y"),
-          HashSet.empty()));
+          CClass.builder()
+            .setAccessibility(CAccessibility.PUBLIC)
+            .setBytecodeVersion(53)
+            .setModule(module0)
+            .setName(CLASS_NAME_Y)
+            .setNode(anyClass())
+            .build()));
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -772,9 +792,24 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameNonPublic.of(
-          CLASS_NAME_X,
-          HashSet.empty()));
+        CChangeClassBecameNonPublic.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PACKAGE_PRIVATE)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -802,9 +837,24 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecamePublic.of(
-          CLASS_NAME_X,
-          HashSet.empty()));
+        CChangeClassBecamePublic.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PACKAGE_PRIVATE)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -832,14 +882,49 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameInterface.of(
-          CLASS_NAME_X,
-          HashSet.of(CModifier.ABSTRACT)));
+        CChangeClassBecameInterface.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.ABSTRACT)
+              .addModifiers(CModifier.INTERFACE)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
+
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameAbstract.of(
-          CLASS_NAME_X,
-          HashSet.of(CModifier.ABSTRACT)));
+        CChangeClassBecameAbstract.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.ABSTRACT)
+              .addModifiers(CModifier.INTERFACE)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -867,14 +952,65 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameNonAbstract.of(
-          CLASS_NAME_X,
-          HashSet.empty()));
+        CChangeClassConstructorAdded.builder()
+          .setConstructor(
+            CConstructor.builder()
+              .setMethod(
+                CMethod.builder()
+                  .setAccessibility(CAccessibility.PUBLIC)
+                  .setClassName(CLASS_NAME_X)
+                  .setName("<init>")
+                  .setReturnType("void")
+                  .setNode(anyMethod())
+                  .build())
+              .build())
+          .build());
+
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameNonInterface.of(
-          CLASS_NAME_X,
-          HashSet.empty()));
+        CChangeClassBecameNonAbstract.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.ABSTRACT)
+              .addModifiers(CModifier.INTERFACE)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
+
+      receiver.onChange(
+        (CChangeCheckType) this.any,
+        CChangeClassBecameNonInterface.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.ABSTRACT)
+              .addModifiers(CModifier.INTERFACE)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -882,7 +1018,7 @@ public abstract class CDriverContract
     new FullVerifications()
     {{
       receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
-      this.times = 2;
+      this.times = 3;
     }};
   }
 
@@ -928,11 +1064,24 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBytecodeVersionChanged.of(
-          CLASS_NAME_X,
-          HashSet.empty(),
-          53,
-          51));
+        CChangeClassBytecodeVersionChanged.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(51)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -960,15 +1109,49 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameEnum.of(
-          CLASS_NAME_X,
-          HashSet.of(CModifier.FINAL)));
+        CChangeClassBecameEnum.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.FINAL)
+              .addModifiers(CModifier.ENUM)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
 
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameFinal.of(
-          CLASS_NAME_X,
-          HashSet.of(CModifier.FINAL)));
+        CChangeClassBecameFinal.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.FINAL)
+              .addModifiers(CModifier.ENUM)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
 
       receiver.onChange(
         (CChangeCheckType) this.any,
@@ -1011,9 +1194,26 @@ public abstract class CDriverContract
 
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassStaticInitializerAdded.of(
-          CLASS_NAME_X,
-          HashSet.of(CModifier.FINAL)));
+        CChangeClassStaticInitializerAdded.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.FINAL)
+              .addModifiers(CModifier.ENUM)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -1041,15 +1241,49 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameNonEnum.of(
-          CLASS_NAME_X,
-          HashSet.empty()));
+        CChangeClassBecameNonEnum.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.FINAL)
+              .addModifiers(CModifier.ENUM)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
 
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameNonFinal.of(
-          CLASS_NAME_X,
-          HashSet.empty()));
+        CChangeClassBecameNonFinal.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.FINAL)
+              .addModifiers(CModifier.ENUM)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
 
       receiver.onChange(
         (CChangeCheckType) this.any,
@@ -1116,9 +1350,25 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameFinal.of(
-          CLASS_NAME_X,
-          HashSet.of(CModifier.FINAL)));
+        CChangeClassBecameFinal.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.FINAL)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -1146,9 +1396,25 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameNonFinal.of(
-          CLASS_NAME_X,
-          HashSet.empty()));
+        CChangeClassBecameNonFinal.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.FINAL)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -1176,9 +1442,25 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameAbstract.of(
-          CLASS_NAME_X,
-          HashSet.of(CModifier.ABSTRACT)));
+        CChangeClassBecameAbstract.builder()
+        .setClassPrevious(
+          CClass.builder()
+            .setAccessibility(CAccessibility.PUBLIC)
+            .setBytecodeVersion(53)
+            .setModule(module0)
+            .setName(CLASS_NAME_X)
+            .setNode(anyClass())
+            .build())
+        .setClassValue(
+          CClass.builder()
+            .setAccessibility(CAccessibility.PUBLIC)
+            .addModifiers(CModifier.ABSTRACT)
+            .setBytecodeVersion(53)
+            .setModule(module1)
+            .setName(CLASS_NAME_X)
+            .setNode(anyClass())
+            .build())
+        .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -1206,9 +1488,25 @@ public abstract class CDriverContract
     {{
       receiver.onChange(
         (CChangeCheckType) this.any,
-        CChangeClassBecameNonAbstract.of(
-          CLASS_NAME_X,
-          HashSet.empty()));
+        CChangeClassBecameNonAbstract.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.ABSTRACT)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -1848,7 +2146,7 @@ public abstract class CDriverContract
           .setField(
             CField.builder()
               .setAccessibility(CAccessibility.PROTECTED)
-              .setClassName(CClassName.of("x.y.z", "x.y.z.p", "Y"))
+              .setClassName(CLASS_NAME_Y)
               .setModifiers(HashSet.empty())
               .setType("int")
               .setName("x")
@@ -2315,8 +2613,20 @@ public abstract class CDriverContract
       receiver.onChange(
         (CChangeCheckType) this.any,
         CChangeClassStaticInitializerAdded.of(
-          CClassName.of("x", "x", "T"),
-          HashSet.empty()));
+          CClass.builder()
+            .setAccessibility(CAccessibility.PUBLIC)
+            .setBytecodeVersion(53)
+            .setModule(module0)
+            .setName(CClassName.of("x", "x", "T"))
+            .setNode(anyClass())
+            .build(),
+          CClass.builder()
+            .setAccessibility(CAccessibility.PUBLIC)
+            .setBytecodeVersion(53)
+            .setModule(module1)
+            .setName(CClassName.of("x", "x", "T"))
+            .setNode(anyClass())
+            .build()));
 
       receiver.onChange(
         (CChangeCheckType) this.any,

@@ -20,6 +20,7 @@ import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
+import org.objectweb.asm.tree.ClassNode;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -78,5 +79,33 @@ public final class CClasses
     }
 
     return supers;
+  }
+
+  /**
+   * Create a class from the given name and class node.
+   *
+   * @param name   The name
+   * @param module The module containing the class
+   * @param node   The class node
+   *
+   * @return A class
+   */
+
+  public static CClass classOf(
+    final CClassName name,
+    final CModuleType module,
+    final ClassNode node)
+  {
+    NullCheck.notNull(name, "Name");
+    NullCheck.notNull(module, "Module");
+    NullCheck.notNull(node, "Node");
+
+    return CClass.of(
+      name,
+      node,
+      module,
+      CClassModifiers.classModifiers(node),
+      CClassModifiers.classAccessibility(node),
+      node.version);
   }
 }

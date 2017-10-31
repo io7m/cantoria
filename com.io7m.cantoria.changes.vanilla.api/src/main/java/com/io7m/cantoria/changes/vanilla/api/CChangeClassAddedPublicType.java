@@ -16,14 +16,12 @@
 
 package com.io7m.cantoria.changes.vanilla.api;
 
-import com.io7m.cantoria.api.CClassName;
+import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CImmutableStyleType;
-import com.io7m.cantoria.api.CModifier;
 import com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility;
 import com.io7m.cantoria.changes.spi.CChangeClassType;
 import com.io7m.cantoria.changes.spi.CChangeSemanticVersioning;
 import com.io7m.cantoria.changes.spi.CChangeSourceCompatibility;
-import io.vavr.collection.Set;
 import org.immutables.value.Value;
 import org.immutables.vavr.encodings.VavrEncodingEnabled;
 
@@ -49,11 +47,7 @@ public interface CChangeClassAddedPublicType
 {
   @Override
   @Value.Parameter
-  CClassName className();
-
-  @Override
-  @Value.Parameter
-  Set<CModifier> modifiers();
+  CClass classValue();
 
   @Override
   default CChangeSemanticVersioning semanticVersioning()

@@ -18,10 +18,10 @@ package com.io7m.cantoria.changes.vanilla;
 
 import com.io7m.cantoria.api.CAccessibility;
 import com.io7m.cantoria.api.CClass;
-import com.io7m.cantoria.api.CClassModifiers;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CConstructors;
 import com.io7m.cantoria.api.CMethod;
+import com.io7m.cantoria.api.CModifier;
 import com.io7m.cantoria.changes.spi.CChangeReceiverType;
 import com.io7m.cantoria.changes.spi.CMethodCheckAdditionType;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassConstructorAdded;
@@ -85,7 +85,7 @@ public final class CMethodAddedToClass implements CMethodCheckAdditionType
      * Ignore interface types and private methods.
      */
 
-    if (CClassModifiers.classIsInterface(class_old.node())) {
+    if (class_new.modifiers().contains(CModifier.INTERFACE)) {
       return;
     }
 
@@ -96,9 +96,10 @@ public final class CMethodAddedToClass implements CMethodCheckAdditionType
     if (method.isStaticInitializer()) {
       receiver.onChange(
         this,
-        CChangeClassStaticInitializerAdded.of(
-          class_new.name(),
-          CClassModifiers.classModifiers(class_new.node())));
+        CChangeClassStaticInitializerAdded.builder()
+          .setClassPrevious(class_old)
+          .setClassValue(class_new)
+          .build());
       return;
     }
 
