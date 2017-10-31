@@ -19,7 +19,6 @@ package com.io7m.cantoria.changes.vanilla.api;
 import com.io7m.cantoria.api.CClassName;
 import com.io7m.cantoria.api.CImmutableStyleType;
 import com.io7m.cantoria.api.CMethod;
-import com.io7m.cantoria.api.CModifier;
 import com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility;
 import com.io7m.cantoria.changes.spi.CChangeMethodType;
 import com.io7m.cantoria.changes.spi.CChangeSemanticVersioning;

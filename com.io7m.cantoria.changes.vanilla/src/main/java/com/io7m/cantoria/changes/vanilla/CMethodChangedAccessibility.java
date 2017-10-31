@@ -21,8 +21,6 @@ import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CMethod;
 import com.io7m.cantoria.changes.spi.CChangeReceiverType;
 import com.io7m.cantoria.changes.spi.CMethodOverloadComparatorType;
-import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldBecameLessAccessible;
-import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldBecameMoreAccessible;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameLessAccessible;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameMoreAccessible;
 import io.vavr.collection.List;
