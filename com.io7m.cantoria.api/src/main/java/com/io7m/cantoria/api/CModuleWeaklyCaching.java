@@ -109,6 +109,7 @@ public final class CModuleWeaklyCaching implements CModuleType
 
     final Optional<CClass> clazz_opt =
       this.module.classValue(package_name, class_name);
+
     return clazz_opt.map(clazz -> {
       this.cache.put(qual, clazz);
       return clazz;

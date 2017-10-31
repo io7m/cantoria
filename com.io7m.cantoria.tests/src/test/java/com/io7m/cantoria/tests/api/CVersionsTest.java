@@ -70,4 +70,20 @@ public final class CVersionsTest
       CVersion.of(1, 0, 0, ""),
       CVersions.parseNullable("1"));
   }
+
+  @Test
+  public void testZero()
+  {
+    Assertions.assertEquals(
+      CVersion.of(0, 0, 0, ""),
+      CVersions.parseNullable(null));
+  }
+
+  @Test
+  public void testShow()
+  {
+    Assertions.assertEquals(
+      "1.2.3-BETA1",
+      CVersions.showVersion(CVersion.of(1, 2, 3, "BETA1")));
+  }
 }

@@ -68,58 +68,6 @@ public final class CClassNames
   }
 
   /**
-   * Parse a fully-qualified slashed class name into a package name and class
-   * name.
-   *
-   * @param module_name The name of the module
-   * @param name        The fully-qualified class name (of the form {@code
-   *                    a/b/C}).
-   *
-   * @return A pair consisting of a package name and class name
-   */
-
-  public static CClassName parseFullyQualifiedDottedWithModule(
-    final String module_name,
-    final String name)
-  {
-    final Tuple2<String, String> p = parseFullyQualifiedDotted(name);
-    return CClassName.of(module_name, p._1, p._2);
-  }
-
-  /**
-   * Parse a fully-qualified slashed class name into a package name and class
-   * name.
-   *
-   * @param name The fully-qualified class name (of the form {@code a/b/C}).
-   *
-   * @return A pair consisting of a package name and class name
-   */
-
-  public static Tuple2<String, String> parseFullyQualifiedSlashed(
-    final String name)
-  {
-    return parseFullyQualifiedDotted(toDottedName(name));
-  }
-
-  /**
-   * Parse a fully-qualified slashed class name into a package name and class
-   * name.
-   *
-   * @param module_name The name of the module
-   * @param name        The fully-qualified class name (of the form {@code
-   *                    a/b/C}).
-   *
-   * @return A pair consisting of a package name and class name
-   */
-
-  public static CClassName parseFullyQualifiedSlashedWithModule(
-    final String module_name,
-    final String name)
-  {
-    return parseFullyQualifiedDottedWithModule(module_name, toDottedName(name));
-  }
-
-  /**
    * Transform a class name from {@code a/b/c} form to {@code a.b.c} form.
    *
    * @param name The class name

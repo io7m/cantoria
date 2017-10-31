@@ -14,13 +14,17 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.cantoria.tests.api;
 
+import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CModuleType;
+import com.io7m.cantoria.api.CModuleWeaklyCaching;
 import com.io7m.cantoria.api.CModules;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.util.Optional;
 
 public final class CModulesTest
 {
@@ -29,7 +33,41 @@ public final class CModulesTest
     throws Exception
   {
     try (CModuleType m = CModules.openPlatformModule("java.base")) {
-      Assertions.assertEquals("java.base", m.descriptor().name());
+      checkBase(m);
+    }
+  }
+
+  private static void checkBase(final CModuleType m)
+    throws IOException
+  {
+    Assertions.assertEquals("java.base", m.descriptor().name());
+    Assertions.assertFalse(m.isClosed());
+    Assertions.assertFalse(m.archive().isClosed());
+
+    {
+      final Optional<CClass> object_opt =
+        m.classValue("java.lang", "Object");
+      final CClass object = object_opt.get();
+      Assertions.assertEquals("Object", object.name().className());
+      Assertions.assertEquals("java.lang", object.name().packageName());
+    }
+
+    {
+      final Optional<CClass> object_opt =
+        m.classValue("java.lang", "Object");
+      final CClass object = object_opt.get();
+      Assertions.assertEquals("Object", object.name().className());
+      Assertions.assertEquals("java.lang", object.name().packageName());
+    }
+  }
+
+  @Test
+  public void testJavaBaseWeaklyCached()
+    throws Exception
+  {
+    try (CModuleType m = CModuleWeaklyCaching.wrap(
+      CModules.openPlatformModule("java.base"))) {
+      checkBase(m);
     }
   }
 
