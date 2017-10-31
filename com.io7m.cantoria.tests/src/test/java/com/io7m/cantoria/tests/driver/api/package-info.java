@@ -14,29 +14,10 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Driver API tests
+ */
 
-package com.io7m.cantoria.tests.core;
+@com.io7m.jnull.NonNullByDefault
+package com.io7m.cantoria.tests.driver.api;
 
-import com.io7m.cantoria.api.CModuleType;
-import com.io7m.cantoria.api.CModules;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-public final class CModulesTest
-{
-  @Test
-  public void testJavaBase()
-    throws Exception
-  {
-    try (CModuleType m = CModules.openPlatformModule("java.base")) {
-      Assertions.assertEquals("java.base", m.descriptor().name());
-    }
-  }
-
-  @Test
-  public void testPlatformModules()
-    throws Exception
-  {
-    Assertions.assertTrue(CModules.listPlatformModules().contains("java.base"));
-  }
-}

@@ -14,30 +14,22 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.tests.core;
+package com.io7m.cantoria.tests.driver;
 
-import com.io7m.cantoria.changes.spi.CChangeCheckType;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.io7m.cantoria.driver.api.CComparisonDriverProviderType;
+import com.io7m.cantoria.driver.api.CComparisonDriverType;
+import com.io7m.cantoria.tests.driver.api.CDriverContract;
 
 import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
-public final class CChangeCheckTest
+public final class CDriverTest extends CDriverContract
 {
-  private static final Logger LOG =
-    LoggerFactory.getLogger(CChangeCheckTest.class);
-
-  @Test
-  public void testAll()
+  @Override
+  protected CComparisonDriverType driver()
   {
-    ServiceLoader.load(CChangeCheckType.class).forEach(ch -> {
-      LOG.info(
-        "check: {}: {} ({})",
-        ch.name(),
-        ch.description(),
-        ch.jlsReferences().collect(Collectors.joining(", ")));
-    });
+    return ServiceLoader.load(CComparisonDriverProviderType.class)
+      .findFirst()
+      .get()
+      .create();
   }
 }

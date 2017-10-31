@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.tests.core;
+package com.io7m.cantoria.tests.changes.spi;
 
 import com.io7m.cantoria.api.CClassRegistry;
 import com.io7m.cantoria.api.CClassRegistryType;
@@ -25,6 +25,7 @@ import com.io7m.cantoria.changes.spi.CChangeCheckType;
 import com.io7m.cantoria.changes.spi.CChangeDescriberType;
 import com.io7m.cantoria.changes.spi.CChangeType;
 import com.io7m.cantoria.driver.CModuleComparisons;
+import com.io7m.cantoria.tests.CTestUtilities;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.nio.file.NoSuchFileException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -89,8 +91,13 @@ public final class CChangeDescriberTest
   private static List<String> listComparisonModules()
     throws IOException
   {
-    final URL url =
-      CChangeDescriberTest.class.getResource("/com/io7m/cantoria/tests/core");
+    final String path = "/com/io7m/cantoria/tests/driver/api";
+
+    final URL url = CChangeDescriberTest.class.getResource(path);
+    if (url == null) {
+      throw new NoSuchFileException(
+        path);
+    }
 
     final List<String> lines;
     try (InputStream stream = url.openStream()) {

@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.tests.core;
+package com.io7m.cantoria.tests.api;
 
 import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CClassRegistry;
@@ -22,11 +22,12 @@ import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CClasses;
 import com.io7m.cantoria.api.CModuleType;
 import com.io7m.cantoria.api.CModules;
+import com.io7m.cantoria.tests.CTestUtilities;
 import io.vavr.collection.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public final class CClassComparisonsTest
+public final class CClassesTest
 {
   private static CClassRegistryType classRegistry(
     final List<CModuleType> modules)

@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.tests.core;
+package com.io7m.cantoria.tests;
 
 import com.io7m.cantoria.api.CModuleType;
 import com.io7m.cantoria.api.CModules;
@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.zip.ZipFile;
 
@@ -47,8 +48,14 @@ public final class CTestUtilities
     LOG.debug("copying {} to {}", name, f);
 
     try (OutputStream out = Files.newOutputStream(f)) {
-      final URL url =
-        CModuleComparisonsTest.class.getResource(name + "/module.jar");
+      final String path =
+        "/com/io7m/cantoria/tests/driver/api/" + name + "/module.jar";
+      final URL url = CTestUtilities.class.getResource(path);
+
+      if (url == null) {
+        throw new NoSuchFileException(path);
+      }
+
       try (InputStream in = url.openStream()) {
         final byte[] buffer = new byte[8192];
         while (true) {

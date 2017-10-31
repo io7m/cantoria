@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.tests.core;
+package com.io7m.cantoria.tests.api;
 
 import com.io7m.cantoria.api.CVersion;
 import com.io7m.cantoria.api.CVersions;

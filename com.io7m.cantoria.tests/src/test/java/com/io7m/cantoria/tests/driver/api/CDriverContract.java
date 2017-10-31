@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.tests.core;
+package com.io7m.cantoria.tests.driver.api;
 
 import com.io7m.cantoria.api.CAccessibility;
 import com.io7m.cantoria.api.CClass;
@@ -95,7 +95,8 @@ import com.io7m.cantoria.changes.vanilla.api.CChangeModulePackageUnqualifiedOpen
 import com.io7m.cantoria.changes.vanilla.api.CChangeModuleRequired;
 import com.io7m.cantoria.changes.vanilla.api.CChangeModuleServiceNoLongerProvided;
 import com.io7m.cantoria.changes.vanilla.api.CChangeModuleServiceProvided;
-import com.io7m.cantoria.driver.CModuleComparisons;
+import com.io7m.cantoria.driver.api.CComparisonDriverType;
+import com.io7m.cantoria.tests.CTestUtilities;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
@@ -109,7 +110,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 import java.io.IOException;
 
-public final class CModuleComparisonsTest
+public abstract class CDriverContract
 {
   private static final CClassName CLASS_NAME_X =
     CClassName.of("x.y.z", "x.y.z.p", "X");
@@ -137,8 +138,10 @@ public final class CModuleComparisonsTest
       Opcodes.ACC_PUBLIC, field_name, field_desc, null, null);
   }
 
+  protected abstract CComparisonDriverType driver();
+
   @Test
-  public void testModuleRequiresTransitiveAdded(
+  public final void testModuleRequiresTransitiveAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -159,7 +162,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "java.logging"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -169,7 +172,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModuleRequiresTransitiveRemoved(
+  public final void testModuleRequiresTransitiveRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -190,7 +193,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "java.logging"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -200,7 +203,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModuleRequiresRemoved(
+  public final void testModuleRequiresRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -221,7 +224,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "java.logging", false));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -231,7 +234,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModuleRequiresAdded(
+  public final void testModuleRequiresAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -252,7 +255,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "java.logging", false));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -262,7 +265,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageExportUnqualifiedRemoved(
+  public final void testModulePackageExportUnqualifiedRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -283,7 +286,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "x.y.z.p"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -293,7 +296,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageExportUnqualifiedAdded(
+  public final void testModulePackageExportUnqualifiedAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -312,7 +315,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "x.y.z.p"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -322,7 +325,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageExportQualifiedAdded(
+  public final void testModulePackageExportQualifiedAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -341,7 +344,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "x.y.z.p", "a.b.c"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -351,7 +354,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageExportQualifiedRemoved(
+  public final void testModulePackageExportQualifiedRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -370,7 +373,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "x.y.z.p", "a.b.c"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -380,7 +383,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageExportQualifiedToUnqualified(
+  public final void testModulePackageExportQualifiedToUnqualified(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -401,7 +404,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "x.y.z.p"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -411,7 +414,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageExportUnqualifiedToQualified(
+  public final void testModulePackageExportUnqualifiedToQualified(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -439,7 +442,7 @@ public final class CModuleComparisonsTest
           "a.b.c"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -449,7 +452,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageOpensUnqualifiedRemoved(
+  public final void testModulePackageOpensUnqualifiedRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -471,7 +474,7 @@ public final class CModuleComparisonsTest
           "x.y.z.p"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -481,7 +484,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageOpensUnqualifiedAdded(
+  public final void testModulePackageOpensUnqualifiedAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -500,7 +503,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "x.y.z.p"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -510,7 +513,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageOpensQualifiedAdded(
+  public final void testModulePackageOpensQualifiedAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -529,7 +532,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "x.y.z.p", "a.b.c"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -539,7 +542,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageOpensQualifiedRemoved(
+  public final void testModulePackageOpensQualifiedRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -558,7 +561,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "x.y.z.p", "a.b.c"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -568,7 +571,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageOpensQualifiedToUnqualified(
+  public final void testModulePackageOpensQualifiedToUnqualified(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -589,7 +592,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "x.y.z.p"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -599,7 +602,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModulePackageOpensUnqualifiedToQualified(
+  public final void testModulePackageOpensUnqualifiedToQualified(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -624,7 +627,7 @@ public final class CModuleComparisonsTest
           "x.y.z", "x.y.z.p", "a.b.c"));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -634,7 +637,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModuleServiceProvided(
+  public final void testModuleServiceProvided(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -654,7 +657,7 @@ public final class CModuleComparisonsTest
           CModuleProvides.of("java.io.Serializable", "x.y.z.p.X")));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -664,7 +667,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testModuleServiceNoLongerProvided(
+  public final void testModuleServiceNoLongerProvided(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -684,7 +687,7 @@ public final class CModuleComparisonsTest
           CModuleProvides.of("java.io.Serializable", "x.y.z.p.X")));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -694,7 +697,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassAdded(
+  public final void testClassAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -714,7 +717,7 @@ public final class CModuleComparisonsTest
           HashSet.empty()));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -724,7 +727,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassRemoved(
+  public final void testClassRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -744,7 +747,7 @@ public final class CModuleComparisonsTest
           HashSet.empty()));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -754,7 +757,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBecameNonPublic(
+  public final void testClassBecameNonPublic(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -774,7 +777,7 @@ public final class CModuleComparisonsTest
           HashSet.empty()));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -784,7 +787,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBecamePublic(
+  public final void testClassBecamePublic(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -804,7 +807,7 @@ public final class CModuleComparisonsTest
           HashSet.empty()));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -814,7 +817,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBecameInterface(
+  public final void testClassBecameInterface(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -839,7 +842,7 @@ public final class CModuleComparisonsTest
           HashSet.of(CModifier.ABSTRACT)));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -849,7 +852,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBecameNonInterface(
+  public final void testClassBecameNonInterface(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -874,7 +877,7 @@ public final class CModuleComparisonsTest
           HashSet.empty()));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -884,7 +887,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassRemovedNotPublic(
+  public final void testClassRemovedNotPublic(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -900,7 +903,7 @@ public final class CModuleComparisonsTest
 
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -910,7 +913,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBytecodeChanged(
+  public final void testClassBytecodeChanged(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -932,7 +935,7 @@ public final class CModuleComparisonsTest
           51));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -942,7 +945,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBecameEnum(
+  public final void testClassBecameEnum(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1013,7 +1016,7 @@ public final class CModuleComparisonsTest
           HashSet.of(CModifier.FINAL)));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1023,7 +1026,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBecameNonEnum(
+  public final void testClassBecameNonEnum(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1088,7 +1091,7 @@ public final class CModuleComparisonsTest
             .build()));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1098,7 +1101,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBecameFinal(
+  public final void testClassBecameFinal(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1118,7 +1121,7 @@ public final class CModuleComparisonsTest
           HashSet.of(CModifier.FINAL)));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1128,7 +1131,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBecameNonFinal(
+  public final void testClassBecameNonFinal(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1148,7 +1151,7 @@ public final class CModuleComparisonsTest
           HashSet.empty()));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1158,7 +1161,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBecameAbstract(
+  public final void testClassBecameAbstract(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1178,7 +1181,7 @@ public final class CModuleComparisonsTest
           HashSet.of(CModifier.ABSTRACT)));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1188,7 +1191,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testClassBecameNonAbstract(
+  public final void testClassBecameNonAbstract(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1208,7 +1211,7 @@ public final class CModuleComparisonsTest
           HashSet.empty()));
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1218,7 +1221,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodBecameNonFinal(
+  public final void testMethodBecameNonFinal(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1259,7 +1262,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1269,7 +1272,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodBecameFinal(
+  public final void testMethodBecameFinal(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1311,7 +1314,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1321,7 +1324,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodBecameNonVarArgs(
+  public final void testMethodBecameNonVarArgs(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1362,7 +1365,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1372,7 +1375,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodBecameVarArgs(
+  public final void testMethodBecameVarArgs(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1413,7 +1416,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1423,7 +1426,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodPublicAdded(
+  public final void testMethodPublicAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1453,7 +1456,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1463,7 +1466,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodPublicRemoved(
+  public final void testMethodPublicRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1493,7 +1496,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1503,7 +1506,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodPrivateAdded(
+  public final void testMethodPrivateAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1519,7 +1522,7 @@ public final class CModuleComparisonsTest
 
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1529,7 +1532,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodPrivateRemoved(
+  public final void testMethodPrivateRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1545,7 +1548,7 @@ public final class CModuleComparisonsTest
 
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1555,7 +1558,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodAddedExceptions(
+  public final void testMethodAddedExceptions(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1596,7 +1599,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1606,7 +1609,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodRemovedExceptions(
+  public final void testMethodRemovedExceptions(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1647,7 +1650,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1657,7 +1660,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodOverloadAdded(
+  public final void testMethodOverloadAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1687,7 +1690,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1697,7 +1700,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodOverloadRemoved(
+  public final void testMethodOverloadRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1727,7 +1730,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1737,7 +1740,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodOverrideBecameLessAccessible(
+  public final void testMethodOverrideBecameLessAccessible(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1778,7 +1781,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1788,7 +1791,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldPublicRemoved(
+  public final void testFieldPublicRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1816,7 +1819,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1826,7 +1829,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldMovedToSuperclass(
+  public final void testFieldMovedToSuperclass(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1863,7 +1866,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1873,7 +1876,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldBecameLessAccessible0(
+  public final void testFieldBecameLessAccessible0(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1910,7 +1913,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1920,7 +1923,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldBecameLessAccessible1(
+  public final void testFieldBecameLessAccessible1(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -1957,7 +1960,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -1967,7 +1970,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldBecameStatic(
+  public final void testFieldBecameStatic(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2004,7 +2007,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2014,7 +2017,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldBecameNonStatic(
+  public final void testFieldBecameNonStatic(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2051,7 +2054,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2061,7 +2064,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldBecameFinal(
+  public final void testFieldBecameFinal(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2098,7 +2101,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2108,7 +2111,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldBecameNonFinal(
+  public final void testFieldBecameNonFinal(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2145,7 +2148,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2155,7 +2158,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldBecameMoreAccessible0(
+  public final void testFieldBecameMoreAccessible0(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2192,7 +2195,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2202,7 +2205,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldBecameMoreAccessible1(
+  public final void testFieldBecameMoreAccessible1(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2239,7 +2242,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2249,7 +2252,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldChangedType(
+  public final void testFieldChangedType(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2286,7 +2289,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2296,7 +2299,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldOverrideChangedStatic(
+  public final void testFieldOverrideChangedStatic(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2339,7 +2342,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2349,7 +2352,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testFieldOverrideBecameLessAccessible(
+  public final void testFieldOverrideBecameLessAccessible(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2386,7 +2389,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2396,7 +2399,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testInterfaceMethodAbstractAdded(
+  public final void testInterfaceMethodAbstractAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2426,7 +2429,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2436,7 +2439,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testInterfaceMethodAbstractRemoved(
+  public final void testInterfaceMethodAbstractRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2466,7 +2469,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2476,7 +2479,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testInterfaceMethodDefaultAdded(
+  public final void testInterfaceMethodDefaultAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2506,7 +2509,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2516,7 +2519,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testInterfaceMethodDefaultRemoved(
+  public final void testInterfaceMethodDefaultRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2546,7 +2549,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2556,7 +2559,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testInterfaceMethodStaticAdded(
+  public final void testInterfaceMethodStaticAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2586,7 +2589,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2596,7 +2599,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testInterfaceMethodStaticRemoved(
+  public final void testInterfaceMethodStaticRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2626,7 +2629,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2636,7 +2639,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testConstructorAdded(
+  public final void testConstructorAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2683,7 +2686,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2693,7 +2696,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testConstructorAddedOverload(
+  public final void testConstructorAddedOverload(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2724,7 +2727,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2734,7 +2737,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testConstructorRemoved(
+  public final void testConstructorRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2781,7 +2784,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2791,7 +2794,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testConstructorRemovedOverload(
+  public final void testConstructorRemovedOverload(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2822,7 +2825,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2832,7 +2835,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testEnumMemberAdded(
+  public final void testEnumMemberAdded(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2870,7 +2873,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2880,7 +2883,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testEnumMemberRemoved(
+  public final void testEnumMemberRemoved(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2918,7 +2921,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
@@ -2928,7 +2931,7 @@ public final class CModuleComparisonsTest
   }
 
   @Test
-  public void testMethodBecameLessAccessible0(
+  public final void testMethodBecameLessAccessible0(
     final @Mocked CChangeReceiverType receiver)
     throws Exception
   {
@@ -2965,7 +2968,7 @@ public final class CModuleComparisonsTest
           .build());
     }};
 
-    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+    this.driver().compareModules(receiver, er, module0, module1);
 
     new FullVerifications()
     {{
