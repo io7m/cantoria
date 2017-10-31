@@ -31,6 +31,12 @@ import org.objectweb.asm.tree.FieldNode;
 public interface CFieldType
 {
   /**
+   * Obtain the node used to construct the field. This value should be
+   * considered strictly informative; {@link FieldNode} values are mutable and
+   * therefore code should not depend on the data contained within the node in
+   * any form. Use the other methods defined on the {@link CFieldType} to
+   * perform checks instead.
+   *
    * @return The node that was used to construct the field value
    */
 

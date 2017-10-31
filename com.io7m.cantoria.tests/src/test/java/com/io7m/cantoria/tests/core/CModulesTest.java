@@ -22,6 +22,9 @@ import com.io7m.cantoria.api.CModules;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 public final class CModulesTest
 {
   @Test

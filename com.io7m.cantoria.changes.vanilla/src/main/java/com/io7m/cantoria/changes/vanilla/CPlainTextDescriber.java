@@ -60,6 +60,8 @@ import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldRemovedPublic;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldTypeChanged;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodAdded;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameFinal;
+import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameLessAccessible;
+import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameMoreAccessible;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameNonFinal;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameNonVarArgs;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameVarArgs;
@@ -208,6 +210,12 @@ public final class CPlainTextDescriber implements CChangeDescriberType
       CChangeClassMethodAdded.class,
       CPlainTextDescriber::onClassMethodAdded);
     this.add(
+      CChangeClassMethodBecameLessAccessible.class,
+      CPlainTextDescriber::onClassMethodBecameLessAccessible);
+    this.add(
+      CChangeClassMethodBecameMoreAccessible.class,
+      CPlainTextDescriber::onClassMethodBecameMoreAccessible);
+    this.add(
       CChangeClassMethodBecameFinal.class,
       CPlainTextDescriber::onClassMethodBecameFinal);
     this.add(
@@ -316,6 +324,40 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     this.add(
       CChangeModuleServiceProvided.class,
       CPlainTextDescriber::onModuleServiceProvided);
+  }
+
+  private static void onClassMethodBecameLessAccessible(
+    final BufferedWriter w,
+    final CChangeType c)
+    throws IOException
+  {
+    final CChangeClassMethodBecameLessAccessible cc =
+      (CChangeClassMethodBecameLessAccessible) c;
+
+    w.append(fieldStart("Change"));
+    w.append("A method became less accessible");
+    w.newLine();
+
+    w.append(fieldStart("Previous method"));
+    w.append(CMethods.show(cc.methodPrevious()));
+    w.newLine();
+  }
+
+  private static void onClassMethodBecameMoreAccessible(
+    final BufferedWriter w,
+    final CChangeType c)
+    throws IOException
+  {
+    final CChangeClassMethodBecameMoreAccessible cc =
+      (CChangeClassMethodBecameMoreAccessible) c;
+
+    w.append(fieldStart("Change"));
+    w.append("A method became more accessible");
+    w.newLine();
+
+    w.append(fieldStart("Previous method"));
+    w.append(CMethods.show(cc.methodPrevious()));
+    w.newLine();
   }
 
   private static void onClassBecameEnum(

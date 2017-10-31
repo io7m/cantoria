@@ -62,6 +62,7 @@ import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldRemovedPublic;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldTypeChanged;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodAdded;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameFinal;
+import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameLessAccessible;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameNonFinal;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameNonVarArgs;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameVarArgs;
@@ -2913,6 +2914,53 @@ public final class CModuleComparisonsTest
             CEnum.builder()
               .setClassValue(class1)
               .setMembers(HashMap.empty())
+              .build())
+          .build());
+    }};
+
+    CModuleComparisons.create().compareModules(receiver, er, module0, module1);
+
+    new FullVerifications()
+    {{
+      receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
+      this.times = 1;
+    }};
+  }
+
+  @Test
+  public void testMethodBecameLessAccessible0(
+    final @Mocked CChangeReceiverType receiver)
+    throws Exception
+  {
+    final CModuleType module0 =
+      CTestUtilities.module("method_became_less_accessible/before");
+    final CModuleType module1 =
+      CTestUtilities.module("method_became_less_accessible/after");
+
+    final CClassRegistryType er = classRegistry(module0, module1);
+
+    new Expectations()
+    {{
+      receiver.onChange(
+        (CChangeCheckType) this.any,
+        CChangeClassMethodBecameLessAccessible.builder()
+          .setMethodPrevious(
+            CMethod.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setClassName(CLASS_NAME_X)
+              .setModifiers(HashSet.empty())
+              .setReturnType("void")
+              .setName("f")
+              .setNode(anyMethod())
+              .build())
+          .setMethod(
+            CMethod.builder()
+              .setAccessibility(CAccessibility.PROTECTED)
+              .setClassName(CLASS_NAME_X)
+              .setModifiers(HashSet.empty())
+              .setReturnType("void")
+              .setName("f")
+              .setNode(anyMethod())
               .build())
           .build());
     }};

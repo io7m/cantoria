@@ -21,6 +21,10 @@ import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CMethod;
 import com.io7m.cantoria.changes.spi.CChangeReceiverType;
 import com.io7m.cantoria.changes.spi.CMethodOverloadComparatorType;
+import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldBecameLessAccessible;
+import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldBecameMoreAccessible;
+import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameLessAccessible;
+import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameMoreAccessible;
 import io.vavr.collection.List;
 
 /**
@@ -48,7 +52,26 @@ public final class CMethodChangedAccessibility
     final CClass class_new,
     final CMethod method_new)
   {
-    // TODO: Unimplemented code
+    final int new_access = method_new.accessibility().accessibility();
+    final int old_access = method_old.accessibility().accessibility();
+
+    if (new_access > old_access) {
+      receiver.onChange(
+        this,
+        CChangeClassMethodBecameMoreAccessible.builder()
+          .setMethodPrevious(method_old)
+          .setMethod(method_new)
+          .build());
+    }
+
+    if (new_access < old_access) {
+      receiver.onChange(
+        this,
+        CChangeClassMethodBecameLessAccessible.builder()
+          .setMethodPrevious(method_old)
+          .setMethod(method_new)
+          .build());
+    }
   }
 
   @Override

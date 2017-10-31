@@ -34,6 +34,12 @@ import java.util.Objects;
 public interface CMethodType
 {
   /**
+   * Obtain the node used to construct the method. This value should be
+   * considered strictly informative; {@link MethodNode} values are mutable and
+   * therefore code should not depend on the data contained within the node in
+   * any form. Use the other methods defined on the {@link CMethodType} to
+   * perform checks instead.
+   *
    * @return The node that was used to construct the method value
    */
 
