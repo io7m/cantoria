@@ -16,6 +16,7 @@
 
 package com.io7m.cantoria.api;
 
+import com.io7m.jaffirm.core.Invariants;
 import com.io7m.jnull.NullCheck;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
@@ -140,5 +141,16 @@ public final class CClassRegistry implements CClassRegistryType
     } catch (final UncheckedIOException e) {
       throw e.getCause();
     }
+  }
+
+  @Override
+  public CClass javaLangObject()
+    throws IOException
+  {
+    final Optional<CClass> opt =
+      this.findClass("java.lang", "Object");
+    Invariants.checkInvariant(
+      opt.isPresent(), "java.lang.Object must be present");
+    return opt.get();
   }
 }

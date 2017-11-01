@@ -20,9 +20,11 @@ import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 
 /**
@@ -107,5 +109,25 @@ public final class CClasses
       CClassModifiers.classModifiers(node),
       CClassModifiers.classAccessibility(node),
       node.version);
+  }
+
+  /**
+   * Parse a class node from the given stream.
+   *
+   * @param stream The stream
+   *
+   * @return A class node
+   *
+   * @throws IOException On I/O or parse errors
+   */
+
+  public static ClassNode classNodeFromStream(
+    final InputStream stream)
+    throws IOException
+  {
+    final ClassReader reader_new = new ClassReader(stream);
+    final ClassNode class_node_new = new ClassNode();
+    reader_new.accept(class_node_new, 0);
+    return class_node_new;
   }
 }

@@ -21,7 +21,6 @@ import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.SortedSet;
 import io.vavr.collection.TreeSet;
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.ModuleNode;
 import org.slf4j.Logger;
@@ -185,16 +184,6 @@ public final class CModules
         module_node,
         module_desc);
     }
-  }
-
-  private static ClassNode loadClassNodeFromStream(
-    final InputStream stream)
-    throws IOException
-  {
-    final ClassReader reader_new = new ClassReader(stream);
-    final ClassNode class_node_new = new ClassNode();
-    reader_new.accept(class_node_new, 0);
-    return class_node_new;
   }
 
   private static final class ZipArchive implements CArchiveType
@@ -371,7 +360,7 @@ public final class CModules
 
       if (opt_stream.isPresent()) {
         try (InputStream stream = opt_stream.get()) {
-          final ClassNode node = loadClassNodeFromStream(stream);
+          final ClassNode node = CClasses.classNodeFromStream(stream);
           final CClassName name =
             CClassName.of(this.module_desc.name(), package_name, class_name);
           return Optional.of(CClasses.classOf(name, this, node));
@@ -507,7 +496,7 @@ public final class CModules
 
       if (opt_stream.isPresent()) {
         try (InputStream stream = opt_stream.get()) {
-          final ClassNode node = loadClassNodeFromStream(stream);
+          final ClassNode node = CClasses.classNodeFromStream(stream);
           final CClassName name =
             CClassName.of(this.module_desc.name(), package_name, class_name);
           return Optional.of(CClasses.classOf(name, this, node));

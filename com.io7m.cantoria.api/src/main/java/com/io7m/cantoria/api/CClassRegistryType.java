@@ -58,4 +58,13 @@ public interface CClassRegistryType
     String package_name,
     String class_name)
     throws IOException;
+
+  /**
+   * @return A reference to {@code java.lang.Object}
+   *
+   * @throws IOException On I/O errors
+   */
+
+  CClass javaLangObject()
+    throws IOException;
 }
