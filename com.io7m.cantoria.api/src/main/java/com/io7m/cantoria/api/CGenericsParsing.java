@@ -14,14 +14,8 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.api.generics;
+package com.io7m.cantoria.api;
 
-import com.io7m.cantoria.api.CClass;
-import com.io7m.cantoria.api.CClassName;
-import com.io7m.cantoria.api.CClassNames;
-import com.io7m.cantoria.api.CClassRegistryType;
-import com.io7m.cantoria.api.CImmutableStyleType;
-import com.io7m.cantoria.api.CShowJavaType;
 import com.io7m.jaffirm.core.Invariants;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jnull.NullCheck;
@@ -29,8 +23,6 @@ import com.io7m.junreachable.UnimplementedCodeException;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
-import org.immutables.value.Value;
-import org.immutables.vavr.encodings.VavrEncodingEnabled;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.signature.SignatureReader;
 import org.objectweb.asm.signature.SignatureVisitor;
@@ -41,27 +33,16 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static com.io7m.cantoria.api.generics.CGenerics.CReferenceType.Kind.REFERENCE_ARRAY;
-import static com.io7m.cantoria.api.generics.CGenerics.CReferenceType.Kind.REFERENCE_CLASS;
-import static com.io7m.cantoria.api.generics.CGenerics.CReferenceType.Kind.REFERENCE_VARIABLE;
-import static com.io7m.cantoria.api.generics.CGenerics.CTypeArgumentType.Kind.TYPE_ARGUMENT_REFERENCE;
-import static com.io7m.cantoria.api.generics.CGenerics.CTypeArgumentType.Kind.TYPE_ARGUMENT_WILDCARD;
-import static com.io7m.cantoria.api.generics.CGenerics.CTypeBoundType.Kind.BOUND_CLASS;
-import static com.io7m.cantoria.api.generics.CGenerics.CTypeBoundType.Kind.BOUND_VARIABLE;
-import static com.io7m.cantoria.api.generics.CGenerics.CWildcardType.Kind.WILDCARD_EXTENDS;
-import static com.io7m.cantoria.api.generics.CGenerics.CWildcardType.Kind.WILDCARD_SUPER;
 
 /**
  * Functions for processing generic type parameters.
  */
 
-public final class CGenerics
+public final class CGenericsParsing
 {
-  private static final Logger LOG = LoggerFactory.getLogger(CGenerics.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CGenericsParsing.class);
 
-  private CGenerics()
+  private CGenericsParsing()
   {
     throw new UnreachableCodeException();
   }
@@ -76,7 +57,7 @@ public final class CGenerics
    * @return A list of type parameters
    */
 
-  public static List<CTypeParameter> parseClassGenericParameters(
+  public static List<CGTypeParameter> parseClassGenericParameters(
     final CClassRegistryType in_registry,
     final String in_signature)
   {
@@ -119,590 +100,6 @@ public final class CGenerics
   }
 
   /**
-   * A type parameter.
-   *
-   * <blockquote>A type variable is an unqualified identifier used as a type in
-   * class, interface, method, and constructor bodies.
-   *
-   * A type variable is introduced by the declaration of a type parameter of a
-   * generic class, interface, method, or constructor</blockquote>
-   *
-   * See JLS 9 §4.4
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CTypeParameterType extends CShowJavaType
-  {
-    /**
-     * @return The type parameter name
-     */
-
-    @Value.Parameter
-    String name();
-
-    /**
-     * @return The type parameter bound, if any
-     */
-
-    @Value.Parameter
-    Optional<CTypeBoundType> bound();
-
-    @Override
-    default String toJava()
-    {
-      final StringBuilder sb = new StringBuilder(64);
-      sb.append(this.name());
-      this.bound().ifPresent(b -> {
-        sb.append(" ");
-        sb.append(b.toJava());
-      });
-      return sb.toString();
-    }
-  }
-
-  /**
-   * A type bound.
-   *
-   * <blockquote>Every type variable declared as a type parameter has a bound.
-   * If no bound is declared for a type variable, Object is
-   * assumed.</blockquote>
-   *
-   * See JLS 9 §4.4
-   */
-
-  public interface CTypeBoundType extends CShowJavaType
-  {
-    /**
-     * @return The precise kind of type bound
-     */
-
-    Kind kind();
-
-    /**
-     * The different kinds of type bounds.
-     */
-
-    enum Kind
-    {
-      /**
-       * The bound is based on a variable.
-       */
-
-      BOUND_VARIABLE,
-
-      /**
-       * The bound is based on a class (or interface).
-       */
-
-      BOUND_CLASS
-    }
-  }
-
-  /**
-   * A type bound based on a variable.
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CTypeBoundVariableType extends CTypeBoundType
-  {
-    /**
-     * @return The bound type variable
-     */
-
-    @Value.Parameter
-    CTypeVariable variable();
-
-    @Override
-    default Kind kind()
-    {
-      return BOUND_VARIABLE;
-    }
-
-    @Override
-    default String toJava()
-    {
-      return new StringBuilder(64)
-        .append("extends ")
-        .append(this.variable().toJava())
-        .toString();
-    }
-  }
-
-  /**
-   * A type bound based on a class (or interface).
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CTypeBoundClassType extends CTypeBoundType
-  {
-    /**
-     * @return The bound class
-     */
-
-    @Value.Parameter
-    CGenericClass classType();
-
-    /**
-     * @return The extra bound intersection types
-     */
-
-    @Value.Parameter
-    List<CGenericClass> intersections();
-
-    @Override
-    default Kind kind()
-    {
-      return BOUND_CLASS;
-    }
-
-    @Override
-    default String toJava()
-    {
-      final StringBuilder sb = new StringBuilder(64);
-      sb.append("extends ");
-      sb.append(this.classType().toJava());
-      this.intersections().forEach(c -> {
-        sb.append(" & ");
-        sb.append(c.toJava());
-      });
-      return sb.toString();
-    }
-  }
-
-  /**
-   * A reference to a generic type.
-   *
-   * <blockquote>There are four kinds of reference types: class types (§8.1),
-   * interface types (§9.1), type variables (§4.4), and array types
-   * (§10.1).</blockquote>
-   *
-   * See JLS 9 §4.3
-   */
-
-  public interface CReferenceType extends CShowJavaType
-  {
-    /**
-     * @return The kind of reference type
-     */
-
-    Kind kind();
-
-    /**
-     * The different kinds of reference types.
-     */
-
-    enum Kind
-    {
-      /**
-       * A reference to a class (or interface)
-       */
-
-      REFERENCE_CLASS,
-
-      /**
-       * A reference to a variable
-       */
-
-      REFERENCE_VARIABLE,
-
-      /**
-       * A reference to an array
-       */
-
-      REFERENCE_ARRAY
-    }
-  }
-
-  /**
-   * A reference to a class.
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CReferenceClassType extends CReferenceType
-  {
-    /**
-     * @return The referred class
-     */
-
-    @Value.Parameter
-    CGenericClassType genericClass();
-
-    @Override
-    default Kind kind()
-    {
-      return REFERENCE_CLASS;
-    }
-
-    @Override
-    default String toJava()
-    {
-      return this.genericClass().toJava();
-    }
-  }
-
-  /**
-   * A reference to a variable.
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CReferenceVariableType extends CReferenceType
-  {
-    /**
-     * @return The referred variable
-     */
-
-    @Value.Parameter
-    CTypeVariable variable();
-
-    @Override
-    default Kind kind()
-    {
-      return REFERENCE_VARIABLE;
-    }
-
-    @Override
-    default String toJava()
-    {
-      return this.variable().toJava();
-    }
-  }
-
-  /**
-   * A reference to an array.
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CReferenceArrayType extends CReferenceType
-  {
-    /**
-     * @return The referred array
-     */
-
-    @Value.Parameter
-    CGenericArrayType array();
-
-    @Override
-    default Kind kind()
-    {
-      return REFERENCE_ARRAY;
-    }
-
-    @Override
-    default String toJava()
-    {
-      return this.array().toJava();
-    }
-  }
-
-  /**
-   * A class (or interface) type.
-   *
-   * See JLS 9 §4.3
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CGenericClassType extends CShowJavaType
-  {
-    /**
-     * @return The name of the class
-     */
-
-    @Value.Parameter
-    CClassName name();
-
-    /**
-     * @return The type arguments
-     */
-
-    @Value.Parameter
-    List<CTypeArgumentType> arguments();
-
-    @Override
-    default String toJava()
-    {
-      final StringBuilder sb = new StringBuilder(64);
-      sb.append(this.name().packageName());
-      sb.append(".");
-      sb.append(this.name().className());
-      if (!this.arguments().isEmpty()) {
-        sb.append("<");
-        sb.append(
-          this.arguments()
-            .map(CShowJavaType::toJava)
-            .collect(Collectors.joining(",")));
-        sb.append(">");
-      }
-      return sb.toString();
-    }
-  }
-
-  /**
-   * An array type.
-   *
-   * See JLS 9 §4.3
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CGenericArrayType extends CShowJavaType
-  {
-    /**
-     * @return TODO: Return something sensible
-     */
-
-    @Value.Parameter
-    Object placeholder();
-
-    @Override
-    default String toJava()
-    {
-      // TODO: Generated method stub
-      throw new UnimplementedCodeException();
-    }
-  }
-
-  /**
-   * The type of wildcards.
-   *
-   * <blockquote> Wildcards may be given explicit bounds, just like regular type
-   * variable declarations. </blockquote>
-   *
-   * See JLS 9 §4.5.1
-   */
-
-  public interface CWildcardType extends CShowJavaType
-  {
-    /**
-     * @return The kind of wildcard
-     */
-
-    Kind kind();
-
-    /**
-     * The different kind of wildcards
-     */
-
-    enum Kind
-    {
-      /**
-       * An upper bound
-       */
-
-      WILDCARD_EXTENDS,
-
-      /**
-       * A lower bound
-       */
-
-      WILDCARD_SUPER
-    }
-  }
-
-  /**
-   * A wildcard representing an upper bound.
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CWildcardExtendsType extends CWildcardType
-  {
-    /**
-     * @return The upper bound
-     */
-
-    @Value.Parameter
-    CReferenceType reference();
-
-    @Override
-    default Kind kind()
-    {
-      return WILDCARD_EXTENDS;
-    }
-
-    @Override
-    default String toJava()
-    {
-      return new StringBuilder(64)
-        .append("? extends ")
-        .append(this.reference().toJava())
-        .toString();
-    }
-  }
-
-  /**
-   * A wildcard representing a lower bound.
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CWildcardSuperType extends CWildcardType
-  {
-    /**
-     * @return The lower bound
-     */
-
-    @Value.Parameter
-    CReferenceType reference();
-
-    @Override
-    default Kind kind()
-    {
-      return WILDCARD_SUPER;
-    }
-
-    @Override
-    default String toJava()
-    {
-      return new StringBuilder(64)
-        .append("? super ")
-        .append(this.reference().toJava())
-        .toString();
-    }
-  }
-
-  /**
-   * A type variable.
-   *
-   * <blockquote>A type variable is introduced by the declaration of a type
-   * parameter of a generic class, interface, method, or constructor (§8.1.2,
-   * §9.1.2, §8.4.4, §8.8.4).</blockquote>
-   *
-   * See JLS 9 §4.4
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CTypeVariableType extends CShowJavaType
-  {
-    /**
-     * @return The name of the type variable
-     */
-
-    @Value.Parameter
-    String name();
-
-    @Override
-    default String toJava()
-    {
-      return this.name();
-    }
-  }
-
-  /**
-   * A type argument.
-   *
-   * <blockquote>Type arguments may be either reference types or wildcards.
-   * Wildcards are useful in situations where only partial knowledge about the
-   * type parameter is required.</blockquote>
-   *
-   * See JLS 9 §4.5.1
-   */
-
-  public interface CTypeArgumentType extends CShowJavaType
-  {
-    /**
-     * @return The kind of type argument
-     */
-
-    Kind kind();
-
-    /**
-     * The different kinds of type argument
-     */
-
-    enum Kind
-    {
-      /**
-       * The type argument is a reference
-       */
-
-      TYPE_ARGUMENT_REFERENCE,
-
-      /**
-       * The type argument is a wildcard
-       */
-
-      TYPE_ARGUMENT_WILDCARD
-    }
-  }
-
-  /**
-   * A reference type argument.
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CTypeArgumentReferenceType extends CTypeArgumentType
-  {
-    /**
-     * @return The type
-     */
-
-    @Value.Parameter
-    CReferenceType reference();
-
-    @Override
-    default Kind kind()
-    {
-      return TYPE_ARGUMENT_REFERENCE;
-    }
-
-    @Override
-    default String toJava()
-    {
-      return this.reference().toJava();
-    }
-  }
-
-  /**
-   * A wildcard type argument.
-   */
-
-  @CImmutableStyleType
-  @VavrEncodingEnabled
-  @Value.Immutable
-  public interface CTypeArgumentWildcardType extends CTypeArgumentType
-  {
-    /**
-     * @return The wildcard
-     */
-
-    @Value.Parameter
-    CWildcardType wildcard();
-
-    @Override
-    default Kind kind()
-    {
-      return TYPE_ARGUMENT_WILDCARD;
-    }
-
-    @Override
-    default String toJava()
-    {
-      return this.wildcard().toJava();
-    }
-  }
-
-  /**
    * A visitor that inspects superclass information. Currently unused (but
    * necessary to complete the {@link ClassGenericVisitor} implementation).
    */
@@ -740,10 +137,10 @@ public final class CGenerics
   {
     private final Logger logger;
     private final CClassRegistryType registry;
-    private final CTypeParameter.Builder parameter_builder;
+    private final CGTypeParameter.Builder parameter_builder;
     private boolean parameter_builder_clean;
     private int bound_visitors;
-    private List<CTypeParameter> completed;
+    private List<CGTypeParameter> completed;
     private String current_name;
     private ClassBoundVisitor bound_visitor;
 
@@ -762,7 +159,7 @@ public final class CGenerics
       this.registry = NullCheck.notNull(in_registry, "Registry");
       this.logger = LoggerFactory.getLogger(ClassGenericVisitor.class);
       this.completed = List.empty();
-      this.parameter_builder = CTypeParameter.builder();
+      this.parameter_builder = CGTypeParameter.builder();
       this.parameter_builder_clean = true;
       this.bound_visitors = 0;
     }
@@ -796,7 +193,7 @@ public final class CGenerics
             !this.bound_visitor.variable.isPresent(),
             "Bound must either be a class or a type variable");
 
-          final CTypeBoundClass b = CTypeBoundClass.of(
+          final CGTypeBoundClass b = CGTypeBoundClass.of(
             this.bound_visitor.class_main.get(),
             this.bound_visitor.class_intersections);
           this.parameter_builder.setBound(b);
@@ -805,12 +202,12 @@ public final class CGenerics
             this.bound_visitor.variable.isPresent(),
             "Bound must either be a class or a type variable");
 
-          final CTypeBoundVariable b =
-            CTypeBoundVariable.of(this.bound_visitor.variable.get());
+          final CGTypeBoundVariable b =
+            CGTypeBoundVariable.of(this.bound_visitor.variable.get());
           this.parameter_builder.setBound(b);
         }
 
-        final CTypeParameter p = this.parameter_builder.build();
+        final CGTypeParameter p = this.parameter_builder.build();
         this.logger.trace("completeInProgressTypeParameter: completed {}", p);
         this.completed = this.completed.append(p);
       }
@@ -834,9 +231,120 @@ public final class CGenerics
       return this.bound_visitor;
     }
 
-    public List<CTypeParameter> completed()
+    public List<CGTypeParameter> completed()
     {
       return this.completed;
+    }
+  }
+
+  private static final class ArrayVisitor extends UnreachableVisitor
+  {
+    private final Logger logger;
+    private final CClassRegistryType registry;
+    private final CGTypeArray.Builder array_builder;
+    private final CGArrayOfReference.Builder array_ref_builder;
+    private int dimensions;
+    private CClass array_class;
+    private CGGenericsType.CGArrayOfType.Kind array_kind;
+    private CGTypeVariable array_variable;
+    private CGGenericsType.CGArrayOfType array;
+
+    ArrayVisitor(
+      final CClassRegistryType in_registry)
+    {
+      this.registry = NullCheck.notNull(in_registry, "Registry");
+
+      this.array_builder = CGTypeArray.builder();
+      this.array_ref_builder = CGArrayOfReference.builder();
+      this.dimensions = 1;
+
+      this.logger = LoggerFactory.getLogger(ArrayVisitor.class);
+      this.logger.trace("created");
+    }
+
+    private static String baseTypeToName(
+      final char c)
+    {
+      switch (c) {
+        case 'B':
+          return "byte";
+        case 'C':
+          return "char";
+        case 'D':
+          return "double";
+        case 'F':
+          return "float";
+        case 'I':
+          return "integer";
+        case 'J':
+          return "long";
+        case 'S':
+          return "short";
+        case 'V':
+          return "void";
+        case 'Z':
+          return "boolean";
+        default:
+          throw new UnreachableCodeException();
+      }
+    }
+
+    @Override
+    public SignatureVisitor visitArrayType()
+    {
+      this.logger.trace("visitArrayType: {}", Integer.valueOf(this.dimensions));
+      ++this.dimensions;
+      return this;
+    }
+
+    @Override
+    public void visitTypeVariable(
+      final String name)
+    {
+      this.logger.trace("visitTypeVariable: {}", name);
+      this.array_kind =
+        CGGenericsType.CGArrayOfType.Kind.ARRAY_OF_VARIABLE;
+      this.array_variable =
+        CGTypeVariable.of(name);
+      this.array =
+        CGArrayOfVariable.of(this.array_variable, this.dimensions);
+    }
+
+    @Override
+    public void visitBaseType(
+      final char descriptor)
+    {
+      this.logger.trace("visitBaseType: {}", Character.valueOf(descriptor));
+
+      this.array_kind =
+        CGGenericsType.CGArrayOfType.Kind.ARRAY_OF_PRIMITIVE;
+      this.array =
+        CGArrayOfPrimitive.of(baseTypeToName(descriptor), this.dimensions);
+    }
+
+    @Override
+    public void visitClassType(
+      final String name)
+    {
+      this.logger.trace("visitClassType: {}", name);
+      final CClass c = lookupClass(this.registry, name);
+      this.array_kind = CGGenericsType.CGArrayOfType.Kind.ARRAY_OF_REFERENCE;
+      this.array_class = c;
+    }
+
+    @Override
+    public void visitEnd()
+    {
+      this.logger.trace("visitEnd");
+      this.logger.trace(
+        "array dimensions: {}",
+        Integer.valueOf(this.dimensions));
+    }
+
+    @Override
+    protected Logger log()
+    {
+      return this.logger;
     }
   }
 
@@ -848,21 +356,30 @@ public final class CGenerics
   {
     private final Logger logger;
     private final char wildcard;
-    private final Consumer<CTypeArgumentType> consumer;
-    private final CGenericClass.Builder class_builder;
+    private final Consumer<CGGenericsType.CGTypeArgumentType> consumer;
+    private final CGTypeClass.Builder class_builder;
     private final CClassRegistryType registry;
+    private final ArrayVisitor array_visitor;
 
     TypeArgumentVisitor(
       final CClassRegistryType in_registry,
       final char in_wildcard,
-      final Consumer<CTypeArgumentType> in_consumer)
+      final Consumer<CGGenericsType.CGTypeArgumentType> in_consumer)
     {
       this.registry = NullCheck.notNull(in_registry, "Registry");
       this.wildcard = in_wildcard;
       this.consumer = NullCheck.notNull(in_consumer, "Consumer");
-      this.class_builder = CGenericClass.builder();
+      this.class_builder = CGTypeClass.builder();
       this.logger = LoggerFactory.getLogger(TypeArgumentVisitor.class);
       this.logger.trace("created ({})", Character.valueOf(this.wildcard));
+      this.array_visitor = new ArrayVisitor(this.registry);
+    }
+
+    @Override
+    public SignatureVisitor visitArrayType()
+    {
+      this.logger.trace("visitArrayType");
+      return this.array_visitor;
     }
 
     @Override
@@ -879,8 +396,8 @@ public final class CGenerics
       final String name)
     {
       this.logger.trace("visitTypeVariable: {}", name);
-      this.consumer.accept(CTypeArgumentReference.of(
-        CReferenceVariable.of(CTypeVariable.of(name))));
+      this.consumer.accept(CGTypeArgumentReference.of(
+        CGReferenceVariable.of(CGTypeVariable.of(name))));
     }
 
     @Override
@@ -888,23 +405,23 @@ public final class CGenerics
     {
       this.logger.trace("visitEnd");
 
-      final CGenericClass clazz = this.class_builder.build();
+      final CGTypeClass clazz = this.class_builder.build();
       switch (this.wildcard) {
         case SignatureVisitor.INSTANCEOF: {
-          this.consumer.accept(CTypeArgumentReference.of(
-            CReferenceClass.of(clazz)));
+          this.consumer.accept(CGTypeArgumentReference.of(
+            CGReferenceClass.of(clazz)));
           return;
         }
 
         case SignatureVisitor.EXTENDS: {
-          this.consumer.accept(CTypeArgumentWildcard.of(
-            CWildcardExtends.of(CReferenceClass.of(clazz))));
+          this.consumer.accept(CGTypeArgumentWildcard.of(
+            CGWildcardExtends.of(CGReferenceClass.of(clazz))));
           return;
         }
 
         case SignatureVisitor.SUPER: {
-          this.consumer.accept(CTypeArgumentWildcard.of(
-            CWildcardSuper.of(CReferenceClass.of(clazz))));
+          this.consumer.accept(CGTypeArgumentWildcard.of(
+            CGWildcardSuper.of(CGReferenceClass.of(clazz))));
           return;
         }
 
@@ -921,8 +438,9 @@ public final class CGenerics
     public SignatureVisitor visitTypeArgument(
       final char in_wildcard)
     {
-      this.logger.trace("visitTypeArgument: {}",
-                        Character.valueOf(in_wildcard));
+      this.logger.trace(
+        "visitTypeArgument: {}",
+        Character.valueOf(in_wildcard));
       return new TypeArgumentVisitor(
         this.registry, in_wildcard, this.class_builder::addArguments);
     }
@@ -939,10 +457,10 @@ public final class CGenerics
       try {
         this.logger.trace("visitTypeArgument");
         this.class_builder.addArguments(
-          CTypeArgumentWildcard.of(
-            CWildcardExtends.of(
-              CReferenceClass.of(
-                CGenericClass.of(
+          CGTypeArgumentWildcard.of(
+            CGWildcardExtends.of(
+              CGReferenceClass.of(
+                CGTypeClass.of(
                   this.registry.javaLangObject().name(), List.empty())))));
       } catch (final IOException e) {
         throw new UncheckedIOException(e);
@@ -960,11 +478,11 @@ public final class CGenerics
   {
     private final Logger logger;
     private final CClassRegistryType registry;
-    private final CGenericClass.Builder class_builder;
-    private List<CGenericClass> class_intersections;
+    private final CGTypeClass.Builder class_builder;
+    private List<CGTypeClass> class_intersections;
     private CClassName class_name_last;
-    private Optional<CGenericClass> class_main;
-    private Optional<CTypeVariable> variable;
+    private Optional<CGTypeClass> class_main;
+    private Optional<CGTypeVariable> variable;
 
     ClassBoundVisitor(
       final CClassRegistryType in_registry,
@@ -977,7 +495,7 @@ public final class CGenerics
 
       this.class_main = Optional.empty();
       this.class_intersections = List.empty();
-      this.class_builder = CGenericClass.builder();
+      this.class_builder = CGTypeClass.builder();
       this.variable = Optional.empty();
       this.logger.trace("created");
     }
@@ -993,7 +511,7 @@ public final class CGenerics
     {
       this.logger.trace("visitEnd");
 
-      final CGenericClass clazz = this.class_builder.build();
+      final CGTypeClass clazz = this.class_builder.build();
       if (this.class_main.isPresent()) {
         this.logger.trace("visitEnd: saved intersection {}", clazz);
         this.class_intersections = this.class_intersections.append(clazz);
@@ -1013,10 +531,10 @@ public final class CGenerics
       try {
         this.logger.trace("visitTypeArgument");
         this.class_builder.addArguments(
-          CTypeArgumentWildcard.of(
-            CWildcardExtends.of(
-              CReferenceClass.of(
-                CGenericClass.of(
+          CGTypeArgumentWildcard.of(
+            CGWildcardExtends.of(
+              CGReferenceClass.of(
+                CGTypeClass.of(
                   this.registry.javaLangObject().name(), List.empty())))));
       } catch (final IOException e) {
         throw new UncheckedIOException(e);
@@ -1053,7 +571,7 @@ public final class CGenerics
         !this.class_main.isPresent(),
         "Type variables cannot be members of intersections");
 
-      this.variable = Optional.of(CTypeVariable.of(name));
+      this.variable = Optional.of(CGTypeVariable.of(name));
     }
 
     @Override

@@ -20,21 +20,21 @@ import com.io7m.cantoria.api.CClassName;
 import com.io7m.cantoria.api.CClassRegistry;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CClasses;
+import com.io7m.cantoria.api.CGReferenceClass;
+import com.io7m.cantoria.api.CGReferenceVariable;
+import com.io7m.cantoria.api.CGTypeArgumentReference;
+import com.io7m.cantoria.api.CGTypeArgumentWildcard;
+import com.io7m.cantoria.api.CGTypeBoundClass;
+import com.io7m.cantoria.api.CGTypeBoundVariable;
+import com.io7m.cantoria.api.CGTypeClass;
+import com.io7m.cantoria.api.CGTypeParameter;
+import com.io7m.cantoria.api.CGTypeVariable;
+import com.io7m.cantoria.api.CGWildcardExtends;
+import com.io7m.cantoria.api.CGWildcardSuper;
+import com.io7m.cantoria.api.CGenericsParsing;
 import com.io7m.cantoria.api.CModuleType;
 import com.io7m.cantoria.api.CModuleWeaklyCaching;
 import com.io7m.cantoria.api.CModules;
-import com.io7m.cantoria.api.generics.CGenericClass;
-import com.io7m.cantoria.api.generics.CGenerics;
-import com.io7m.cantoria.api.generics.CReferenceClass;
-import com.io7m.cantoria.api.generics.CReferenceVariable;
-import com.io7m.cantoria.api.generics.CTypeArgumentReference;
-import com.io7m.cantoria.api.generics.CTypeArgumentWildcard;
-import com.io7m.cantoria.api.generics.CTypeBoundClass;
-import com.io7m.cantoria.api.generics.CTypeBoundVariable;
-import com.io7m.cantoria.api.generics.CTypeParameter;
-import com.io7m.cantoria.api.generics.CTypeVariable;
-import com.io7m.cantoria.api.generics.CWildcardExtends;
-import com.io7m.cantoria.api.generics.CWildcardSuper;
 import io.vavr.collection.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -84,8 +84,8 @@ public final class CGenericsTest
     final CClassRegistryType er = classRegistry();
 
     final ClassNode node = classOf("Generics0.class");
-    final List<CTypeParameter> params =
-      CGenerics.parseClassGenericParameters(er, node.signature);
+    final List<CGTypeParameter> params =
+      CGenericsParsing.parseClassGenericParameters(er, node.signature);
 
     params.forEach(par -> LOG.debug("{}", par.toJava()));
 
@@ -118,39 +118,39 @@ public final class CGenericsTest
     final CClassName consumer_name =
       CClassName.of("java.base", "java.util.function", "Consumer");
 
-    final CGenericClass object =
-      CGenericClass.builder()
+    final CGTypeClass object =
+      CGTypeClass.builder()
         .setName(object_name)
         .build();
 
-    final CGenericClass number =
-      CGenericClass.builder()
+    final CGTypeClass number =
+      CGTypeClass.builder()
         .setName(number_name)
         .build();
 
-    final CGenericClass integer =
-      CGenericClass.builder()
+    final CGTypeClass integer =
+      CGTypeClass.builder()
         .setName(integer_name)
         .build();
 
-    final CReferenceClass object_reference =
-      CReferenceClass.of(object);
+    final CGReferenceClass object_reference =
+      CGReferenceClass.of(object);
 
-    final CReferenceClass integer_reference =
-      CReferenceClass.of(integer);
+    final CGReferenceClass integer_reference =
+      CGReferenceClass.of(integer);
 
     Assertions.assertAll(
       () -> {
         // A
-        final CTypeParameter a = params.get(0);
+        final CGTypeParameter a = params.get(0);
 
-        final CTypeBoundClass object_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass object_bound =
+          CGTypeBoundClass.builder()
             .setClassType(object)
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("A")
             .setBound(object_bound)
             .build(),
@@ -159,33 +159,33 @@ public final class CGenericsTest
 
       () -> {
         // B extends A
-        final CTypeParameter b = params.get(1);
+        final CGTypeParameter b = params.get(1);
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("B")
-            .setBound(CTypeBoundVariable.of(CTypeVariable.of("A")))
+            .setBound(CGTypeBoundVariable.of(CGTypeVariable.of("A")))
             .build(),
           b);
       },
 
       () -> {
         // C extends java.util.List<?>
-        final CTypeParameter c = params.get(2);
+        final CGTypeParameter c = params.get(2);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(list_name)
                 .addArguments(
-                  CTypeArgumentWildcard.of(
-                    CWildcardExtends.of(object_reference)))
+                  CGTypeArgumentWildcard.of(
+                    CGWildcardExtends.of(object_reference)))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("C")
             .setBound(list_bound)
             .build(),
@@ -194,19 +194,19 @@ public final class CGenericsTest
 
       () -> {
         // C1 extends java.util.List<java.lang.Object>
-        final CTypeParameter c1 = params.get(3);
+        final CGTypeParameter c1 = params.get(3);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(list_name)
-                .addArguments(CTypeArgumentReference.of(object_reference))
+                .addArguments(CGTypeArgumentReference.of(object_reference))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("C1")
             .setBound(list_bound)
             .build(),
@@ -215,21 +215,21 @@ public final class CGenericsTest
 
       () -> {
         // D extends java.util.ArrayList<?>
-        final CTypeParameter d = params.get(4);
+        final CGTypeParameter d = params.get(4);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(arraylist_name)
                 .addArguments(
-                  CTypeArgumentWildcard.of(
-                    CWildcardExtends.of(object_reference)))
+                  CGTypeArgumentWildcard.of(
+                    CGWildcardExtends.of(object_reference)))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("D")
             .setBound(list_bound)
             .build(),
@@ -238,21 +238,21 @@ public final class CGenericsTest
 
       () -> {
         // D extends java.util.ArrayList<?>
-        final CTypeParameter d = params.get(4);
+        final CGTypeParameter d = params.get(4);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(arraylist_name)
                 .addArguments(
-                  CTypeArgumentWildcard.of(
-                    CWildcardExtends.of(object_reference)))
+                  CGTypeArgumentWildcard.of(
+                    CGWildcardExtends.of(object_reference)))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("D")
             .setBound(list_bound)
             .build(),
@@ -261,22 +261,22 @@ public final class CGenericsTest
 
       () -> {
         // E extends java.util.List<A>
-        final CTypeParameter e = params.get(5);
+        final CGTypeParameter e = params.get(5);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(list_name)
                 .addArguments(
-                  CTypeArgumentReference.of(
-                    CReferenceVariable.of(
-                      CTypeVariable.of("A"))))
+                  CGTypeArgumentReference.of(
+                    CGReferenceVariable.of(
+                      CGTypeVariable.of("A"))))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("E")
             .setBound(list_bound)
             .build(),
@@ -285,22 +285,22 @@ public final class CGenericsTest
 
       () -> {
         // F extends java.util.ArrayList<A>
-        final CTypeParameter f = params.get(6);
+        final CGTypeParameter f = params.get(6);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(arraylist_name)
                 .addArguments(
-                  CTypeArgumentReference.of(
-                    CReferenceVariable.of(
-                      CTypeVariable.of("A"))))
+                  CGTypeArgumentReference.of(
+                    CGReferenceVariable.of(
+                      CGTypeVariable.of("A"))))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("F")
             .setBound(list_bound)
             .build(),
@@ -309,25 +309,25 @@ public final class CGenericsTest
 
       () -> {
         // G extends java.util.List<Comparable<?>>
-        final CTypeParameter g = params.get(7);
+        final CGTypeParameter g = params.get(7);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(list_name)
                 .addArguments(
-                  CTypeArgumentReference.of(CReferenceClass.of(
-                    CGenericClass.builder()
+                  CGTypeArgumentReference.of(CGReferenceClass.of(
+                    CGTypeClass.builder()
                       .setName(comparable_name)
-                      .addArguments(CTypeArgumentWildcard.of(
-                        CWildcardExtends.of(object_reference)))
+                      .addArguments(CGTypeArgumentWildcard.of(
+                        CGWildcardExtends.of(object_reference)))
                       .build())))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("G")
             .setBound(list_bound)
             .build(),
@@ -336,28 +336,28 @@ public final class CGenericsTest
 
       () -> {
         // G1 extends java.util.List<? extends Comparable<?>>
-        final CTypeParameter g = params.get(8);
+        final CGTypeParameter g = params.get(8);
 
-        final CWildcardExtends w_extends =
-          CWildcardExtends.of(
-            CReferenceClass.of(
-              CGenericClass.builder()
+        final CGWildcardExtends w_extends =
+          CGWildcardExtends.of(
+            CGReferenceClass.of(
+              CGTypeClass.builder()
                 .setName(comparable_name)
-                .addArguments(CTypeArgumentWildcard.of(
-                  CWildcardExtends.of(object_reference)))
+                .addArguments(CGTypeArgumentWildcard.of(
+                  CGWildcardExtends.of(object_reference)))
                 .build()));
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(list_name)
-                .addArguments(CTypeArgumentWildcard.of(w_extends))
+                .addArguments(CGTypeArgumentWildcard.of(w_extends))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("G1")
             .setBound(list_bound)
             .build(),
@@ -366,25 +366,25 @@ public final class CGenericsTest
 
       () -> {
         // extends java.util.ArrayList<Comparable<?>>
-        final CTypeParameter h = params.get(9);
+        final CGTypeParameter h = params.get(9);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(arraylist_name)
                 .addArguments(
-                  CTypeArgumentReference.of(CReferenceClass.of(
-                    CGenericClass.builder()
+                  CGTypeArgumentReference.of(CGReferenceClass.of(
+                    CGTypeClass.builder()
                       .setName(comparable_name)
-                      .addArguments(CTypeArgumentWildcard.of(
-                        CWildcardExtends.of(object_reference)))
+                      .addArguments(CGTypeArgumentWildcard.of(
+                        CGWildcardExtends.of(object_reference)))
                       .build())))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("H")
             .setBound(list_bound)
             .build(),
@@ -393,25 +393,25 @@ public final class CGenericsTest
 
       () -> {
         // I extends java.util.List<Comparable<A>>
-        final CTypeParameter i = params.get(10);
+        final CGTypeParameter i = params.get(10);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(list_name)
                 .addArguments(
-                  CTypeArgumentReference.of(CReferenceClass.of(
-                    CGenericClass.builder()
+                  CGTypeArgumentReference.of(CGReferenceClass.of(
+                    CGTypeClass.builder()
                       .setName(comparable_name)
-                      .addArguments(CTypeArgumentReference.of(
-                        CReferenceVariable.of(CTypeVariable.of("A"))))
+                      .addArguments(CGTypeArgumentReference.of(
+                        CGReferenceVariable.of(CGTypeVariable.of("A"))))
                       .build())))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("I")
             .setBound(list_bound)
             .build(),
@@ -420,25 +420,25 @@ public final class CGenericsTest
 
       () -> {
         // J extends java.util.ArrayList<Comparable<A>>
-        final CTypeParameter j = params.get(11);
+        final CGTypeParameter j = params.get(11);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(arraylist_name)
                 .addArguments(
-                  CTypeArgumentReference.of(CReferenceClass.of(
-                    CGenericClass.builder()
+                  CGTypeArgumentReference.of(CGReferenceClass.of(
+                    CGTypeClass.builder()
                       .setName(comparable_name)
-                      .addArguments(CTypeArgumentReference.of(
-                        CReferenceVariable.of(CTypeVariable.of("A"))))
+                      .addArguments(CGTypeArgumentReference.of(
+                        CGReferenceVariable.of(CGTypeVariable.of("A"))))
                       .build())))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("J")
             .setBound(list_bound)
             .build(),
@@ -447,27 +447,27 @@ public final class CGenericsTest
 
       () -> {
         // K extends java.util.List<java.util.function.Function<A, B>>
-        final CTypeParameter k = params.get(12);
+        final CGTypeParameter k = params.get(12);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(list_name)
                 .addArguments(
-                  CTypeArgumentReference.of(CReferenceClass.of(
-                    CGenericClass.builder()
+                  CGTypeArgumentReference.of(CGReferenceClass.of(
+                    CGTypeClass.builder()
                       .setName(function_name)
-                      .addArguments(CTypeArgumentReference.of(
-                        CReferenceVariable.of(CTypeVariable.of("A"))))
-                      .addArguments(CTypeArgumentReference.of(
-                        CReferenceVariable.of(CTypeVariable.of("B"))))
+                      .addArguments(CGTypeArgumentReference.of(
+                        CGReferenceVariable.of(CGTypeVariable.of("A"))))
+                      .addArguments(CGTypeArgumentReference.of(
+                        CGReferenceVariable.of(CGTypeVariable.of("B"))))
                       .build())))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("K")
             .setBound(list_bound)
             .build(),
@@ -476,21 +476,21 @@ public final class CGenericsTest
 
       () -> {
         // L extends java.util.List<? super Integer>
-        final CTypeParameter l = params.get(13);
+        final CGTypeParameter l = params.get(13);
 
-        final CTypeBoundClass list_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass list_bound =
+          CGTypeBoundClass.builder()
             .setClassType(
-              CGenericClass.builder()
+              CGTypeClass.builder()
                 .setName(list_name)
                 .addArguments(
-                  CTypeArgumentWildcard.of(
-                    CWildcardSuper.of(integer_reference)))
+                  CGTypeArgumentWildcard.of(
+                    CGWildcardSuper.of(integer_reference)))
                 .build())
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("L")
             .setBound(list_bound)
             .build(),
@@ -499,16 +499,16 @@ public final class CGenericsTest
 
       () -> {
         // M extends Number & java.io.Serializable
-        final CTypeParameter m = params.get(14);
+        final CGTypeParameter m = params.get(14);
 
-        final CTypeBoundClass object_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass object_bound =
+          CGTypeBoundClass.builder()
             .setClassType(number)
-            .addIntersections(CGenericClass.of(serial_name, List.empty()))
+            .addIntersections(CGTypeClass.of(serial_name, List.empty()))
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("M")
             .setBound(object_bound)
             .build(),
@@ -517,18 +517,18 @@ public final class CGenericsTest
 
       () -> {
         // N extends Number & java.util.function.Consumer<Integer>
-        final CTypeParameter n = params.get(15);
+        final CGTypeParameter n = params.get(15);
 
-        final CTypeBoundClass object_bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass object_bound =
+          CGTypeBoundClass.builder()
             .setClassType(number)
-            .addIntersections(CGenericClass.of(
+            .addIntersections(CGTypeClass.of(
               consumer_name,
-              List.of(CTypeArgumentReference.of(integer_reference))))
+              List.of(CGTypeArgumentReference.of(integer_reference))))
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
             .setName("N")
             .setBound(object_bound)
             .build(),
@@ -544,8 +544,8 @@ public final class CGenericsTest
     final CClassRegistryType er = classRegistry();
 
     final ClassNode node = classOf("GenericsIntersection.class");
-    final List<CTypeParameter> params =
-      CGenerics.parseClassGenericParameters(er, node.signature);
+    final List<CGTypeParameter> params =
+      CGenericsParsing.parseClassGenericParameters(er, node.signature);
 
     params.forEach(par -> LOG.debug("{}", par.toJava()));
 
@@ -558,29 +558,81 @@ public final class CGenericsTest
     final CClassName number_name =
       CClassName.of("java.base", "java.lang", "Number");
 
-    final CGenericClass number =
-      CGenericClass.builder()
+    final CGTypeClass number =
+      CGTypeClass.builder()
         .setName(number_name)
         .build();
 
-    final CGenericClass serializable =
-      CGenericClass.builder()
+    final CGTypeClass serializable =
+      CGTypeClass.builder()
         .setName(serial_name)
         .build();
 
     Assertions.assertAll(
       () -> {
         // M extends Number & java.io.Serializable
-        final CTypeParameter m = params.get(0);
+        final CGTypeParameter m = params.get(0);
 
-        final CTypeBoundClass bound =
-          CTypeBoundClass.builder()
+        final CGTypeBoundClass bound =
+          CGTypeBoundClass.builder()
             .setClassType(number)
             .addIntersections(serializable)
             .build();
 
         Assertions.assertEquals(
-          CTypeParameter.builder()
+          CGTypeParameter.builder()
+            .setName("M")
+            .setBound(bound)
+            .build(),
+          m);
+      }
+    );
+  }
+
+  @Test
+  public void testParseGenericsArrays()
+    throws Exception
+  {
+    final CClassRegistryType er = classRegistry();
+
+    final ClassNode node = classOf("GenericsArrays.class");
+    final List<CGTypeParameter> params =
+      CGenericsParsing.parseClassGenericParameters(er, node.signature);
+
+    params.forEach(par -> LOG.debug("{}", par.toJava()));
+
+    Assertions.assertEquals(3, params.size());
+
+    final CClassName object_name =
+      CClassName.of("java.base", "java.lang", "Object");
+    final CClassName serial_name =
+      CClassName.of("java.base", "java.io", "Serializable");
+    final CClassName number_name =
+      CClassName.of("java.base", "java.lang", "Number");
+
+    final CGTypeClass number =
+      CGTypeClass.builder()
+        .setName(number_name)
+        .build();
+
+    final CGTypeClass serializable =
+      CGTypeClass.builder()
+        .setName(serial_name)
+        .build();
+
+    Assertions.assertAll(
+      () -> {
+        // M extends Number & java.io.Serializable
+        final CGTypeParameter m = params.get(0);
+
+        final CGTypeBoundClass bound =
+          CGTypeBoundClass.builder()
+            .setClassType(number)
+            .addIntersections(serializable)
+            .build();
+
+        Assertions.assertEquals(
+          CGTypeParameter.builder()
             .setName("M")
             .setBound(bound)
             .build(),
