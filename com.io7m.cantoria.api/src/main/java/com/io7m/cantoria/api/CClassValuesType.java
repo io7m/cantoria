@@ -19,6 +19,8 @@ package com.io7m.cantoria.api;
 import io.vavr.collection.Set;
 import org.objectweb.asm.tree.ClassNode;
 
+import java.util.Optional;
+
 /**
  * The values exposed by classes.
  */
@@ -60,4 +62,11 @@ public interface CClassValuesType
    */
 
   int bytecodeVersion();
+
+  /**
+   * @return The JVM type signature. Not present in classes that do not use
+   * generics.
+   */
+
+  Optional<CGClassSignature> signature();
 }

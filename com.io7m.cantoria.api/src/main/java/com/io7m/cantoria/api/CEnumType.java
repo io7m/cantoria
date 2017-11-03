@@ -23,6 +23,8 @@ import org.immutables.value.Value;
 import org.immutables.vavr.encodings.VavrEncodingEnabled;
 import org.objectweb.asm.tree.ClassNode;
 
+import java.util.Optional;
+
 /**
  * A parsed enum.
  */
@@ -73,6 +75,12 @@ public interface CEnumType extends CClassValuesType
   default int bytecodeVersion()
   {
     return this.classValue().bytecodeVersion();
+  }
+
+  @Override
+  default Optional<CGClassSignature> signature()
+  {
+    return this.classValue().signature();
   }
 
   /**

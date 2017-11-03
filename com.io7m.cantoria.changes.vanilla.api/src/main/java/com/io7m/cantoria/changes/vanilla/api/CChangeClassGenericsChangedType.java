@@ -14,60 +14,53 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.api;
+package com.io7m.cantoria.changes.vanilla.api;
 
-import io.vavr.collection.Set;
+import com.io7m.cantoria.api.CClass;
+import com.io7m.cantoria.api.CImmutableStyleType;
+import com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility;
+import com.io7m.cantoria.changes.spi.CChangeClassType;
+import com.io7m.cantoria.changes.spi.CChangeSemanticVersioning;
+import com.io7m.cantoria.changes.spi.CChangeSourceCompatibility;
 import org.immutables.value.Value;
 import org.immutables.vavr.encodings.VavrEncodingEnabled;
-import org.objectweb.asm.tree.ClassNode;
-
-import java.util.Optional;
 
 /**
- * A parsed class.
+ * The generic parameters of a class have changed.
  */
 
 @CImmutableStyleType
 @VavrEncodingEnabled
 @Value.Immutable
-public interface CClassType extends CClassValuesType
+public interface CChangeClassGenericsChangedType
+  extends CChangeClassType
 {
   @Override
   @Value.Parameter
-  CClassName name();
-
-  @Override
-  @Value.Parameter
-  @Value.Auxiliary
-  ClassNode node();
-
-  @Override
-  @Value.Parameter
-  @Value.Auxiliary
-  CModuleType module();
-
-  @Override
-  @Value.Parameter
-  Set<CModifier> modifiers();
-
-  @Override
-  @Value.Parameter
-  CAccessibility accessibility();
-
-  @Override
-  @Value.Parameter
-  int bytecodeVersion();
-
-  @Override
-  @Value.Parameter
-  Optional<CGClassSignature> signature();
+  CClass classValue();
 
   /**
-   * @return {@code true} if the class is an enum
+   * @return The previous state of the class
    */
 
-  default boolean isEnum()
+  @Value.Parameter
+  CClass classPrevious();
+
+  @Override
+  default CChangeSemanticVersioning semanticVersioning()
   {
-    return this.modifiers().contains(CModifier.ENUM);
+    return CChangeSemanticVersioning.SEMANTIC_MAJOR;
+  }
+
+  @Override
+  default CChangeBinaryCompatibility binaryCompatibility()
+  {
+    return CChangeBinaryCompatibility.BINARY_COMPATIBLE;
+  }
+
+  @Override
+  default CChangeSourceCompatibility sourceCompatibility()
+  {
+    return CChangeSourceCompatibility.SOURCE_INCOMPATIBLE;
   }
 }

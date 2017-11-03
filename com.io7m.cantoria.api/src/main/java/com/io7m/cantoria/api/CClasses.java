@@ -108,7 +108,9 @@ public final class CClasses
       module,
       CClassModifiers.classModifiers(node),
       CClassModifiers.classAccessibility(node),
-      node.version);
+      node.version,
+      Optional.ofNullable(node.signature)
+        .map(CGenericsParsing::parseClassSignature));
   }
 
   /**

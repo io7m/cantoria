@@ -26,6 +26,12 @@ import com.io7m.cantoria.api.CEnum;
 import com.io7m.cantoria.api.CEnumMember;
 import com.io7m.cantoria.api.CField;
 import com.io7m.cantoria.api.CFieldModifiers;
+import com.io7m.cantoria.api.CGClassSignature;
+import com.io7m.cantoria.api.CGClassTypeSignature;
+import com.io7m.cantoria.api.CGFieldTypeSignatureClass;
+import com.io7m.cantoria.api.CGTypeArgumentExactly;
+import com.io7m.cantoria.api.CGTypeArguments;
+import com.io7m.cantoria.api.CGTypeParameter;
 import com.io7m.cantoria.api.CMethod;
 import com.io7m.cantoria.api.CModifier;
 import com.io7m.cantoria.api.CModuleProvides;
@@ -60,6 +66,7 @@ import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldOverrideBecameLess
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldOverrideChangedStatic;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldRemovedPublic;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldTypeChanged;
+import com.io7m.cantoria.changes.vanilla.api.CChangeClassGenericsChanged;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodAdded;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameFinal;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameLessAccessible;
@@ -1127,6 +1134,7 @@ public abstract class CDriverContract
               .setModule(module1)
               .setName(CLASS_NAME_X)
               .setNode(anyClass())
+              .setSignature(enumSignature("x.y.z.p.X"))
               .build())
           .build());
 
@@ -1150,6 +1158,7 @@ public abstract class CDriverContract
               .setModule(module1)
               .setName(CLASS_NAME_X)
               .setNode(anyClass())
+              .setSignature(enumSignature("x.y.z.p.X"))
               .build())
           .build());
 
@@ -1212,6 +1221,7 @@ public abstract class CDriverContract
               .setModule(module1)
               .setName(CLASS_NAME_X)
               .setNode(anyClass())
+              .setSignature(enumSignature("x.y.z.p.X"))
               .build())
           .build());
     }};
@@ -1221,8 +1231,26 @@ public abstract class CDriverContract
     new FullVerifications()
     {{
       receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
-      this.times = 6;
+      this.times = 7;
     }};
+  }
+
+  private static CGClassSignature enumSignature(
+    final String long_name)
+  {
+    return CGClassSignature.builder()
+      .setSuperclass(
+        CGClassTypeSignature.builder()
+          .setTypeName("java.lang.Enum")
+          .setTypeArguments(CGTypeArguments.of(List.of(
+            CGTypeArgumentExactly.of(
+              CGFieldTypeSignatureClass.of(
+                CGClassTypeSignature.builder()
+                  .setTypeName(long_name)
+                  .setTypeArguments(CGTypeArguments.of(List.empty()))
+                  .build())))))
+          .build())
+      .build();
   }
 
   @Test
@@ -1251,6 +1279,7 @@ public abstract class CDriverContract
               .setModule(module0)
               .setName(CLASS_NAME_X)
               .setNode(anyClass())
+              .setSignature(enumSignature("x.y.z.p.X"))
               .build())
           .setClassValue(
             CClass.builder()
@@ -1274,6 +1303,7 @@ public abstract class CDriverContract
               .setModule(module0)
               .setName(CLASS_NAME_X)
               .setNode(anyClass())
+              .setSignature(enumSignature("x.y.z.p.X"))
               .build())
           .setClassValue(
             CClass.builder()
@@ -1330,7 +1360,7 @@ public abstract class CDriverContract
     new FullVerifications()
     {{
       receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
-      this.times = 6;
+      this.times = 7;
     }};
   }
 
@@ -1443,24 +1473,24 @@ public abstract class CDriverContract
       receiver.onChange(
         (CChangeCheckType) this.any,
         CChangeClassBecameAbstract.builder()
-        .setClassPrevious(
-          CClass.builder()
-            .setAccessibility(CAccessibility.PUBLIC)
-            .setBytecodeVersion(53)
-            .setModule(module0)
-            .setName(CLASS_NAME_X)
-            .setNode(anyClass())
-            .build())
-        .setClassValue(
-          CClass.builder()
-            .setAccessibility(CAccessibility.PUBLIC)
-            .addModifiers(CModifier.ABSTRACT)
-            .setBytecodeVersion(53)
-            .setModule(module1)
-            .setName(CLASS_NAME_X)
-            .setNode(anyClass())
-            .build())
-        .build());
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .addModifiers(CModifier.ABSTRACT)
+              .setBytecodeVersion(53)
+              .setModule(module1)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
     }};
 
     this.driver().compareModules(receiver, er, module0, module1);
@@ -3285,5 +3315,228 @@ public abstract class CDriverContract
       receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
       this.times = 1;
     }};
+  }
+
+  @Test
+  public final void testClassGenericsAdded(
+    final @Mocked CChangeReceiverType receiver)
+    throws Exception
+  {
+    final CModuleType module0 =
+      CTestUtilities.module("class_generics_added/before");
+    final CModuleType module1 =
+      CTestUtilities.module("class_generics_added/after");
+
+    final CClassRegistryType er = classRegistry(module0, module1);
+
+    new Expectations()
+    {{
+      receiver.onChange(
+        (CChangeCheckType) this.any,
+        CChangeClassGenericsChanged.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .setSignature(
+                CGClassSignature.builder()
+                  .setSuperclass(javaLangObjectSignature())
+                  .setParameters(List.of(
+                    CGTypeParameter.builder()
+                      .setName("A")
+                      .setType(CGFieldTypeSignatureClass.of(
+                        javaLangObjectSignature()))
+                      .build()))
+                  .build())
+              .build())
+          .build());
+    }};
+
+    this.driver().compareModules(receiver, er, module0, module1);
+
+    new FullVerifications()
+    {{
+      receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
+      this.times = 1;
+    }};
+  }
+
+  @Test
+  public final void testClassGenericsRemoved(
+    final @Mocked CChangeReceiverType receiver)
+    throws Exception
+  {
+    final CModuleType module0 =
+      CTestUtilities.module("class_generics_removed/before");
+    final CModuleType module1 =
+      CTestUtilities.module("class_generics_removed/after");
+
+    final CClassRegistryType er = classRegistry(module0, module1);
+
+    new Expectations()
+    {{
+      receiver.onChange(
+        (CChangeCheckType) this.any,
+        CChangeClassGenericsChanged.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .setSignature(
+                CGClassSignature.builder()
+                  .setSuperclass(javaLangObjectSignature())
+                  .setParameters(List.of(
+                    CGTypeParameter.builder()
+                      .setName("A")
+                      .setType(CGFieldTypeSignatureClass.of(
+                        javaLangObjectSignature()))
+                      .build()))
+                  .build())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .build())
+          .build());
+    }};
+
+    this.driver().compareModules(receiver, er, module0, module1);
+
+    new FullVerifications()
+    {{
+      receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
+      this.times = 1;
+    }};
+  }
+
+  @Test
+  public final void testClassGenericsChangedCompatible(
+    final @Mocked CChangeReceiverType receiver)
+    throws Exception
+  {
+    final CModuleType module0 =
+      CTestUtilities.module("class_generics_changed_compatible/before");
+    final CModuleType module1 =
+      CTestUtilities.module("class_generics_changed_compatible/after");
+
+    final CClassRegistryType er = classRegistry(module0, module1);
+
+    new Expectations()
+    {{
+
+    }};
+
+    this.driver().compareModules(receiver, er, module0, module1);
+
+    new FullVerifications()
+    {{
+      receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
+      this.times = 0;
+    }};
+  }
+
+  @Test
+  public final void testClassGenericsChangedIncompatible(
+    final @Mocked CChangeReceiverType receiver)
+    throws Exception
+  {
+    final CModuleType module0 =
+      CTestUtilities.module("class_generics_changed_incompatible/before");
+    final CModuleType module1 =
+      CTestUtilities.module("class_generics_changed_incompatible/after");
+
+    final CClassRegistryType er = classRegistry(module0, module1);
+
+    new Expectations()
+    {{
+      receiver.onChange(
+        (CChangeCheckType) this.any,
+        CChangeClassGenericsChanged.builder()
+          .setClassPrevious(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .setSignature(
+                CGClassSignature.builder()
+                  .setSuperclass(javaLangObjectSignature())
+                  .setParameters(List.of(
+                    CGTypeParameter.builder()
+                      .setName("A")
+                      .setType(CGFieldTypeSignatureClass.of(javaLangIntegerSignature()))
+                      .build()))
+                  .build())
+              .build())
+          .setClassValue(
+            CClass.builder()
+              .setAccessibility(CAccessibility.PUBLIC)
+              .setBytecodeVersion(53)
+              .setModule(module0)
+              .setName(CLASS_NAME_X)
+              .setNode(anyClass())
+              .setSignature(
+                CGClassSignature.builder()
+                  .setSuperclass(javaLangObjectSignature())
+                  .setParameters(List.of(
+                    CGTypeParameter.builder()
+                      .setName("A")
+                      .setType(CGFieldTypeSignatureClass.of(javaLangNumberSignature()))
+                      .build()))
+                  .build())
+              .build())
+          .build());
+    }};
+
+    this.driver().compareModules(receiver, er, module0, module1);
+
+    new FullVerifications()
+    {{
+      receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
+      this.times = 1;
+    }};
+  }
+
+  private static CGClassTypeSignature javaLangNumberSignature()
+  {
+    return CGClassTypeSignature.builder()
+      .setTypeName("java.lang.Number")
+      .setTypeArguments(CGTypeArguments.of(List.empty()))
+      .build();
+  }
+
+  private static CGClassTypeSignature javaLangIntegerSignature()
+  {
+    return CGClassTypeSignature.builder()
+      .setTypeName("java.lang.Integer")
+      .setTypeArguments(CGTypeArguments.of(List.empty()))
+      .build();
+  }
+
+  private static CGClassTypeSignature javaLangObjectSignature()
+  {
+    return CGClassTypeSignature.builder()
+      .setTypeName("java.lang.Object")
+      .setTypeArguments(CGTypeArguments.of(List.empty()))
+      .build();
   }
 }

@@ -20,6 +20,8 @@ import com.io7m.cantoria.api.CClassNames;
 import com.io7m.cantoria.api.CConstructors;
 import com.io7m.cantoria.api.CField;
 import com.io7m.cantoria.api.CFields;
+import com.io7m.cantoria.api.CGClassSignature;
+import com.io7m.cantoria.api.CGenericsType;
 import com.io7m.cantoria.api.CMethod;
 import com.io7m.cantoria.api.CMethods;
 import com.io7m.cantoria.api.CModifier;
@@ -58,6 +60,7 @@ import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldOverrideBecameLess
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldOverrideChangedStatic;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldRemovedPublic;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassFieldTypeChanged;
+import com.io7m.cantoria.changes.vanilla.api.CChangeClassGenericsChanged;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodAdded;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameFinal;
 import com.io7m.cantoria.changes.vanilla.api.CChangeClassMethodBecameLessAccessible;
@@ -105,6 +108,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -205,6 +209,10 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     this.add(
       CChangeClassFieldTypeChanged.class,
       CPlainTextDescriber::onClassFieldTypeChanged);
+
+    this.add(
+      CChangeClassGenericsChanged.class,
+      CPlainTextDescriber::onClassGenericsChanged);
 
     this.add(
       CChangeClassMethodAdded.class,
@@ -324,6 +332,21 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     this.add(
       CChangeModuleServiceProvided.class,
       CPlainTextDescriber::onModuleServiceProvided);
+  }
+
+  private static void onClassGenericsChanged(
+    final BufferedWriter w,
+    final CChangeType c)
+    throws IOException
+  {
+    final CChangeClassGenericsChanged cc =
+      (CChangeClassGenericsChanged) c;
+
+    w.append(fieldStart("Change"));
+    w.append("The generic type parameters of a class have changed");
+    w.newLine();
+
+    showGenerics(w, cc.classPrevious().signature(), "(Then)");
   }
 
   private static void onClassMethodBecameLessAccessible(
@@ -1364,6 +1387,8 @@ public final class CPlainTextDescriber implements CChangeDescriberType
         w.append(fieldStart("Class"));
         w.append(CClassNames.show(c.classValue().name()));
         w.newLine();
+
+        showGenerics(w, c.classValue().signature(), "(Now)");
         break;
       }
 
@@ -1408,6 +1433,8 @@ public final class CPlainTextDescriber implements CChangeDescriberType
         w.append(fieldStart("Class"));
         w.append(CClassNames.show(c.enumType().name()));
         w.newLine();
+
+        showGenerics(w, c.enumType().signature(), "(Now)");
         break;
       }
     }
@@ -1431,11 +1458,35 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     }
   }
 
+  private static void showGenerics(
+    final BufferedWriter w,
+    final Optional<CGClassSignature> sig_opt,
+    final String period)
+    throws IOException
+  {
+    w.append(fieldStart("Generic type parameters " + period));
+    if (sig_opt.isPresent()) {
+      final CGClassSignature sig = sig_opt.get();
+      if (!sig.parameters().isEmpty()) {
+        w.append("<");
+        w.append(sig.parameters()
+                   .map(CGenericsType.CGTypeParameterType::toJava)
+                   .collect(Collectors.joining(",")));
+        w.append(">");
+      } else {
+        w.append("(None)");
+      }
+    } else {
+      w.append("(None)");
+    }
+    w.newLine();
+  }
+
   private static String fieldStart(
     final String name)
   {
     NullCheck.notNull(name, "Name");
-    return String.format("%-24s ", name + ":");
+    return String.format("%-32s ", name + ":");
   }
 
   private static String semanticVersioning(

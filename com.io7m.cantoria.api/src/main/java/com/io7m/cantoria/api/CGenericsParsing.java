@@ -70,6 +70,38 @@ public final class CGenericsParsing
       .build();
   }
 
+  private static String loggerName(
+    final Class<?> clazz,
+    final int depth)
+  {
+    final StringBuilder sb = new StringBuilder(64);
+    sb.append(clazz.getCanonicalName());
+    sb.append("[");
+    sb.append(depth);
+    sb.append("]");
+    return sb.toString();
+  }
+
+  private static CGenericsType.CGTypeArgumentType.Kind ofWildcard(
+    final char wildcard_type)
+  {
+    switch (wildcard_type) {
+      case SignatureVisitor.INSTANCEOF: {
+        return CGenericsType.CGTypeArgumentType.Kind.EXACTLY;
+      }
+      case SignatureVisitor.SUPER: {
+        return CGenericsType.CGTypeArgumentType.Kind.SUPER;
+      }
+      case SignatureVisitor.EXTENDS: {
+        return CGenericsType.CGTypeArgumentType.Kind.EXTENDS;
+      }
+      default: {
+        throw new IllegalArgumentException(
+          "Unrecognized type argument kind: " + wildcard_type);
+      }
+    }
+  }
+
   private static final class InterfaceVisitor
     extends BaseVisitor
   {
@@ -171,6 +203,14 @@ public final class CGenericsParsing
     {
       this.logger().trace("visitClassType: {}", name);
       this.type_class = CClassNames.toDottedName(name);
+    }
+
+    @Override
+    public void visitTypeArgument()
+    {
+      this.logger().trace("visitTypeArgument: ?");
+      this.type_arguments =
+        this.type_arguments.append(CGTypeArgumentAny.builder().build());
     }
 
     @Override
@@ -681,18 +721,6 @@ public final class CGenericsParsing
     }
   }
 
-  private static String loggerName(
-    final Class<?> clazz,
-    final int depth)
-  {
-    final StringBuilder sb = new StringBuilder(64);
-    sb.append(clazz.getCanonicalName());
-    sb.append("[");
-    sb.append(depth);
-    sb.append("]");
-    return sb.toString();
-  }
-
   private static final class SuperclassVisitor extends BaseVisitor
   {
     private final Consumer<CGClassTypeSignature> on_completion;
@@ -924,26 +952,6 @@ public final class CGenericsParsing
           .build();
 
       this.onComplete(t);
-    }
-  }
-
-  private static CGenericsType.CGTypeArgumentType.Kind ofWildcard(
-    final char wildcard_type)
-  {
-    switch (wildcard_type) {
-      case SignatureVisitor.INSTANCEOF: {
-        return CGenericsType.CGTypeArgumentType.Kind.EXACTLY;
-      }
-      case SignatureVisitor.SUPER: {
-        return CGenericsType.CGTypeArgumentType.Kind.SUPER;
-      }
-      case SignatureVisitor.EXTENDS: {
-        return CGenericsType.CGTypeArgumentType.Kind.EXTENDS;
-      }
-      default: {
-        throw new IllegalArgumentException(
-          "Unrecognized type argument kind: " + wildcard_type);
-      }
     }
   }
 }
