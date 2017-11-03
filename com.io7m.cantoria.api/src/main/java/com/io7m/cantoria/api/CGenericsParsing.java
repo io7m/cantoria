@@ -16,12 +16,10 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jaffirm.core.Invariants;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnimplementedCodeException;
 import com.io7m.junreachable.UnreachableCodeException;
-import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.signature.SignatureReader;
@@ -29,18 +27,16 @@ import org.objectweb.asm.signature.SignatureVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * Functions for processing generic type parameters.
+ * Functions to parse generic type signatures.
  */
 
 public final class CGenericsParsing
 {
-  private static final Logger LOG = LoggerFactory.getLogger(CGenericsParsing.class);
+  private static final Logger LOG =
+    LoggerFactory.getLogger(CGenericsParsing.class);
 
   private CGenericsParsing()
   {
@@ -48,602 +44,246 @@ public final class CGenericsParsing
   }
 
   /**
-   * Parse the given type signature into a list of type parameters. The type
-   * signature is assumed to have been taken from a class with type parameters.
+   * Parse a class signature.
    *
-   * @param in_registry  A class registry
-   * @param in_signature The type signature
+   * See JVMS 9 §4.7.9.1
    *
-   * @return A list of type parameters
+   * @param signature The class signature
+   *
+   * @return A parsed class signature
    */
 
-  public static List<CGTypeParameter> parseClassGenericParameters(
-    final CClassRegistryType in_registry,
-    final String in_signature)
+  public static CGClassSignature parseClassSignature(
+    final String signature)
   {
-    NullCheck.notNull(in_registry, "Registry");
-    NullCheck.notNull(in_signature, "Signature");
+    NullCheck.notNull(signature, "Signature");
 
-    LOG.trace("parseClassGenericParameters: {}", in_signature);
+    LOG.trace("parseClassTypeSignature: {}", signature);
 
-    final ClassGenericVisitor visitor = new ClassGenericVisitor(in_registry);
-    new SignatureReader(in_signature).accept(visitor);
-    return visitor.completed();
+    final SignatureReader reader = new SignatureReader(signature);
+    final ClassSignatureVisitor visitor = new ClassSignatureVisitor(0);
+    reader.accept(visitor);
+    return CGClassSignature.builder()
+      .setParameters(visitor.parameters)
+      .setSuperclass(visitor.superclass)
+      .setInterfaces(visitor.interfaces)
+      .build();
   }
 
-  private static CClass lookupClass(
-    final CClassRegistryType in_registry,
-    final String name)
+  private static final class InterfaceVisitor
+    extends BaseVisitor
   {
-    try {
-      final Tuple2<String, String> pair =
-        CClassNames.parseFullyQualifiedDotted(
-          CClassNames.toDottedName(name));
+    private final Consumer<CGClassTypeSignature> on_completion;
+    private List<CGenericsType.CGTypeArgumentType> type_arguments;
+    private String class_name;
 
-      final Optional<CClass> class_opt =
-        in_registry.findClass(pair._1, pair._2);
-
-      if (!class_opt.isPresent()) {
-        throw new UnimplementedCodeException();
-      }
-
-      return class_opt.get();
-    } catch (final IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-
-  private enum ClassBoundKind
-  {
-    CLASS_BOUND,
-    INTERFACE_BOUND
-  }
-
-  /**
-   * A visitor that inspects superclass information. Currently unused (but
-   * necessary to complete the {@link ClassGenericVisitor} implementation).
-   */
-
-  private static final class SuperclassVisitor extends UnreachableVisitor
-  {
-    private final Logger logger;
-
-    SuperclassVisitor()
+    InterfaceVisitor(
+      final int in_depth,
+      final Consumer<CGClassTypeSignature> in_on_completion)
     {
-      this.logger = LoggerFactory.getLogger(SuperclassVisitor.class);
+      super(
+        LoggerFactory.getLogger(loggerName(
+          InterfaceVisitor.class,
+          in_depth)),
+        in_depth);
+
+      this.on_completion =
+        NullCheck.notNull(in_on_completion, "On completion");
+
+      this.type_arguments = List.empty();
+    }
+
+    @Override
+    public void visitEnd()
+    {
+      this.logger().trace("visitEnd");
+      this.on_completion.accept(
+        CGClassTypeSignature.builder()
+          .setTypeName(this.class_name)
+          .setTypeArguments(CGTypeArguments.of(this.type_arguments))
+          .build());
     }
 
     @Override
     public void visitClassType(
       final String name)
     {
-      this.logger.trace("visitClassType: {}", name);
-    }
-
-    @Override
-    public void visitEnd()
-    {
-      this.logger.trace("visitEnd");
-    }
-
-    @Override
-    protected Logger log()
-    {
-      return this.logger;
-    }
-  }
-
-  private static final class ClassGenericVisitor extends UnreachableVisitor
-  {
-    private final Logger logger;
-    private final CClassRegistryType registry;
-    private final CGTypeParameter.Builder parameter_builder;
-    private boolean parameter_builder_clean;
-    private int bound_visitors;
-    private List<CGTypeParameter> completed;
-    private String current_name;
-    private ClassBoundVisitor bound_visitor;
-
-    @Override
-    public SignatureVisitor visitSuperclass()
-    {
-      this.logger.trace("visitSuperclass");
-
-      this.completeInProgressTypeParameter();
-      return new SuperclassVisitor();
-    }
-
-    private ClassGenericVisitor(
-      final CClassRegistryType in_registry)
-    {
-      this.registry = NullCheck.notNull(in_registry, "Registry");
-      this.logger = LoggerFactory.getLogger(ClassGenericVisitor.class);
-      this.completed = List.empty();
-      this.parameter_builder = CGTypeParameter.builder();
-      this.parameter_builder_clean = true;
-      this.bound_visitors = 0;
-    }
-
-    @Override
-    protected Logger log()
-    {
-      return this.logger;
-    }
-
-    @Override
-    public void visitFormalTypeParameter(
-      final String name)
-    {
-      this.logger.trace("visitFormalTypeParameter: {}", name);
-
-      this.completeInProgressTypeParameter();
-      this.parameter_builder.setBound(Optional.empty());
-      this.parameter_builder.setName(name);
-      this.parameter_builder_clean = false;
-      this.current_name = name;
-    }
-
-    private void completeInProgressTypeParameter()
-    {
-      this.logger.trace("completeInProgressTypeParameter");
-
-      if (!this.parameter_builder_clean) {
-        if (this.bound_visitor.class_main.isPresent()) {
-          Invariants.checkInvariant(
-            !this.bound_visitor.variable.isPresent(),
-            "Bound must either be a class or a type variable");
-
-          final CGTypeBoundClass b = CGTypeBoundClass.of(
-            this.bound_visitor.class_main.get(),
-            this.bound_visitor.class_intersections);
-          this.parameter_builder.setBound(b);
-        } else {
-          Invariants.checkInvariant(
-            this.bound_visitor.variable.isPresent(),
-            "Bound must either be a class or a type variable");
-
-          final CGTypeBoundVariable b =
-            CGTypeBoundVariable.of(this.bound_visitor.variable.get());
-          this.parameter_builder.setBound(b);
-        }
-
-        final CGTypeParameter p = this.parameter_builder.build();
-        this.logger.trace("completeInProgressTypeParameter: completed {}", p);
-        this.completed = this.completed.append(p);
-      }
-
-      this.bound_visitor =
-        new ClassBoundVisitor(this.registry, this.bound_visitors);
-      ++this.bound_visitors;
-    }
-
-    @Override
-    public SignatureVisitor visitClassBound()
-    {
-      this.logger.trace("visitClassBound");
-      return this.bound_visitor;
-    }
-
-    @Override
-    public SignatureVisitor visitInterfaceBound()
-    {
-      this.logger.trace("visitInterfaceBound");
-      return this.bound_visitor;
-    }
-
-    public List<CGTypeParameter> completed()
-    {
-      return this.completed;
-    }
-  }
-
-  private static final class ArrayVisitor extends UnreachableVisitor
-  {
-    private final Logger logger;
-    private final CClassRegistryType registry;
-    private final CGTypeArray.Builder array_builder;
-    private final CGArrayOfReference.Builder array_ref_builder;
-    private int dimensions;
-    private CClass array_class;
-    private CGGenericsType.CGArrayOfType.Kind array_kind;
-    private CGTypeVariable array_variable;
-    private CGGenericsType.CGArrayOfType array;
-
-    ArrayVisitor(
-      final CClassRegistryType in_registry)
-    {
-      this.registry = NullCheck.notNull(in_registry, "Registry");
-
-      this.array_builder = CGTypeArray.builder();
-      this.array_ref_builder = CGArrayOfReference.builder();
-      this.dimensions = 1;
-
-      this.logger = LoggerFactory.getLogger(ArrayVisitor.class);
-      this.logger.trace("created");
-    }
-
-    private static String baseTypeToName(
-      final char c)
-    {
-      switch (c) {
-        case 'B':
-          return "byte";
-        case 'C':
-          return "char";
-        case 'D':
-          return "double";
-        case 'F':
-          return "float";
-        case 'I':
-          return "integer";
-        case 'J':
-          return "long";
-        case 'S':
-          return "short";
-        case 'V':
-          return "void";
-        case 'Z':
-          return "boolean";
-        default:
-          throw new UnreachableCodeException();
-      }
-    }
-
-    @Override
-    public SignatureVisitor visitArrayType()
-    {
-      this.logger.trace("visitArrayType: {}", Integer.valueOf(this.dimensions));
-      ++this.dimensions;
-      return this;
-    }
-
-    @Override
-    public void visitTypeVariable(
-      final String name)
-    {
-      this.logger.trace("visitTypeVariable: {}", name);
-      this.array_kind =
-        CGGenericsType.CGArrayOfType.Kind.ARRAY_OF_VARIABLE;
-      this.array_variable =
-        CGTypeVariable.of(name);
-      this.array =
-        CGArrayOfVariable.of(this.array_variable, this.dimensions);
-    }
-
-    @Override
-    public void visitBaseType(
-      final char descriptor)
-    {
-      this.logger.trace("visitBaseType: {}", Character.valueOf(descriptor));
-
-      this.array_kind =
-        CGGenericsType.CGArrayOfType.Kind.ARRAY_OF_PRIMITIVE;
-      this.array =
-        CGArrayOfPrimitive.of(baseTypeToName(descriptor), this.dimensions);
-    }
-
-    @Override
-    public void visitClassType(
-      final String name)
-    {
-      this.logger.trace("visitClassType: {}", name);
-      final CClass c = lookupClass(this.registry, name);
-      this.array_kind = CGGenericsType.CGArrayOfType.Kind.ARRAY_OF_REFERENCE;
-      this.array_class = c;
-    }
-
-    @Override
-    public void visitEnd()
-    {
-      this.logger.trace("visitEnd");
-      this.logger.trace(
-        "array dimensions: {}",
-        Integer.valueOf(this.dimensions));
-    }
-
-    @Override
-    protected Logger log()
-    {
-      return this.logger;
-    }
-  }
-
-  /**
-   * A visitor that constructs a single type argument.
-   */
-
-  private static final class TypeArgumentVisitor extends UnreachableVisitor
-  {
-    private final Logger logger;
-    private final char wildcard;
-    private final Consumer<CGGenericsType.CGTypeArgumentType> consumer;
-    private final CGTypeClass.Builder class_builder;
-    private final CClassRegistryType registry;
-    private final ArrayVisitor array_visitor;
-
-    TypeArgumentVisitor(
-      final CClassRegistryType in_registry,
-      final char in_wildcard,
-      final Consumer<CGGenericsType.CGTypeArgumentType> in_consumer)
-    {
-      this.registry = NullCheck.notNull(in_registry, "Registry");
-      this.wildcard = in_wildcard;
-      this.consumer = NullCheck.notNull(in_consumer, "Consumer");
-      this.class_builder = CGTypeClass.builder();
-      this.logger = LoggerFactory.getLogger(TypeArgumentVisitor.class);
-      this.logger.trace("created ({})", Character.valueOf(this.wildcard));
-      this.array_visitor = new ArrayVisitor(this.registry);
-    }
-
-    @Override
-    public SignatureVisitor visitArrayType()
-    {
-      this.logger.trace("visitArrayType");
-      return this.array_visitor;
-    }
-
-    @Override
-    public void visitClassType(
-      final String name)
-    {
-      this.logger.trace("visitClassType: {}", name);
-      final CClass c = lookupClass(this.registry, name);
-      this.class_builder.setName(c.name());
-    }
-
-    @Override
-    public void visitTypeVariable(
-      final String name)
-    {
-      this.logger.trace("visitTypeVariable: {}", name);
-      this.consumer.accept(CGTypeArgumentReference.of(
-        CGReferenceVariable.of(CGTypeVariable.of(name))));
-    }
-
-    @Override
-    public void visitEnd()
-    {
-      this.logger.trace("visitEnd");
-
-      final CGTypeClass clazz = this.class_builder.build();
-      switch (this.wildcard) {
-        case SignatureVisitor.INSTANCEOF: {
-          this.consumer.accept(CGTypeArgumentReference.of(
-            CGReferenceClass.of(clazz)));
-          return;
-        }
-
-        case SignatureVisitor.EXTENDS: {
-          this.consumer.accept(CGTypeArgumentWildcard.of(
-            CGWildcardExtends.of(CGReferenceClass.of(clazz))));
-          return;
-        }
-
-        case SignatureVisitor.SUPER: {
-          this.consumer.accept(CGTypeArgumentWildcard.of(
-            CGWildcardSuper.of(CGReferenceClass.of(clazz))));
-          return;
-        }
-
-        default: {
-          this.logger.error(
-            "unrecognized wildcard type: {}",
-            Character.valueOf(this.wildcard));
-          throw new UnimplementedCodeException();
-        }
-      }
+      this.logger().trace("visitClassType: {}", name);
+      this.class_name = CClassNames.toDottedName(name);
     }
 
     @Override
     public SignatureVisitor visitTypeArgument(
-      final char in_wildcard)
+      final char wildcard_type)
     {
-      this.logger.trace(
-        "visitTypeArgument: {}",
-        Character.valueOf(in_wildcard));
+      this.logger().trace(
+        "visitTypeArgument: {}", Character.valueOf(wildcard_type));
+
       return new TypeArgumentVisitor(
-        this.registry, in_wildcard, this.class_builder::addArguments);
+        this.depth() + 1,
+        ofWildcard(wildcard_type),
+        type -> {
+          this.logger().trace("visitTypeArgument: complete {}", type);
+          this.type_arguments = this.type_arguments.append(type);
+        });
     }
 
     @Override
-    public void visitTypeArgument()
+    protected void onStart()
     {
-      this.logger.trace("visitTypeArgument");
-
-      /*
-       * An unbounded wildcard implicitly has java.lang.Object as its bound.
-       */
-
-      try {
-        this.logger.trace("visitTypeArgument");
-        this.class_builder.addArguments(
-          CGTypeArgumentWildcard.of(
-            CGWildcardExtends.of(
-              CGReferenceClass.of(
-                CGTypeClass.of(
-                  this.registry.javaLangObject().name(), List.empty())))));
-      } catch (final IOException e) {
-        throw new UncheckedIOException(e);
-      }
-    }
-
-    @Override
-    protected Logger log()
-    {
-      return this.logger;
+      this.logger().trace("onStart");
     }
   }
 
-  private static final class ClassBoundVisitor extends UnreachableVisitor
+  private static final class InterfaceBoundVisitor
+    extends BaseVisitor
   {
-    private final Logger logger;
-    private final CClassRegistryType registry;
-    private final CGTypeClass.Builder class_builder;
-    private List<CGTypeClass> class_intersections;
-    private CClassName class_name_last;
-    private Optional<CGTypeClass> class_main;
-    private Optional<CGTypeVariable> variable;
+    private final Consumer<CGenericsType.CGFieldTypeSignatureType> on_completion;
+    private List<CGenericsType.CGTypeArgumentType> type_arguments;
+    private String type_class;
+    private String parameter_name;
 
-    ClassBoundVisitor(
-      final CClassRegistryType in_registry,
-      final int id)
+    InterfaceBoundVisitor(
+      final int in_depth,
+      final Consumer<CGenericsType.CGFieldTypeSignatureType> in_on_completion)
     {
-      this.registry =
-        NullCheck.notNull(in_registry, "Registry");
-      this.logger =
-        LoggerFactory.getLogger(loggerName(id));
+      super(
+        LoggerFactory.getLogger(loggerName(
+          InterfaceBoundVisitor.class,
+          in_depth)),
+        in_depth);
 
-      this.class_main = Optional.empty();
-      this.class_intersections = List.empty();
-      this.class_builder = CGTypeClass.builder();
-      this.variable = Optional.empty();
-      this.logger.trace("created");
-    }
-
-    private static String loggerName(
-      final int id)
-    {
-      return ClassBoundVisitor.class + "[" + id + "]";
+      this.type_arguments =
+        List.empty();
+      this.on_completion =
+        NullCheck.notNull(in_on_completion, "On completion");
     }
 
     @Override
-    public void visitEnd()
+    protected void onStart()
     {
-      this.logger.trace("visitEnd");
-
-      final CGTypeClass clazz = this.class_builder.build();
-      if (this.class_main.isPresent()) {
-        this.logger.trace("visitEnd: saved intersection {}", clazz);
-        this.class_intersections = this.class_intersections.append(clazz);
-      } else {
-        this.logger.trace("visitEnd: saved main class {}", clazz);
-        this.class_main = Optional.of(clazz);
-      }
-    }
-
-    @Override
-    public void visitTypeArgument()
-    {
-      /*
-       * An unbounded wildcard implicitly has java.lang.Object as its bound.
-       */
-
-      try {
-        this.logger.trace("visitTypeArgument");
-        this.class_builder.addArguments(
-          CGTypeArgumentWildcard.of(
-            CGWildcardExtends.of(
-              CGReferenceClass.of(
-                CGTypeClass.of(
-                  this.registry.javaLangObject().name(), List.empty())))));
-      } catch (final IOException e) {
-        throw new UncheckedIOException(e);
-      }
-    }
-
-    @Override
-    public SignatureVisitor visitTypeArgument(
-      final char wildcard)
-    {
-      this.logger.trace("visitTypeArgument: {}", Character.valueOf(wildcard));
-      return new TypeArgumentVisitor(
-        this.registry, wildcard, this.class_builder::addArguments);
+      this.logger().trace("onStart");
     }
 
     @Override
     public void visitClassType(
       final String name)
     {
-      this.logger.trace("visitClassType: {}", name);
-
-      final CClass c = lookupClass(this.registry, name);
-      this.class_name_last = c.name();
-      this.class_builder.setName(this.class_name_last);
+      this.logger().trace("visitClassType: {}", name);
+      this.type_class = CClassNames.toDottedName(name);
     }
 
     @Override
-    public void visitTypeVariable(
-      final String name)
+    public SignatureVisitor visitTypeArgument(
+      final char wildcard_type)
     {
-      this.logger.trace("visitTypeVariable: {}", name);
+      this.logger().trace(
+        "visitTypeArgument: {}", Character.valueOf(wildcard_type));
 
-      Preconditions.checkPrecondition(
-        !this.class_main.isPresent(),
-        "Type variables cannot be members of intersections");
-
-      this.variable = Optional.of(CGTypeVariable.of(name));
+      return new TypeArgumentVisitor(
+        this.depth() + 1,
+        ofWildcard(wildcard_type),
+        type -> {
+          this.logger().trace("visitTypeArgument: complete {}", type);
+          this.type_arguments = this.type_arguments.append(type);
+        });
     }
 
     @Override
-    protected Logger log()
+    public void visitEnd()
     {
-      return this.logger;
+      this.logger().trace("visitEnd");
+
+      this.on_completion.accept(
+        CGFieldTypeSignatureClass.of(
+          CGClassTypeSignature.builder()
+            .setTypeName(this.type_class)
+            .setTypeArguments(CGTypeArguments.of(this.type_arguments))
+            .build()));
     }
   }
 
-  private static abstract class UnreachableVisitor extends SignatureVisitor
+  private static abstract class BaseVisitor extends SignatureVisitor
   {
-    UnreachableVisitor()
+    private final int depth;
+    private final Logger logger;
+
+    BaseVisitor(
+      final Logger in_logger,
+      final int in_depth)
     {
       super(Opcodes.ASM6);
+      this.depth = in_depth;
+      this.logger = NullCheck.notNull(in_logger, "Logger");
+      this.onStart();
     }
 
-    protected abstract Logger log();
+    protected final Logger logger()
+    {
+      return this.logger;
+    }
+
+    protected final int depth()
+    {
+      return this.depth;
+    }
+
+    protected abstract void onStart();
 
     @Override
     public void visitFormalTypeParameter(
       final String name)
     {
-      this.log().trace("visitFormalTypeParameter: {}", name);
+      this.logger().trace("visitFormalTypeParameter: {}", name);
       throw new UnreachableCodeException();
     }
 
     @Override
     public SignatureVisitor visitClassBound()
     {
-      this.log().trace("visitClassBound");
+      this.logger().trace("visitClassBound");
       throw new UnreachableCodeException();
     }
 
     @Override
     public SignatureVisitor visitInterfaceBound()
     {
-      this.log().trace("visitInterfaceBound");
+      this.logger().trace("visitInterfaceBound");
       throw new UnreachableCodeException();
     }
 
     @Override
     public SignatureVisitor visitSuperclass()
     {
-      this.log().trace("visitSuperclass");
+      this.logger().trace("visitSuperclass");
       throw new UnreachableCodeException();
     }
 
     @Override
     public SignatureVisitor visitInterface()
     {
-      this.log().trace("visitInterface");
+      this.logger().trace("visitInterface");
       throw new UnreachableCodeException();
     }
 
     @Override
     public SignatureVisitor visitParameterType()
     {
-      this.log().trace("visitParameterType");
+      this.logger().trace("visitParameterType");
       throw new UnreachableCodeException();
     }
 
     @Override
     public SignatureVisitor visitReturnType()
     {
-      this.log().trace("visitReturnType");
+      this.logger().trace("visitReturnType");
       throw new UnreachableCodeException();
     }
 
     @Override
     public SignatureVisitor visitExceptionType()
     {
-      this.log().trace("visitExceptionType");
+      this.logger().trace("visitExceptionType");
       throw new UnreachableCodeException();
     }
 
@@ -651,7 +291,7 @@ public final class CGenericsParsing
     public void visitBaseType(
       final char descriptor)
     {
-      this.log().trace("visitBaseType: {}", Character.valueOf(descriptor));
+      this.logger().trace("visitBaseType: {}", Character.valueOf(descriptor));
       throw new UnreachableCodeException();
     }
 
@@ -659,14 +299,14 @@ public final class CGenericsParsing
     public void visitTypeVariable(
       final String name)
     {
-      this.log().trace("visitTypeVariable: {}", name);
+      this.logger().trace("visitTypeVariable: {}", name);
       throw new UnreachableCodeException();
     }
 
     @Override
     public SignatureVisitor visitArrayType()
     {
-      this.log().trace("visitArrayType");
+      this.logger().trace("visitArrayType");
       throw new UnreachableCodeException();
     }
 
@@ -674,7 +314,7 @@ public final class CGenericsParsing
     public void visitClassType(
       final String name)
     {
-      this.log().trace("visitClassType: {}", name);
+      this.logger().trace("visitClassType: {}", name);
       throw new UnreachableCodeException();
     }
 
@@ -682,14 +322,14 @@ public final class CGenericsParsing
     public void visitInnerClassType(
       final String name)
     {
-      this.log().trace("visitInnerClassType: {}", name);
+      this.logger().trace("visitInnerClassType: {}", name);
       throw new UnreachableCodeException();
     }
 
     @Override
     public void visitTypeArgument()
     {
-      this.log().trace("visitTypeArgument");
+      this.logger().trace("visitTypeArgument: ?");
       throw new UnreachableCodeException();
     }
 
@@ -697,15 +337,613 @@ public final class CGenericsParsing
     public SignatureVisitor visitTypeArgument(
       final char wildcard)
     {
-      this.log().trace("visitTypeArgument: {}", Character.valueOf(wildcard));
+      this.logger().trace("visitTypeArgument: {}", Character.valueOf(wildcard));
       throw new UnreachableCodeException();
     }
 
     @Override
     public void visitEnd()
     {
-      this.log().trace("visitEnd");
+      this.logger().trace("visitEnd");
       throw new UnreachableCodeException();
+    }
+  }
+
+  private static final class ArrayTypeVisitor extends BaseVisitor
+  {
+    private final CGFieldTypeSignatureArray.Builder array_builder;
+    private final Consumer<CGFieldTypeSignatureArray> on_completion;
+    private int dimensions = 1;
+    private CGenericsType.CGTypeSignatureType type;
+    private String type_class;
+    private List<CGenericsType.CGTypeArgumentType> type_arguments;
+
+    ArrayTypeVisitor(
+      final int in_depth,
+      final Consumer<CGFieldTypeSignatureArray> in_on_completion)
+    {
+      super(
+        LoggerFactory.getLogger(loggerName(ArrayTypeVisitor.class, in_depth)),
+        in_depth);
+
+      this.array_builder = CGFieldTypeSignatureArray.builder();
+      this.on_completion = NullCheck.notNull(in_on_completion, "Consumer");
+      this.type_arguments = List.empty();
+    }
+
+    @Override
+    protected void onStart()
+    {
+      this.logger().trace("onStart");
+    }
+
+    @Override
+    public void visitEnd()
+    {
+      this.logger().trace("visitEnd");
+
+      this.type =
+        CGTypeSignatureField.of(CGFieldTypeSignatureClass.of(
+          CGClassTypeSignature.builder()
+            .setTypeName(this.type_class)
+            .setTypeArguments(CGTypeArguments.of(this.type_arguments))
+            .build()));
+
+      this.onComplete();
+    }
+
+    private void onComplete()
+    {
+      this.array_builder.setDimensions(this.dimensions);
+      this.array_builder.setType(this.type);
+      final CGFieldTypeSignatureArray at = this.array_builder.build();
+      this.logger().trace("onComplete: {}", at);
+      this.on_completion.accept(at);
+    }
+
+    @Override
+    public SignatureVisitor visitArrayType()
+    {
+      this.logger().trace("visitArrayType");
+      ++this.dimensions;
+      return this;
+    }
+
+    @Override
+    public void visitClassType(
+      final String name)
+    {
+      this.logger().trace("visitClassType: {}", name);
+      this.type_class = CClassNames.toDottedName(name);
+    }
+
+    @Override
+    public SignatureVisitor visitTypeArgument(
+      final char wildcard)
+    {
+      this.logger().trace("visitTypeArgument: {}", Character.valueOf(wildcard));
+      final TypeArgumentVisitor visitor =
+        new TypeArgumentVisitor(
+          this.depth() + 1,
+          ofWildcard(wildcard),
+          argument_type -> {
+            this.logger().trace(
+              "visitTypeArgument: complete {}",
+              argument_type);
+            this.type_arguments = this.type_arguments.append(argument_type);
+          });
+      return visitor;
+    }
+
+    @Override
+    public void visitBaseType(
+      final char descriptor)
+    {
+      this.logger().trace("visitBaseType: {}", Character.valueOf(descriptor));
+      this.type = CGTypeSignaturePrimitive.of(
+        CGenericsType.Primitive.ofDescriptor(descriptor));
+      this.onComplete();
+    }
+  }
+
+  private static final class ClassBoundVisitor
+    extends BaseVisitor
+  {
+    private final Consumer<CGenericsType.CGFieldTypeSignatureType> on_completion;
+    private List<CGenericsType.CGTypeArgumentType> type_arguments_inner;
+    private List<CGenericsType.CGTypeArgumentType> type_arguments;
+    private String type_class;
+    private String type_class_inner;
+    private List<CGClassTypeSignature> type_inners;
+    private boolean collecting_inners;
+
+    ClassBoundVisitor(
+      final int in_depth,
+      final Consumer<CGenericsType.CGFieldTypeSignatureType> in_on_completion)
+    {
+      super(
+        LoggerFactory.getLogger(loggerName(ClassBoundVisitor.class, in_depth)),
+        in_depth);
+
+      this.type_arguments = List.empty();
+      this.type_arguments_inner = List.empty();
+      this.type_inners = List.empty();
+      this.collecting_inners = false;
+
+      this.on_completion =
+        NullCheck.notNull(in_on_completion, "On completion");
+    }
+
+    @Override
+    public SignatureVisitor visitTypeArgument(
+      final char wildcard_type)
+    {
+      this.logger().trace(
+        "visitTypeArgument: {}", Character.valueOf(wildcard_type));
+
+      return new TypeArgumentVisitor(
+        this.depth() + 1,
+        ofWildcard(wildcard_type),
+        type -> {
+          this.logger().trace("visitTypeArgument: complete {}", type);
+
+          if (this.collecting_inners) {
+            this.type_arguments_inner = this.type_arguments_inner.append(type);
+          } else {
+            this.type_arguments = this.type_arguments.append(type);
+          }
+        });
+    }
+
+    @Override
+    protected void onStart()
+    {
+      this.logger().trace("onStart");
+    }
+
+    @Override
+    public void visitEnd()
+    {
+      this.logger().trace("visitEnd");
+
+      this.completeInnerTypeIfNecessary();
+      this.on_completion.accept(
+        CGFieldTypeSignatureClass.of(
+          CGClassTypeSignature.builder()
+            .setTypeName(this.type_class)
+            .setTypeArguments(CGTypeArguments.of(this.type_arguments))
+            .setInnerTypes(this.type_inners)
+            .build()));
+    }
+
+    @Override
+    public void visitInnerClassType(
+      final String name)
+    {
+      this.logger().trace("visitInnerClassType: {}", name);
+
+      this.completeInnerTypeIfNecessary();
+      this.collecting_inners = true;
+      this.type_class_inner = CClassNames.toDottedName(name);
+      this.type_arguments_inner = List.empty();
+    }
+
+    private void completeInnerTypeIfNecessary()
+    {
+      if (this.type_class_inner != null) {
+        this.type_inners =
+          this.type_inners.append(
+            CGClassTypeSignature.of(
+              this.type_class_inner,
+              CGTypeArguments.of(this.type_arguments_inner),
+              List.empty()));
+      }
+    }
+
+    @Override
+    public void visitClassType(
+      final String name)
+    {
+      this.logger().trace("visitClassType: {}", name);
+
+      if (!this.collecting_inners) {
+        this.type_class = CClassNames.toDottedName(name);
+      } else {
+        this.type_class_inner = CClassNames.toDottedName(name);
+      }
+    }
+
+    @Override
+    public void visitTypeVariable(
+      final String name)
+    {
+      this.logger().trace("visitTypeVariable: {}", name);
+
+      Preconditions.checkPrecondition(
+        !this.collecting_inners,
+        "Inner classes cannot be type variables");
+
+      this.on_completion.accept(
+        CGFieldTypeSignatureVariable.of(CGTypeVariable.of(name)));
+    }
+  }
+
+  private static final class ClassSignatureVisitor extends BaseVisitor
+  {
+    private List<CGenericsType.CGFieldTypeSignatureType> bounds;
+    private String parameter_name;
+    private List<CGTypeParameter> parameters;
+    private CGClassSignature signature;
+    private CGClassTypeSignature superclass;
+    private List<CGClassTypeSignature> interfaces;
+
+    ClassSignatureVisitor(
+      final int in_depth)
+    {
+      super(
+        LoggerFactory.getLogger(loggerName(
+          ClassSignatureVisitor.class,
+          in_depth)),
+        in_depth);
+
+      this.bounds = List.empty();
+      this.parameters = List.empty();
+      this.interfaces = List.empty();
+    }
+
+    @Override
+    protected void onStart()
+    {
+      this.logger().trace("onStart");
+    }
+
+    @Override
+    public void visitFormalTypeParameter(
+      final String name)
+    {
+      this.logger().trace("visitFormalTypeParameter: {}", name);
+
+      this.completeTypeParameterIfNecessary();
+      this.parameter_name = name;
+    }
+
+    private void completeTypeParameterIfNecessary()
+    {
+      if (this.parameter_name != null) {
+        final CGTypeParameter.Builder b = CGTypeParameter.builder();
+        b.setName(this.parameter_name);
+        b.setType(this.bounds.head());
+        b.addAllIntersections(this.bounds.tail());
+        this.parameters = this.parameters.append(b.build());
+        this.parameter_name = null;
+        this.bounds = List.empty();
+      }
+    }
+
+    @Override
+    public SignatureVisitor visitClassBound()
+    {
+      this.logger().trace("visitClassBound");
+      return new ClassBoundVisitor(
+        this.depth() + 1,
+        type -> {
+          this.logger().trace("visitClassBound: complete {}", type);
+          this.bounds = this.bounds.append(type);
+        });
+    }
+
+    @Override
+    public SignatureVisitor visitInterfaceBound()
+    {
+      this.logger().trace("visitInterfaceBound");
+      return new InterfaceBoundVisitor(
+        this.depth() + 1,
+        type -> {
+          this.logger().trace("visitInterfaceBound: complete {}", type);
+          this.bounds = this.bounds.append(type);
+        });
+    }
+
+    @Override
+    public SignatureVisitor visitSuperclass()
+    {
+      this.logger().trace("visitSuperclass");
+      this.completeTypeParameterIfNecessary();
+      return new SuperclassVisitor(
+        this.depth() + 1,
+        (parsed_superclass) -> {
+          this.logger().trace(
+            "visitSuperclass: complete {}",
+            parsed_superclass);
+          this.superclass = parsed_superclass;
+        });
+    }
+
+    @Override
+    public SignatureVisitor visitArrayType()
+    {
+      this.logger().trace("visitArrayType");
+
+      return new ArrayTypeVisitor(this.depth() + 1, array -> {
+        this.logger().trace("visitArrayType: complete {}", array);
+        throw new UnimplementedCodeException();
+      });
+    }
+
+    @Override
+    public SignatureVisitor visitInterface()
+    {
+      this.logger().trace("visitInterface");
+      return new InterfaceVisitor(this.depth() + 1, type -> {
+        this.logger().trace("visitInterface: complete {}", type);
+        this.interfaces = this.interfaces.append(type);
+      });
+    }
+  }
+
+  private static String loggerName(
+    final Class<?> clazz,
+    final int depth)
+  {
+    final StringBuilder sb = new StringBuilder(64);
+    sb.append(clazz.getCanonicalName());
+    sb.append("[");
+    sb.append(depth);
+    sb.append("]");
+    return sb.toString();
+  }
+
+  private static final class SuperclassVisitor extends BaseVisitor
+  {
+    private final Consumer<CGClassTypeSignature> on_completion;
+    private boolean collecting_inners;
+    private List<CGenericsType.CGTypeArgumentType> type_arguments_inner;
+    private List<CGenericsType.CGTypeArgumentType> type_arguments;
+    private String type_class;
+    private String type_class_inner;
+    private List<CGClassTypeSignature> type_inners;
+
+    SuperclassVisitor(
+      final int in_depth,
+      final Consumer<CGClassTypeSignature> in_on_completion)
+    {
+      super(
+        LoggerFactory.getLogger(loggerName(SuperclassVisitor.class, in_depth)),
+        in_depth);
+
+      this.on_completion =
+        NullCheck.notNull(in_on_completion, "On completion");
+
+      this.type_arguments = List.empty();
+      this.type_arguments_inner = List.empty();
+      this.type_inners = List.empty();
+      this.collecting_inners = false;
+    }
+
+    @Override
+    public void visitEnd()
+    {
+      this.logger().trace("visitEnd");
+
+      this.completeInnerTypeIfNecessary();
+      this.on_completion.accept(
+        CGClassTypeSignature.builder()
+          .setTypeName(this.type_class)
+          .setTypeArguments(CGTypeArguments.of(this.type_arguments))
+          .setInnerTypes(this.type_inners)
+          .build());
+    }
+
+    @Override
+    public void visitClassType(
+      final String name)
+    {
+      this.logger().trace("visitClassType: {}", name);
+
+      if (!this.collecting_inners) {
+        this.type_class = CClassNames.toDottedName(name);
+      } else {
+        this.type_class_inner = CClassNames.toDottedName(name);
+      }
+    }
+
+    private void completeInnerTypeIfNecessary()
+    {
+      if (this.type_class_inner != null) {
+        this.type_inners =
+          this.type_inners.append(
+            CGClassTypeSignature.of(
+              this.type_class_inner,
+              CGTypeArguments.of(this.type_arguments_inner),
+              List.empty()));
+      }
+    }
+
+    @Override
+    public void visitInnerClassType(
+      final String name)
+    {
+      this.logger().trace("visitInnerClassType: {}", name);
+
+      this.completeInnerTypeIfNecessary();
+      this.collecting_inners = true;
+      this.type_class_inner = CClassNames.toDottedName(name);
+      this.type_arguments_inner = List.empty();
+    }
+
+    @Override
+    public void visitTypeArgument()
+    {
+      this.logger().trace("visitTypeArgument: ?");
+
+      this.type_arguments =
+        this.type_arguments.append(CGTypeArgumentAny.builder().build());
+    }
+
+    @Override
+    public SignatureVisitor visitTypeArgument(
+      final char wildcard_type)
+    {
+      this.logger().trace(
+        "visitTypeArgument: {}", Character.valueOf(wildcard_type));
+
+      return new TypeArgumentVisitor(
+        this.depth() + 1,
+        ofWildcard(wildcard_type),
+        type -> {
+          this.logger().trace("visitTypeArgument: complete {}", type);
+
+          if (this.collecting_inners) {
+            this.type_arguments_inner = this.type_arguments_inner.append(type);
+          } else {
+            this.type_arguments = this.type_arguments.append(type);
+          }
+        });
+    }
+
+    @Override
+    protected void onStart()
+    {
+      this.logger().trace("onStart");
+    }
+  }
+
+  private static final class TypeArgumentVisitor
+    extends BaseVisitor
+  {
+    private final CGenericsType.CGTypeArgumentType.Kind argument_kind;
+    private final Consumer<CGenericsType.CGTypeArgumentType> on_completion;
+    private String class_name;
+    private List<CGenericsType.CGTypeArgumentType> class_type_arguments;
+
+    TypeArgumentVisitor(
+      final int in_depth,
+      final CGenericsType.CGTypeArgumentType.Kind in_wildcard_type,
+      final Consumer<CGenericsType.CGTypeArgumentType> in_on_completion)
+    {
+      super(
+        LoggerFactory.getLogger(loggerName(
+          TypeArgumentVisitor.class,
+          in_depth)),
+        in_depth);
+
+      this.argument_kind =
+        NullCheck.notNull(in_wildcard_type, "Kind");
+      this.on_completion =
+        NullCheck.notNull(in_on_completion, "On completion");
+
+      this.class_type_arguments = List.empty();
+    }
+
+    @Override
+    protected void onStart()
+    {
+      this.logger().trace("onStart");
+    }
+
+    @Override
+    public void visitTypeVariable(
+      final String name)
+    {
+      this.logger().trace("visitTypeVariable: {}", name);
+      this.onComplete(CGFieldTypeSignatureVariable.of(CGTypeVariable.of(name)));
+    }
+
+    @Override
+    public SignatureVisitor visitArrayType()
+    {
+      this.logger().trace("visitArrayType");
+      return new ArrayTypeVisitor(
+        this.depth() + 1,
+        this::onComplete);
+    }
+
+    private void onComplete(
+      final CGenericsType.CGFieldTypeSignatureType type)
+    {
+      this.logger().trace("onComplete: {}", type);
+
+      switch (this.argument_kind) {
+        case ANY: {
+          throw new UnreachableCodeException();
+        }
+        case EXTENDS: {
+          this.on_completion.accept(CGTypeArgumentExtends.of(type));
+          break;
+        }
+        case EXACTLY: {
+          this.on_completion.accept(CGTypeArgumentExactly.of(type));
+          break;
+        }
+        case SUPER: {
+          this.on_completion.accept(CGTypeArgumentSuper.of(type));
+          break;
+        }
+      }
+    }
+
+    @Override
+    public void visitClassType(
+      final String name)
+    {
+      this.logger().trace("visitClassType: {}", name);
+      this.class_name = CClassNames.toDottedName(name);
+    }
+
+    @Override
+    public SignatureVisitor visitTypeArgument(
+      final char wildcard_type)
+    {
+      this.logger().trace(
+        "visitTypeArgument: {}", Character.valueOf(wildcard_type));
+
+      return new TypeArgumentVisitor(
+        this.depth() + 1,
+        ofWildcard(wildcard_type),
+        argument_type -> {
+          this.logger().trace("visitTypeArgument: add {}", argument_type);
+          this.class_type_arguments =
+            this.class_type_arguments.append(argument_type);
+        });
+    }
+
+    @Override
+    public void visitEnd()
+    {
+      this.logger().trace("visitEnd");
+      this.logger().trace("class name: {}", this.class_name);
+      this.logger().trace("class arguments: {}", this.class_type_arguments);
+
+      final CGFieldTypeSignatureClass t =
+        CGFieldTypeSignatureClass.builder()
+          .setClassType(
+            CGClassTypeSignature.builder()
+              .setTypeName(this.class_name)
+              .setTypeArguments(CGTypeArguments.of(this.class_type_arguments))
+              .build())
+          .build();
+
+      this.onComplete(t);
+    }
+  }
+
+  private static CGenericsType.CGTypeArgumentType.Kind ofWildcard(
+    final char wildcard_type)
+  {
+    switch (wildcard_type) {
+      case SignatureVisitor.INSTANCEOF: {
+        return CGenericsType.CGTypeArgumentType.Kind.EXACTLY;
+      }
+      case SignatureVisitor.SUPER: {
+        return CGenericsType.CGTypeArgumentType.Kind.SUPER;
+      }
+      case SignatureVisitor.EXTENDS: {
+        return CGenericsType.CGTypeArgumentType.Kind.EXTENDS;
+      }
+      default: {
+        throw new IllegalArgumentException(
+          "Unrecognized type argument kind: " + wildcard_type);
+      }
     }
   }
 }
