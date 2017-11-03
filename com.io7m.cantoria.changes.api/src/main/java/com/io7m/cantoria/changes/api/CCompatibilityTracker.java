@@ -116,7 +116,7 @@ public final class CCompatibilityTracker
         version.major(),
         version.minor(),
         version.patch() + 1,
-        "");
+        version.qualifier());
     }
 
     switch (this.semanticVersioning()) {

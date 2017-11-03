@@ -244,7 +244,7 @@ public final class CCompatibilityTrackerTest
     t.onChange(c);
 
     Assertions.assertEquals(
-      CVersion.of(0, 3, 2, ""),
-      t.suggestVersionNumber(CVersion.of(0, 3, 1, "")));
+      CVersion.of(0, 3, 2, "x"),
+      t.suggestVersionNumber(CVersion.of(0, 3, 1, "x")));
   }
 }
