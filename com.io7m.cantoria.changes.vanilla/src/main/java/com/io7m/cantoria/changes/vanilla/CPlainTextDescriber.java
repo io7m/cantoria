@@ -346,7 +346,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("The generic type parameters of a class have changed");
     w.newLine();
 
-    showGenerics(w, cc.classPrevious().signature(), "(Then)");
+    showGenerics(w, cc.classPrevious().signature(), "(Previous)");
   }
 
   private static void onClassMethodBecameLessAccessible(
@@ -361,7 +361,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A method became less accessible");
     w.newLine();
 
-    w.append(fieldStart("Previous method"));
+    w.append(fieldStart("Method (Previous)"));
     w.append(CMethods.show(cc.methodPrevious()));
     w.newLine();
   }
@@ -378,7 +378,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A method became more accessible");
     w.newLine();
 
-    w.append(fieldStart("Previous method"));
+    w.append(fieldStart("Method (Previous)"));
     w.append(CMethods.show(cc.methodPrevious()));
     w.newLine();
   }
@@ -775,7 +775,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
       "A method declaration reduces the accessibility of an overridden method");
     w.newLine();
 
-    w.append(fieldStart("Ancestor class"));
+    w.append(fieldStart("Class (Ancestor)"));
     w.append(CClassNames.show(method_ancestor.className()));
     w.newLine();
     w.append(fieldStart("Ancestor method"));
@@ -806,7 +806,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     }
     w.newLine();
 
-    w.append(fieldStart("Ancestor class"));
+    w.append(fieldStart("Class (Ancestor)"));
     w.append(CClassNames.show(method_ancestor.className()));
     w.newLine();
     w.append(fieldStart("Ancestor method"));
@@ -852,7 +852,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A method was moved to an ancestor class");
     w.newLine();
 
-    w.append(fieldStart("Ancestor class"));
+    w.append(fieldStart("Class (Ancestor)"));
     w.append(CClassNames.show(cc.methodAncestor().className()));
     w.newLine();
 
@@ -873,7 +873,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("The declared thrown exceptions for a method have changed");
     w.newLine();
 
-    w.append(fieldStart("Previous method"));
+    w.append(fieldStart("Method (Previous)"));
     w.append(CMethods.show(cc.methodPrevious()));
     w.newLine();
   }
@@ -890,7 +890,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A previously final method became non-final");
     w.newLine();
 
-    w.append(fieldStart("Previous method"));
+    w.append(fieldStart("Method (Previous)"));
     w.append(CMethods.show(cc.methodPrevious()));
     w.newLine();
   }
@@ -907,7 +907,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A previously non-final method became final");
     w.newLine();
 
-    w.append(fieldStart("Previous method"));
+    w.append(fieldStart("Method (Previous)"));
     w.append(CMethods.show(cc.methodPrevious()));
     w.newLine();
   }
@@ -924,7 +924,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A previously final method became non-variadic");
     w.newLine();
 
-    w.append(fieldStart("Previous method"));
+    w.append(fieldStart("Method (Previous)"));
     w.append(CMethods.show(cc.methodPrevious()));
     w.newLine();
   }
@@ -941,7 +941,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A previously non-final method became variadic");
     w.newLine();
 
-    w.append(fieldStart("Previous method"));
+    w.append(fieldStart("Method (Previous)"));
     w.append(CMethods.show(cc.methodPrevious()));
     w.newLine();
   }
@@ -958,7 +958,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("The type of a non-private field changed");
     w.newLine();
 
-    w.append(fieldStart("Previous field"));
+    w.append(fieldStart("Field (Previous)"));
     w.append(CFields.show(cc.fieldPrevious()));
     w.newLine();
   }
@@ -985,11 +985,11 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A field moved to an ancestor class");
     w.newLine();
 
-    w.append(fieldStart("Ancestor class"));
+    w.append(fieldStart("Class (Ancestor)"));
     w.append(CClassNames.show(cc.fieldAncestor().className()));
     w.newLine();
 
-    w.append(fieldStart("Ancestor field"));
+    w.append(fieldStart("Field (Ancestor)"));
     w.append(CFields.show(cc.fieldAncestor()));
     w.newLine();
   }
@@ -1006,7 +1006,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A previously non-static field became static");
     w.newLine();
 
-    w.append(fieldStart("Previous field"));
+    w.append(fieldStart("Field (Previous)"));
     w.append(CFields.show(cc.fieldPrevious()));
     w.newLine();
   }
@@ -1023,7 +1023,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A previously static field became non-static");
     w.newLine();
 
-    w.append(fieldStart("Previous field"));
+    w.append(fieldStart("Field (Previous)"));
     w.append(CFields.show(cc.fieldPrevious()));
     w.newLine();
   }
@@ -1040,7 +1040,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A previously final field became non-final");
     w.newLine();
 
-    w.append(fieldStart("Previous field"));
+    w.append(fieldStart("Field (Previous)"));
     w.append(CFields.show(cc.fieldPrevious()));
     w.newLine();
   }
@@ -1057,7 +1057,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("The accessibility of a field was increased");
     w.newLine();
 
-    w.append(fieldStart("Previous field"));
+    w.append(fieldStart("Field (Previous)"));
     w.append(CFields.show(cc.fieldPrevious()));
     w.newLine();
   }
@@ -1074,7 +1074,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("The accessibility of a field was reduced");
     w.newLine();
 
-    w.append(fieldStart("Previous field"));
+    w.append(fieldStart("Field (Previous)"));
     w.append(CFields.show(cc.fieldPrevious()));
     w.newLine();
   }
@@ -1091,7 +1091,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("A non-final field became final");
     w.newLine();
 
-    w.append(fieldStart("Previous field"));
+    w.append(fieldStart("Field (Previous)"));
     w.append(CFields.show(cc.fieldPrevious()));
     w.newLine();
   }
@@ -1118,11 +1118,11 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.append("The bytecode version of a public class has changed");
     w.newLine();
 
-    w.append(fieldStart("Previous bytecode"));
+    w.append(fieldStart("Bytecode version (Previous)"));
     w.append(bytecodeVersion(cc.classPrevious().bytecodeVersion()));
     w.newLine();
 
-    w.append(fieldStart("Current bytecode"));
+    w.append(fieldStart("Bytecode version (Current)"));
     w.append(bytecodeVersion(cc.classValue().bytecodeVersion()));
     w.newLine();
   }
@@ -1315,10 +1315,10 @@ public final class CPlainTextDescriber implements CChangeDescriberType
       "A field declaration reduces the accessibility of an overridden field");
     w.newLine();
 
-    w.append(fieldStart("Ancestor class"));
+    w.append(fieldStart("Class (Ancestor)"));
     w.append(CClassNames.show(field_ancestor.className()));
     w.newLine();
-    w.append(fieldStart("Ancestor field"));
+    w.append(fieldStart("Field (Ancestor)"));
     w.append(CFields.show(field_ancestor));
     w.newLine();
   }
@@ -1346,10 +1346,10 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     }
     w.newLine();
 
-    w.append(fieldStart("Ancestor class"));
+    w.append(fieldStart("Class (Ancestor)"));
     w.append(CClassNames.show(field_ancestor.className()));
     w.newLine();
-    w.append(fieldStart("Ancestor field"));
+    w.append(fieldStart("Field (Ancestor)"));
     w.append(CFields.show(field_ancestor));
     w.newLine();
   }
@@ -1375,7 +1375,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
         w.append(CClassNames.show(f.className()));
         w.newLine();
 
-        w.append(fieldStart("Field"));
+        w.append(fieldStart("Field (Current)"));
         w.append(CFields.show(f));
         w.newLine();
         break;
@@ -1388,7 +1388,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
         w.append(CClassNames.show(c.classValue().name()));
         w.newLine();
 
-        showGenerics(w, c.classValue().signature(), "(Now)");
+        showGenerics(w, c.classValue().signature(), "(Current)");
         break;
       }
 
@@ -1399,7 +1399,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
         w.append(CClassNames.show(c.className()));
         w.newLine();
 
-        w.append(fieldStart("Constructor"));
+        w.append(fieldStart("Constructor (Current)"));
         w.append(CConstructors.show(c.constructor()));
         w.newLine();
         break;
@@ -1412,7 +1412,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
         w.append(CClassNames.show(c.className()));
         w.newLine();
 
-        w.append(fieldStart("Method"));
+        w.append(fieldStart("Method (Current)"));
         w.append(CMethods.show(c.method()));
         w.newLine();
         break;
@@ -1434,7 +1434,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
         w.append(CClassNames.show(c.enumType().name()));
         w.newLine();
 
-        showGenerics(w, c.enumType().signature(), "(Now)");
+        showGenerics(w, c.enumType().signature(), "(Current)");
         break;
       }
     }
@@ -1486,7 +1486,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final String name)
   {
     NullCheck.notNull(name, "Name");
-    return String.format("%-32s ", name + ":");
+    return String.format("%-36s ", name + ":");
   }
 
   private static String semanticVersioning(
