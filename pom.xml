@@ -25,6 +25,7 @@
     <module>com.io7m.cantoria.tests</module>
     <module>com.io7m.cantoria.checkstyle</module>
     <module>com.io7m.cantoria.documentation</module>
+    <module>com.io7m.cantoria.changes.api</module>
     <module>com.io7m.cantoria.changes.spi</module>
     <module>com.io7m.cantoria.changes.vanilla</module>
     <module>com.io7m.cantoria.changes.vanilla.api</module>

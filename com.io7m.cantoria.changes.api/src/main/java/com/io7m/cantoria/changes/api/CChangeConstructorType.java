@@ -14,27 +14,32 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
+package com.io7m.cantoria.changes.api;
 
-import com.io7m.cantoria.api.CField;
-import org.immutables.value.Value;
+import com.io7m.cantoria.api.CClassName;
+import com.io7m.cantoria.api.CConstructor;
 
 /**
- * The type of changes related to fields.
+ * The type of changes related to constructors.
  */
 
-public interface CChangeFieldType extends CChangeType
+public interface CChangeConstructorType extends CChangeType
 {
   @Override
   default Category category()
   {
-    return Category.CHANGE_FIELD;
+    return Category.CHANGE_CONSTRUCTOR;
   }
 
   /**
-   * @return The changed field
+   * @return The name of the class
    */
 
-  @Value.Parameter
-  CField field();
+  CClassName className();
+
+  /**
+   * @return The changed constructor
+   */
+
+  CConstructor constructor();
 }

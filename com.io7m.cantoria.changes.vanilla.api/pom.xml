@@ -28,7 +28,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.cantoria.changes.spi</artifactId>
+      <artifactId>com.io7m.cantoria.changes.api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

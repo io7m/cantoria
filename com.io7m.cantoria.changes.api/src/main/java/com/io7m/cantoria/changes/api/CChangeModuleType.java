@@ -14,23 +14,23 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
+package com.io7m.cantoria.changes.api;
 
 /**
- * The binary compatibility of a change
+ * The type of changes related to entire modules.
  */
 
-public enum CChangeBinaryCompatibility
+public interface CChangeModuleType extends CChangeType
 {
+  @Override
+  default Category category()
+  {
+    return Category.CHANGE_MODULE;
+  }
+
   /**
-   * The change is binary compatible
+   * @return The name of the module that changed
    */
 
-  BINARY_COMPATIBLE,
-
-  /**
-   * The change is binary incompatible
-   */
-
-  BINARY_INCOMPATIBLE
+  String module();
 }

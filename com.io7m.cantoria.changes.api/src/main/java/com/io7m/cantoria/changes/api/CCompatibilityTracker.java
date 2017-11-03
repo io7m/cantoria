@@ -14,16 +14,16 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
+package com.io7m.cantoria.changes.api;
 
 import com.io7m.cantoria.api.CVersion;
 import com.io7m.junreachable.UnreachableCodeException;
 
 import java.util.Objects;
 
-import static com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility.BINARY_INCOMPATIBLE;
-import static com.io7m.cantoria.changes.spi.CChangeSemanticVersioning.maximum;
-import static com.io7m.cantoria.changes.spi.CChangeSourceCompatibility.SOURCE_INCOMPATIBLE;
+import static com.io7m.cantoria.changes.api.CChangeBinaryCompatibility.BINARY_INCOMPATIBLE;
+import static com.io7m.cantoria.changes.api.CChangeSemanticVersioning.maximum;
+import static com.io7m.cantoria.changes.api.CChangeSourceCompatibility.SOURCE_INCOMPATIBLE;
 
 /**
  * A tracker for compatibility values.

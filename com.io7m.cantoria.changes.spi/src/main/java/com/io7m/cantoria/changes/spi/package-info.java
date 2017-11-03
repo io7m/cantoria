@@ -15,7 +15,7 @@
  */
 
 /**
- * Change types.
+ * Changes SPI.
  */
 
 package com.io7m.cantoria.changes.spi;

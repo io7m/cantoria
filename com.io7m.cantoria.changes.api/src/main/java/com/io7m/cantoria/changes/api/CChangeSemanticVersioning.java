@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
+package com.io7m.cantoria.changes.api;
 
 import com.io7m.junreachable.UnreachableCodeException;
 

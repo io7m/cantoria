@@ -14,25 +14,34 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
+package com.io7m.cantoria.changes.api;
 
-import com.io7m.cantoria.api.CEnum;
+import com.io7m.cantoria.api.CClassName;
+import com.io7m.cantoria.api.CMethod;
+import org.immutables.value.Value;
 
 /**
- * The type of changes related to enums.
+ * The type of changes related to methods.
  */
 
-public interface CChangeEnumType extends CChangeType
+public interface CChangeMethodType extends CChangeType
 {
   @Override
   default Category category()
   {
-    return Category.CHANGE_ENUM;
+    return Category.CHANGE_METHOD;
   }
 
   /**
-   * @return The enum
+   * @return The name of the class
    */
 
-  CEnum enumType();
+  CClassName className();
+
+  /**
+   * @return The changed method
+   */
+
+  @Value.Parameter
+  CMethod method();
 }

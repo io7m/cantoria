@@ -14,32 +14,23 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
-
-import com.io7m.cantoria.api.CClassName;
-import com.io7m.cantoria.api.CConstructor;
+package com.io7m.cantoria.changes.api;
 
 /**
- * The type of changes related to constructors.
+ * The source compatibility of a change
  */
 
-public interface CChangeConstructorType extends CChangeType
+public enum CChangeSourceCompatibility
 {
-  @Override
-  default Category category()
-  {
-    return Category.CHANGE_CONSTRUCTOR;
-  }
-
   /**
-   * @return The name of the class
+   * The change is source compatible
    */
 
-  CClassName className();
+  SOURCE_COMPATIBLE,
 
   /**
-   * @return The changed constructor
+   * The change is source incompatible
    */
 
-  CConstructor constructor();
+  SOURCE_INCOMPATIBLE
 }

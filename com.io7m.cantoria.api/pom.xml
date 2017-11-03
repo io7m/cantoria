@@ -15,7 +15,7 @@
   <artifactId>com.io7m.cantoria.api</artifactId>
   <packaging>jar</packaging>
 
-  <name>com.io7m.cantoria.changes.spi</name>
+  <name>com.io7m.cantoria.api</name>
   <description>Java 9+ API Analysis tool (API)</description>
   <url>http://io7m.github.io/cantoria/</url>
 

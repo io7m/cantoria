@@ -14,23 +14,25 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
+package com.io7m.cantoria.changes.api;
+
+import com.io7m.cantoria.api.CClass;
 
 /**
- * The source compatibility of a change
+ * The type of changes related to entire classes.
  */
 
-public enum CChangeSourceCompatibility
+public interface CChangeClassType extends CChangeType
 {
+  @Override
+  default Category category()
+  {
+    return Category.CHANGE_CLASS;
+  }
+
   /**
-   * The change is source compatible
+   * @return The class that changed
    */
 
-  SOURCE_COMPATIBLE,
-
-  /**
-   * The change is source incompatible
-   */
-
-  SOURCE_INCOMPATIBLE
+  CClass classValue();
 }

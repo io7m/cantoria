@@ -19,10 +19,10 @@ package com.io7m.cantoria.changes.vanilla.api;
 import com.io7m.cantoria.api.CClassName;
 import com.io7m.cantoria.api.CConstructor;
 import com.io7m.cantoria.api.CImmutableStyleType;
-import com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility;
-import com.io7m.cantoria.changes.spi.CChangeConstructorType;
-import com.io7m.cantoria.changes.spi.CChangeSemanticVersioning;
-import com.io7m.cantoria.changes.spi.CChangeSourceCompatibility;
+import com.io7m.cantoria.changes.api.CChangeBinaryCompatibility;
+import com.io7m.cantoria.changes.api.CChangeConstructorType;
+import com.io7m.cantoria.changes.api.CChangeSemanticVersioning;
+import com.io7m.cantoria.changes.api.CChangeSourceCompatibility;
 import org.immutables.value.Value;
 import org.immutables.vavr.encodings.VavrEncodingEnabled;
 

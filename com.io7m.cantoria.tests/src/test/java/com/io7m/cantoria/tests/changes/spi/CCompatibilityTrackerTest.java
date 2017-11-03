@@ -17,20 +17,20 @@
 package com.io7m.cantoria.tests.changes.spi;
 
 import com.io7m.cantoria.api.CVersion;
-import com.io7m.cantoria.changes.spi.CChangeType;
-import com.io7m.cantoria.changes.spi.CCompatibilityTracker;
+import com.io7m.cantoria.changes.api.CChangeType;
+import com.io7m.cantoria.changes.api.CCompatibilityTracker;
 import mockit.Expectations;
 import mockit.Mocked;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility.BINARY_COMPATIBLE;
-import static com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility.BINARY_INCOMPATIBLE;
-import static com.io7m.cantoria.changes.spi.CChangeSemanticVersioning.SEMANTIC_MAJOR;
-import static com.io7m.cantoria.changes.spi.CChangeSemanticVersioning.SEMANTIC_MINOR;
-import static com.io7m.cantoria.changes.spi.CChangeSemanticVersioning.SEMANTIC_NONE;
-import static com.io7m.cantoria.changes.spi.CChangeSourceCompatibility.SOURCE_COMPATIBLE;
-import static com.io7m.cantoria.changes.spi.CChangeSourceCompatibility.SOURCE_INCOMPATIBLE;
+import static com.io7m.cantoria.changes.api.CChangeBinaryCompatibility.BINARY_COMPATIBLE;
+import static com.io7m.cantoria.changes.api.CChangeBinaryCompatibility.BINARY_INCOMPATIBLE;
+import static com.io7m.cantoria.changes.api.CChangeSemanticVersioning.SEMANTIC_MAJOR;
+import static com.io7m.cantoria.changes.api.CChangeSemanticVersioning.SEMANTIC_MINOR;
+import static com.io7m.cantoria.changes.api.CChangeSemanticVersioning.SEMANTIC_NONE;
+import static com.io7m.cantoria.changes.api.CChangeSourceCompatibility.SOURCE_COMPATIBLE;
+import static com.io7m.cantoria.changes.api.CChangeSourceCompatibility.SOURCE_INCOMPATIBLE;
 
 public final class CCompatibilityTrackerTest
 {

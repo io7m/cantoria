@@ -14,26 +14,23 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
-
-import com.io7m.cantoria.changes.api.CChangeType;
+package com.io7m.cantoria.changes.api;
 
 /**
- * A receiver of change events.
+ * The binary compatibility of a change
  */
 
-public interface CChangeReceiverType
+public enum CChangeBinaryCompatibility
 {
   /**
-   * A change was encountered.
-   *
-   * @param originator The check that discovered the change
-   * @param change     The change
-   *
-   * @see CChangeCheckType
+   * The change is binary compatible
    */
 
-  void onChange(
-    CChangeCheckType originator,
-    CChangeType change);
+  BINARY_COMPATIBLE,
+
+  /**
+   * The change is binary incompatible
+   */
+
+  BINARY_INCOMPATIBLE
 }

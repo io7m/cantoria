@@ -14,23 +14,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
-
 /**
- * The type of changes related to entire modules.
+ * Change types API.
  */
 
-public interface CChangeModuleType extends CChangeType
-{
-  @Override
-  default Category category()
-  {
-    return Category.CHANGE_MODULE;
-  }
+package com.io7m.cantoria.changes.api;
 
-  /**
-   * @return The name of the module that changed
-   */
-
-  String module();
-}

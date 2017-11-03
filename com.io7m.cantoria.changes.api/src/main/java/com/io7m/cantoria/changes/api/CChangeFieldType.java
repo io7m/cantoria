@@ -14,34 +14,27 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
+package com.io7m.cantoria.changes.api;
 
-import com.io7m.cantoria.api.CClassName;
-import com.io7m.cantoria.api.CMethod;
+import com.io7m.cantoria.api.CField;
 import org.immutables.value.Value;
 
 /**
- * The type of changes related to methods.
+ * The type of changes related to fields.
  */
 
-public interface CChangeMethodType extends CChangeType
+public interface CChangeFieldType extends CChangeType
 {
   @Override
   default Category category()
   {
-    return Category.CHANGE_METHOD;
+    return Category.CHANGE_FIELD;
   }
 
   /**
-   * @return The name of the class
-   */
-
-  CClassName className();
-
-  /**
-   * @return The changed method
+   * @return The changed field
    */
 
   @Value.Parameter
-  CMethod method();
+  CField field();
 }

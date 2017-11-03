@@ -14,25 +14,25 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.changes.spi;
+package com.io7m.cantoria.changes.api;
 
-import com.io7m.cantoria.api.CClass;
+import com.io7m.cantoria.api.CEnum;
 
 /**
- * The type of changes related to entire classes.
+ * The type of changes related to enums.
  */
 
-public interface CChangeClassType extends CChangeType
+public interface CChangeEnumType extends CChangeType
 {
   @Override
   default Category category()
   {
-    return Category.CHANGE_CLASS;
+    return Category.CHANGE_ENUM;
   }
 
   /**
-   * @return The class that changed
+   * @return The enum
    */
 
-  CClass classValue();
+  CEnum enumType();
 }

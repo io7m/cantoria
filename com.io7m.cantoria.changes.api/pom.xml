@@ -12,11 +12,11 @@
     <version>0.0.1</version>
   </parent>
 
-  <artifactId>com.io7m.cantoria.changes.spi</artifactId>
+  <artifactId>com.io7m.cantoria.changes.api</artifactId>
   <packaging>jar</packaging>
 
-  <name>com.io7m.cantoria.changes.spi</name>
-  <description>Java 9+ API Analysis tool (Changes SPI)</description>
+  <name>com.io7m.cantoria.changes.api</name>
+  <description>Java 9+ API Analysis tool (Changes API)</description>
   <url>http://io7m.github.io/cantoria/</url>
 
   <scm>
@@ -29,11 +29,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.cantoria.api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.cantoria.changes.api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

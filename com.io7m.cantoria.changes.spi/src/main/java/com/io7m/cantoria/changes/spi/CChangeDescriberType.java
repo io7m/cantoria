@@ -16,6 +16,8 @@
 
 package com.io7m.cantoria.changes.spi;
 
+import com.io7m.cantoria.changes.api.CChangeType;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
