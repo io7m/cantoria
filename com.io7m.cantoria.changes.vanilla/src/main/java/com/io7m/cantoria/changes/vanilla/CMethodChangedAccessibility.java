@@ -30,7 +30,7 @@ import io.vavr.collection.List;
  */
 
 public final class CMethodChangedAccessibility
-  implements CMethodOverloadComparatorType
+  extends LocalizedCheck implements CMethodOverloadComparatorType
 {
   /**
    * Construct a comparator
@@ -38,7 +38,7 @@ public final class CMethodChangedAccessibility
 
   public CMethodChangedAccessibility()
   {
-
+    super(CMethodChangedAccessibility.class.getCanonicalName());
   }
 
   @Override
@@ -82,11 +82,5 @@ public final class CMethodChangedAccessibility
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.12");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Check if the accessibility of a method has changed";
   }
 }

@@ -40,7 +40,8 @@ import java.io.UncheckedIOException;
  * JLS 9 §13.4.8
  */
 
-public final class CFieldCheckRemovedOrMoved implements CFieldCheckRemovalType
+public final class CFieldCheckRemovedOrMoved
+  extends LocalizedCheck implements CFieldCheckRemovalType
 {
   /**
    * Construct a check
@@ -48,7 +49,7 @@ public final class CFieldCheckRemovedOrMoved implements CFieldCheckRemovalType
 
   public CFieldCheckRemovedOrMoved()
   {
-
+    super(CFieldCheckRemovedOrMoved.class.getCanonicalName());
   }
 
   @Override
@@ -103,11 +104,5 @@ public final class CFieldCheckRemovedOrMoved implements CFieldCheckRemovalType
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.8");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Check if a field has been removed or merely moved to a superclass";
   }
 }

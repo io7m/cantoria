@@ -47,7 +47,8 @@ import io.vavr.collection.Map;
  * @see CChangeInterfaceMethodStaticAddedType
  */
 
-public final class CMethodAddedToInterface implements CMethodCheckAdditionType
+public final class CMethodAddedToInterface
+  extends LocalizedCheck implements CMethodCheckAdditionType
 {
   /**
    * Construct a method check.
@@ -55,7 +56,7 @@ public final class CMethodAddedToInterface implements CMethodCheckAdditionType
 
   public CMethodAddedToInterface()
   {
-
+    super(CMethodAddedToInterface.class.getCanonicalName());
   }
 
   @Override
@@ -68,12 +69,6 @@ public final class CMethodAddedToInterface implements CMethodCheckAdditionType
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.5.3");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Check method additions to interfaces";
   }
 
   @Override

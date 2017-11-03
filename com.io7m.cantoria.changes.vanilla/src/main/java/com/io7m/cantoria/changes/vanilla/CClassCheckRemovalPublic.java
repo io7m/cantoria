@@ -34,7 +34,8 @@ import io.vavr.collection.List;
  * @see CChangeClassAddedPublic
  */
 
-public final class CClassCheckRemovalPublic implements CClassCheckRemovalType
+public final class CClassCheckRemovalPublic
+  extends LocalizedCheck implements CClassCheckRemovalType
 {
   /**
    * Construct a comparator
@@ -42,19 +43,13 @@ public final class CClassCheckRemovalPublic implements CClassCheckRemovalType
 
   public CClassCheckRemovalPublic()
   {
-
+    super(CClassCheckRemovalPublic.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.3");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Checks if any classes that were removed from the module were public";
   }
 
   @Override

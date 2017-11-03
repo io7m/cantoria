@@ -37,7 +37,7 @@ import java.util.Objects;
  */
 
 public final class CMethodExceptionsChanged
-  implements CMethodOverloadComparatorType
+  extends LocalizedCheck implements CMethodOverloadComparatorType
 {
   /**
    * Construct a comparator
@@ -45,7 +45,7 @@ public final class CMethodExceptionsChanged
 
   public CMethodExceptionsChanged()
   {
-
+    super(CMethodExceptionsChanged.class.getCanonicalName());
   }
 
   @Override
@@ -82,11 +82,5 @@ public final class CMethodExceptionsChanged
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.21");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Checks to see if the declared exceptions for a method have been changed";
   }
 }

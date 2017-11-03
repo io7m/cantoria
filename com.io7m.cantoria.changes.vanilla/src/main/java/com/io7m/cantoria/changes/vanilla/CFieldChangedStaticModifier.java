@@ -36,7 +36,8 @@ import io.vavr.collection.List;
  * @see CChangeClassFieldBecameStatic
  */
 
-public final class CFieldChangedStaticModifier implements CFieldComparatorType
+public final class CFieldChangedStaticModifier
+  extends LocalizedCheck implements CFieldComparatorType
 {
   /**
    * Construct a comparator
@@ -44,7 +45,7 @@ public final class CFieldChangedStaticModifier implements CFieldComparatorType
 
   public CFieldChangedStaticModifier()
   {
-
+    super(CFieldChangedStaticModifier.class.getCanonicalName());
   }
 
   @Override
@@ -94,11 +95,5 @@ public final class CFieldChangedStaticModifier implements CFieldComparatorType
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.10");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Compares the static modifier of fields.";
   }
 }

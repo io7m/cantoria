@@ -45,7 +45,7 @@ import io.vavr.collection.List;
  */
 
 public final class CMethodChangedFinality
-  implements CMethodOverloadComparatorType
+  extends LocalizedCheck implements CMethodOverloadComparatorType
 {
   /**
    * Construct a comparator
@@ -53,7 +53,7 @@ public final class CMethodChangedFinality
 
   public CMethodChangedFinality()
   {
-
+    super(CMethodChangedFinality.class.getCanonicalName());
   }
 
   @Override
@@ -66,12 +66,6 @@ public final class CMethodChangedFinality
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.17");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Compares the finality of methods.";
   }
 
   @Override

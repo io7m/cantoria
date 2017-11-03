@@ -342,6 +342,46 @@ public final class CPlainTextDescriber implements CChangeDescriberType
       this::onModuleServiceProvided);
   }
 
+  private static String bytecodeVersion(
+    final int version)
+  {
+    switch (version) {
+      case 41: {
+        return String.format("%d (%s)", Integer.valueOf(version), "Java 1.1");
+      }
+      case 46: {
+        return String.format("%d (%s)", Integer.valueOf(version), "Java 1.2");
+      }
+      case 47: {
+        return String.format("%d (%s)", Integer.valueOf(version), "Java 1.3");
+      }
+      case 49: {
+        return String.format("%d (%s)", Integer.valueOf(version), "Java 5");
+      }
+      case 50: {
+        return String.format("%d (%s)", Integer.valueOf(version), "Java 6");
+      }
+      case 51: {
+        return String.format("%d (%s)", Integer.valueOf(version), "Java 7");
+      }
+      case 52: {
+        return String.format("%d (%s)", Integer.valueOf(version), "Java 8");
+      }
+      case 53: {
+        return String.format("%d (%s)", Integer.valueOf(version), "Java 9");
+      }
+      default: {
+        return String.format("%d", Integer.valueOf(version));
+      }
+    }
+  }
+
+  private static BufferedWriter makeWriter(
+    final OutputStream out)
+  {
+    return new BufferedWriter(new OutputStreamWriter(out, UTF_8));
+  }
+
   private void onClassGenericsChanged(
     final BufferedWriter w,
     final CChangeType c)
@@ -1045,40 +1085,6 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.newLine();
   }
 
-  private static String bytecodeVersion(
-    final int version)
-  {
-    switch (version) {
-      case 41: {
-        return String.format("%d (%s)", Integer.valueOf(version), "Java 1.1");
-      }
-      case 46: {
-        return String.format("%d (%s)", Integer.valueOf(version), "Java 1.2");
-      }
-      case 47: {
-        return String.format("%d (%s)", Integer.valueOf(version), "Java 1.3");
-      }
-      case 49: {
-        return String.format("%d (%s)", Integer.valueOf(version), "Java 5");
-      }
-      case 50: {
-        return String.format("%d (%s)", Integer.valueOf(version), "Java 6");
-      }
-      case 51: {
-        return String.format("%d (%s)", Integer.valueOf(version), "Java 7");
-      }
-      case 52: {
-        return String.format("%d (%s)", Integer.valueOf(version), "Java 8");
-      }
-      case 53: {
-        return String.format("%d (%s)", Integer.valueOf(version), "Java 9");
-      }
-      default: {
-        return String.format("%d", Integer.valueOf(version));
-      }
-    }
-  }
-
   private void onClassAddedPublic(
     final BufferedWriter w,
     final CChangeType c)
@@ -1245,12 +1251,6 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     w.newLine();
   }
 
-  private static BufferedWriter makeWriter(
-    final OutputStream out)
-  {
-    return new BufferedWriter(new OutputStreamWriter(out, UTF_8));
-  }
-
   private void showChangeDetails(
     final CChangeCheckType originator,
     final CChangeType change,
@@ -1347,12 +1347,6 @@ public final class CPlainTextDescriber implements CChangeDescriberType
       w.append(originator.jlsReferences().collect(Collectors.joining(",")));
       w.newLine();
     }
-  }
-
-  private enum Revision
-  {
-    PREVIOUS,
-    CURRENT
   }
 
   private void showGenerics(
@@ -1497,6 +1491,12 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     this.showChangeDetails(originator, change, w);
     w.newLine();
     w.flush();
+  }
+
+  private enum Revision
+  {
+    PREVIOUS,
+    CURRENT
   }
 
   private interface DescriberType

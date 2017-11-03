@@ -44,7 +44,7 @@ import java.io.UncheckedIOException;
  */
 
 public final class CMethodAddedCheckStaticLinkage
-  implements CMethodCheckAdditionType
+  extends LocalizedCheck implements CMethodCheckAdditionType
 {
   /**
    * Construct a check.
@@ -52,7 +52,7 @@ public final class CMethodAddedCheckStaticLinkage
 
   public CMethodAddedCheckStaticLinkage()
   {
-
+    super(CMethodAddedCheckStaticLinkage.class.getCanonicalName());
   }
 
   @Override
@@ -65,12 +65,6 @@ public final class CMethodAddedCheckStaticLinkage
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.12");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Checks to see if the addition of a method would cause a linkage error.";
   }
 
   @Override

@@ -43,7 +43,7 @@ import java.io.UncheckedIOException;
  */
 
 public final class CFieldAddedCheckStaticLinkage
-  implements CFieldCheckAdditionType
+  extends LocalizedCheck implements CFieldCheckAdditionType
 {
   /**
    * Construct a check.
@@ -51,7 +51,7 @@ public final class CFieldAddedCheckStaticLinkage
 
   public CFieldAddedCheckStaticLinkage()
   {
-
+    super(CFieldAddedCheckStaticLinkage.class.getCanonicalName());
   }
 
   @Override
@@ -121,11 +121,5 @@ public final class CFieldAddedCheckStaticLinkage
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.8");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Checks to see if the addition of a field would cause a linkage error.";
   }
 }

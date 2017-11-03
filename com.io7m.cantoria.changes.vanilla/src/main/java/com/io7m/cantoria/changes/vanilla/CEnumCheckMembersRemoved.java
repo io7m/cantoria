@@ -40,7 +40,8 @@ import io.vavr.collection.Map;
  * @see CChangeEnumAddedMembers
  */
 
-public final class CEnumCheckMembersRemoved implements CEnumComparatorType
+public final class CEnumCheckMembersRemoved
+  extends LocalizedCheck implements CEnumComparatorType
 {
   /**
    * Construct a comparator
@@ -48,19 +49,13 @@ public final class CEnumCheckMembersRemoved implements CEnumComparatorType
 
   public CEnumCheckMembersRemoved()
   {
-
+    super(CEnumCheckMembersRemoved.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.26");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Checks if any members were removed from an enum";
   }
 
   @Override

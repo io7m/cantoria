@@ -42,7 +42,8 @@ import io.vavr.collection.Map;
  * reference the method or constructor declared in a superclass.</blockquote>
  */
 
-public final class CMethodAddedToClass implements CMethodCheckAdditionType
+public final class CMethodAddedToClass
+  extends LocalizedCheck implements CMethodCheckAdditionType
 {
   /**
    * Construct a method check.
@@ -50,9 +51,8 @@ public final class CMethodAddedToClass implements CMethodCheckAdditionType
 
   public CMethodAddedToClass()
   {
-
+    super(CMethodAddedToClass.class.getCanonicalName());
   }
-
 
   @Override
   public String name()
@@ -64,12 +64,6 @@ public final class CMethodAddedToClass implements CMethodCheckAdditionType
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.12");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Check method additions to classes";
   }
 
   @Override

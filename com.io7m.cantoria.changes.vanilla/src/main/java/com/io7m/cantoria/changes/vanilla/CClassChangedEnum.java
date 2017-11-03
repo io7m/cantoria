@@ -32,7 +32,8 @@ import io.vavr.collection.List;
  * @see CChangeClassBecameNonEnum
  */
 
-public final class CClassChangedEnum implements CClassComparatorType
+public final class CClassChangedEnum
+  extends LocalizedCheck implements CClassComparatorType
 {
   /**
    * Construct a comparator
@@ -40,19 +41,13 @@ public final class CClassChangedEnum implements CClassComparatorType
 
   public CClassChangedEnum()
   {
-
+    super(CClassChangedEnum.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.empty();
-  }
-
-  @Override
-  public String description()
-  {
-    return "Determine if a class has started or stopped being an enum";
   }
 
   @Override

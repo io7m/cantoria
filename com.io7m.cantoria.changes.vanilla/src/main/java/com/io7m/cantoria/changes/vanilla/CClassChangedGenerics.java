@@ -34,7 +34,8 @@ import java.util.Optional;
  * @see CChangeClassGenericsChanged
  */
 
-public final class CClassChangedGenerics implements CClassComparatorType
+public final class CClassChangedGenerics
+  extends LocalizedCheck implements CClassComparatorType
 {
   /**
    * Construct a comparator
@@ -42,19 +43,13 @@ public final class CClassChangedGenerics implements CClassComparatorType
 
   public CClassChangedGenerics()
   {
-
+    super(CClassChangedGenerics.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.empty();
-  }
-
-  @Override
-  public String description()
-  {
-    return "Determine if a class has modified generic parameters";
   }
 
   @Override

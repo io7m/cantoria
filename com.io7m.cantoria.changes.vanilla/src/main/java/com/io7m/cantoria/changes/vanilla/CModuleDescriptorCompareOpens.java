@@ -40,7 +40,7 @@ import io.vavr.collection.SortedSet;
  */
 
 public final class CModuleDescriptorCompareOpens
-  implements CModuleDescriptorComparatorType
+  extends LocalizedCheck implements CModuleDescriptorComparatorType
 {
   /**
    * Construct a comparator.
@@ -48,19 +48,13 @@ public final class CModuleDescriptorCompareOpens
 
   public CModuleDescriptorCompareOpens()
   {
-
+    super(CModuleDescriptorCompareOpens.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.3");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Determine if any packages have been newly opened, or have been removed";
   }
 
   @Override

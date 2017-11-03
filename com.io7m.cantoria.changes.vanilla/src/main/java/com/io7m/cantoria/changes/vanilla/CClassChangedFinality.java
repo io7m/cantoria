@@ -35,7 +35,8 @@ import io.vavr.collection.List;
  * @see CChangeClassBecameNonFinal
  */
 
-public final class CClassChangedFinality implements CClassComparatorType
+public final class CClassChangedFinality
+  extends LocalizedCheck implements CClassComparatorType
 {
   /**
    * Construct a comparator
@@ -43,19 +44,13 @@ public final class CClassChangedFinality implements CClassComparatorType
 
   public CClassChangedFinality()
   {
-
+    super(CClassChangedFinality.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.2");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Determine if a class has started or stopped being final";
   }
 
   @Override

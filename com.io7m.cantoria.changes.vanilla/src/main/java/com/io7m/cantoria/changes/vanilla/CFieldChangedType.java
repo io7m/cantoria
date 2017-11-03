@@ -34,7 +34,8 @@ import java.util.Objects;
  * @see CChangeClassFieldTypeChanged
  */
 
-public final class CFieldChangedType implements CFieldComparatorType
+public final class CFieldChangedType
+  extends LocalizedCheck implements CFieldComparatorType
 {
   /**
    * Construct a comparator
@@ -42,7 +43,7 @@ public final class CFieldChangedType implements CFieldComparatorType
 
   public CFieldChangedType()
   {
-
+    super(CFieldChangedType.class.getCanonicalName());
   }
 
   @Override
@@ -74,11 +75,5 @@ public final class CFieldChangedType implements CFieldComparatorType
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.10");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Compares the types of fields.";
   }
 }

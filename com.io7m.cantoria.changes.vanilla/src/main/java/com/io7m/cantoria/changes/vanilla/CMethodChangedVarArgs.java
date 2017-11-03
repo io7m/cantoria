@@ -34,7 +34,7 @@ import io.vavr.collection.List;
  */
 
 public final class CMethodChangedVarArgs
-  implements CMethodOverloadComparatorType
+  extends LocalizedCheck implements CMethodOverloadComparatorType
 {
   /**
    * Construct a comparator
@@ -42,7 +42,7 @@ public final class CMethodChangedVarArgs
 
   public CMethodChangedVarArgs()
   {
-
+    super(CMethodChangedVarArgs.class.getCanonicalName());
   }
 
   @Override
@@ -55,12 +55,6 @@ public final class CMethodChangedVarArgs
   public List<String> jlsReferences()
   {
     return List.empty();
-  }
-
-  @Override
-  public String description()
-  {
-    return "Compares the varargs modifier of methods.";
   }
 
   @Override

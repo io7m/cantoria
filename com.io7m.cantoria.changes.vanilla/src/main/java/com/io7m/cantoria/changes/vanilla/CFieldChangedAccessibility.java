@@ -34,7 +34,8 @@ import io.vavr.collection.List;
  * @see CChangeClassFieldBecameMoreAccessible
  */
 
-public final class CFieldChangedAccessibility implements CFieldComparatorType
+public final class CFieldChangedAccessibility
+  extends LocalizedCheck implements CFieldComparatorType
 {
   /**
    * Construct a comparator.
@@ -42,7 +43,7 @@ public final class CFieldChangedAccessibility implements CFieldComparatorType
 
   public CFieldChangedAccessibility()
   {
-
+    super(CFieldChangedAccessibility.class.getCanonicalName());
   }
 
   @Override
@@ -86,11 +87,5 @@ public final class CFieldChangedAccessibility implements CFieldComparatorType
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.7");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Compares the accessibility of fields.";
   }
 }

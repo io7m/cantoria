@@ -38,7 +38,7 @@ import io.vavr.collection.Map;
  */
 
 public final class CMethodRemovedFromInterface
-  implements CMethodCheckRemovalType
+  extends LocalizedCheck implements CMethodCheckRemovalType
 {
   /**
    * Construct a check.
@@ -46,7 +46,7 @@ public final class CMethodRemovedFromInterface
 
   public CMethodRemovedFromInterface()
   {
-
+    super(CMethodRemovedFromInterface.class.getCanonicalName());
   }
 
   @Override
@@ -59,12 +59,6 @@ public final class CMethodRemovedFromInterface
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.5.3");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Check interface method removals";
   }
 
   @Override

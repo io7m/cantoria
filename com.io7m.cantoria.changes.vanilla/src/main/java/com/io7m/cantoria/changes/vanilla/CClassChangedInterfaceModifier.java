@@ -33,8 +33,8 @@ import io.vavr.collection.List;
  * @see CChangeClassBecameNonInterface
  */
 
-public final class CClassChangedInterfaceModifier implements
-  CClassComparatorType
+public final class CClassChangedInterfaceModifier
+  extends LocalizedCheck implements CClassComparatorType
 {
   /**
    * Construct a comparator
@@ -42,19 +42,13 @@ public final class CClassChangedInterfaceModifier implements
 
   public CClassChangedInterfaceModifier()
   {
-
+    super(CClassChangedInterfaceModifier.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.empty();
-  }
-
-  @Override
-  public String description()
-  {
-    return "Determine if a class has started or stopped being an interface";
   }
 
   @Override

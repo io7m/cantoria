@@ -35,7 +35,7 @@ import io.vavr.collection.SortedSet;
  */
 
 public final class CModuleDescriptorCompareRequires
-  implements CModuleDescriptorComparatorType
+  extends LocalizedCheck implements CModuleDescriptorComparatorType
 {
   /**
    * Construct a comparator.
@@ -43,19 +43,13 @@ public final class CModuleDescriptorCompareRequires
 
   public CModuleDescriptorCompareRequires()
   {
-
+    super(CModuleDescriptorCompareRequires.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.3");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Determine if a module's requirements have changed";
   }
 
   @Override

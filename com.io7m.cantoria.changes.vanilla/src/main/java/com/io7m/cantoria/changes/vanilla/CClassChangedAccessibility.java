@@ -34,7 +34,8 @@ import io.vavr.collection.List;
  * @see CChangeClassBecameNonPublic
  */
 
-public final class CClassChangedAccessibility implements CClassComparatorType
+public final class CClassChangedAccessibility
+  extends LocalizedCheck implements CClassComparatorType
 {
   /**
    * Construct a comparator
@@ -42,19 +43,13 @@ public final class CClassChangedAccessibility implements CClassComparatorType
 
   public CClassChangedAccessibility()
   {
-
+    super(CClassChangedAccessibility.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.3");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Determine if a class has started or stopped being public";
   }
 
   @Override

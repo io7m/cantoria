@@ -35,7 +35,8 @@ import io.vavr.collection.List;
  * @see CChangeClassBecameNonAbstract
  */
 
-public final class CClassChangedAbstractness implements CClassComparatorType
+public final class CClassChangedAbstractness
+  extends LocalizedCheck implements CClassComparatorType
 {
   /**
    * Construct a comparator
@@ -43,19 +44,13 @@ public final class CClassChangedAbstractness implements CClassComparatorType
 
   public CClassChangedAbstractness()
   {
-
+    super(CClassChangedAbstractness.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.1");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Determine if a class has started or stopped being abstract";
   }
 
   @Override

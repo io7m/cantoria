@@ -48,7 +48,8 @@ import java.io.UncheckedIOException;
  * superclass.</blockquote>
  */
 
-public final class CMethodRemovedFromClass implements CMethodCheckRemovalType
+public final class CMethodRemovedFromClass
+  extends LocalizedCheck implements CMethodCheckRemovalType
 {
   /**
    * Construct a check.
@@ -56,7 +57,7 @@ public final class CMethodRemovedFromClass implements CMethodCheckRemovalType
 
   public CMethodRemovedFromClass()
   {
-
+    super(CMethodRemovedFromClass.class.getCanonicalName());
   }
 
   @Override
@@ -69,12 +70,6 @@ public final class CMethodRemovedFromClass implements CMethodCheckRemovalType
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.12");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Check method removals";
   }
 
   @Override

@@ -33,7 +33,8 @@ import io.vavr.collection.List;
  * @see com.io7m.cantoria.changes.vanilla.api.CChangeClassAddedPublic
  */
 
-public final class CClassCheckAdditionPublic implements CClassCheckAdditionType
+public final class CClassCheckAdditionPublic
+  extends LocalizedCheck implements CClassCheckAdditionType
 {
   /**
    * Construct a comparator
@@ -41,19 +42,13 @@ public final class CClassCheckAdditionPublic implements CClassCheckAdditionType
 
   public CClassCheckAdditionPublic()
   {
-
+    super(CClassCheckAdditionPublic.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.3");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Checks if any classes that were added to module the are public";
   }
 
   @Override

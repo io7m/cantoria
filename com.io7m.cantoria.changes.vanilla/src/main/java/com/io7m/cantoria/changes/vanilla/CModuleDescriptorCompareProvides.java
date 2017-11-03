@@ -35,7 +35,7 @@ import io.vavr.collection.Set;
  */
 
 public final class CModuleDescriptorCompareProvides
-  implements CModuleDescriptorComparatorType
+  extends LocalizedCheck implements CModuleDescriptorComparatorType
 {
   /**
    * Construct a comparator.
@@ -43,19 +43,13 @@ public final class CModuleDescriptorCompareProvides
 
   public CModuleDescriptorCompareProvides()
   {
-
+    super(CModuleDescriptorCompareProvides.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.3");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Determine if any new services have been provided or revoked";
   }
 
   @Override

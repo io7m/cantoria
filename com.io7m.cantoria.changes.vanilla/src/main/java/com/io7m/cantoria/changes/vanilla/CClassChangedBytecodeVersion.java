@@ -30,7 +30,8 @@ import io.vavr.collection.List;
  * @see CChangeClassBytecodeVersionChanged
  */
 
-public final class CClassChangedBytecodeVersion implements CClassComparatorType
+public final class CClassChangedBytecodeVersion
+  extends LocalizedCheck implements CClassComparatorType
 {
   /**
    * Construct a comparator
@@ -38,19 +39,13 @@ public final class CClassChangedBytecodeVersion implements CClassComparatorType
 
   public CClassChangedBytecodeVersion()
   {
-
+    super(CClassChangedBytecodeVersion.class.getCanonicalName());
   }
 
   @Override
   public List<String> jlsReferences()
   {
     return List.empty();
-  }
-
-  @Override
-  public String description()
-  {
-    return "Determine if a class's bytecode version has changed";
   }
 
   @Override

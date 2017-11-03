@@ -36,7 +36,8 @@ import io.vavr.collection.List;
  * @see CChangeClassFieldBecameNonFinal
  */
 
-public final class CFieldChangedFinality implements CFieldComparatorType
+public final class CFieldChangedFinality
+  extends LocalizedCheck implements CFieldComparatorType
 {
   /**
    * Construct a comparator
@@ -44,7 +45,7 @@ public final class CFieldChangedFinality implements CFieldComparatorType
 
   public CFieldChangedFinality()
   {
-
+    super(CFieldChangedFinality.class.getCanonicalName());
   }
 
   @Override
@@ -94,11 +95,5 @@ public final class CFieldChangedFinality implements CFieldComparatorType
   public List<String> jlsReferences()
   {
     return List.of("JLS 9 §13.4.9");
-  }
-
-  @Override
-  public String description()
-  {
-    return "Compares the finality of fields.";
   }
 }
