@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.tests.changes.spi;
+package com.io7m.cantoria.tests.changes.api;
 
 import com.io7m.cantoria.api.CVersion;
 import com.io7m.cantoria.changes.api.CChangeType;
@@ -223,5 +223,28 @@ public final class CCompatibilityTrackerTest
     Assertions.assertEquals(
       CVersion.of(1, 2, 4, ""),
       t.suggestVersionNumber(CVersion.of(1, 2, 3, "")));
+  }
+
+  @Test
+  public void testSuggestedVersionLessThanOne(
+    final @Mocked CChangeType c)
+  {
+    final CCompatibilityTracker t = CCompatibilityTracker.create();
+
+    new Expectations()
+    {{
+      c.sourceCompatibility();
+      this.result = SOURCE_INCOMPATIBLE;
+      c.binaryCompatibility();
+      this.result = BINARY_INCOMPATIBLE;
+      c.semanticVersioning();
+      this.result = SEMANTIC_MAJOR;
+    }};
+
+    t.onChange(c);
+
+    Assertions.assertEquals(
+      CVersion.of(0, 3, 2, ""),
+      t.suggestVersionNumber(CVersion.of(0, 3, 1, "")));
   }
 }

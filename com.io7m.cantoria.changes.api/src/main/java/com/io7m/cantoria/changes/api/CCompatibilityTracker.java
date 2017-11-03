@@ -111,6 +111,14 @@ public final class CCompatibilityTracker
   public CVersion suggestVersionNumber(
     final CVersion version)
   {
+    if (version.major() < 1) {
+      return CVersion.of(
+        version.major(),
+        version.minor(),
+        version.patch() + 1,
+        "");
+    }
+
     switch (this.semanticVersioning()) {
       case SEMANTIC_MAJOR: {
         return CVersion.of(
