@@ -16,12 +16,12 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import io.vavr.collection.SortedSet;
 import org.objectweb.asm.tree.ModuleNode;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
@@ -40,7 +40,7 @@ public final class CModuleWeaklyCaching implements CModuleType
   private CModuleWeaklyCaching(
     final CModuleType in_module)
   {
-    this.module = NullCheck.notNull(in_module, "Module");
+    this.module = Objects.requireNonNull(in_module, "Module");
     this.cache = new WeakHashMap<>();
   }
 

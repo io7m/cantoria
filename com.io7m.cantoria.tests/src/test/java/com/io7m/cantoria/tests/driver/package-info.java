@@ -18,6 +18,5 @@
  * Driver implementation tests
  */
 
-@com.io7m.jnull.NonNullByDefault
 package com.io7m.cantoria.tests.driver;
 

@@ -16,7 +16,6 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
@@ -25,6 +24,7 @@ import org.objectweb.asm.tree.ClassNode;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -55,8 +55,8 @@ public final class CClasses
     final CClass c)
     throws IOException
   {
-    NullCheck.notNull(registry, "Registry");
-    NullCheck.notNull(c, "Class");
+    Objects.requireNonNull(registry, "Registry");
+    Objects.requireNonNull(c, "Class");
 
     CClass current = c;
     List<CClass> supers = List.empty();
@@ -98,9 +98,9 @@ public final class CClasses
     final CModuleType module,
     final ClassNode node)
   {
-    NullCheck.notNull(name, "Name");
-    NullCheck.notNull(module, "Module");
-    NullCheck.notNull(node, "Node");
+    Objects.requireNonNull(name, "Name");
+    Objects.requireNonNull(module, "Module");
+    Objects.requireNonNull(node, "Node");
 
     return CClass.of(
       name,

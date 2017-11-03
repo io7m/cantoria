@@ -17,11 +17,11 @@
 package com.io7m.cantoria.api;
 
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 import io.vavr.collection.List;
 import org.immutables.value.Value;
 import org.immutables.vavr.encodings.VavrEncodingEnabled;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -100,7 +100,7 @@ public interface CGenericsType
       final String in_name)
     {
       this.descriptor = in_descriptor;
-      this.name = NullCheck.notNull(in_name, "name");
+      this.name = Objects.requireNonNull(in_name, "name");
     }
 
     /**

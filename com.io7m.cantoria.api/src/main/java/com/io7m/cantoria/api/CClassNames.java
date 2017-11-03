@@ -16,12 +16,12 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +47,7 @@ public final class CClassNames
   public static Tuple2<String, String> parseFullyQualifiedDotted(
     final String name)
   {
-    NullCheck.notNull(name, "name");
+    Objects.requireNonNull(name, "name");
 
     final List<String> components =
       List.of(name.split("\\."));
@@ -78,7 +78,7 @@ public final class CClassNames
   public static String toDottedName(
     final String name)
   {
-    NullCheck.notNull(name, "Name");
+    Objects.requireNonNull(name, "Name");
     return name.replace('/', '.');
   }
 
@@ -93,7 +93,7 @@ public final class CClassNames
   public static String toDashedName(
     final String name)
   {
-    NullCheck.notNull(name, "Name");
+    Objects.requireNonNull(name, "Name");
     return name.replace('.', '/');
   }
 
@@ -108,7 +108,7 @@ public final class CClassNames
   public static String show(
     final CClassName name)
   {
-    NullCheck.notNull(name, "Name");
+    Objects.requireNonNull(name, "Name");
     return new StringBuilder(64)
       .append(name.moduleName())
       .append("/")

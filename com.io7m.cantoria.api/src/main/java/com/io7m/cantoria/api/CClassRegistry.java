@@ -17,7 +17,6 @@
 package com.io7m.cantoria.api;
 
 import com.io7m.jaffirm.core.Invariants;
-import com.io7m.jnull.NullCheck;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import org.slf4j.Logger;
@@ -25,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -44,9 +44,9 @@ public final class CClassRegistry implements CClassRegistryType
     final HashMap<String, String> in_module_by_package)
   {
     this.modules_by_name =
-      NullCheck.notNull(in_modules_by_name, "Modules");
+      Objects.requireNonNull(in_modules_by_name, "Modules");
     this.module_by_package =
-      NullCheck.notNull(in_module_by_package, "Modules");
+      Objects.requireNonNull(in_module_by_package, "Modules");
   }
 
   /**
@@ -60,7 +60,7 @@ public final class CClassRegistry implements CClassRegistryType
   public static CClassRegistryType create(
     final List<CModuleType> modules)
   {
-    NullCheck.notNull(modules, "Archives");
+    Objects.requireNonNull(modules, "Archives");
 
     HashMap<String, CModuleType> modules_by_name = HashMap.empty();
     HashMap<String, String> module_by_package = HashMap.empty();
@@ -91,9 +91,9 @@ public final class CClassRegistry implements CClassRegistryType
     final String class_name)
     throws IOException
   {
-    NullCheck.notNull(module_name, "Module");
-    NullCheck.notNull(package_name, "Package");
-    NullCheck.notNull(class_name, "Class");
+    Objects.requireNonNull(module_name, "Module");
+    Objects.requireNonNull(package_name, "Package");
+    Objects.requireNonNull(class_name, "Class");
 
     if (LOG.isTraceEnabled()) {
       LOG.trace(
@@ -122,8 +122,8 @@ public final class CClassRegistry implements CClassRegistryType
     final String class_name)
     throws IOException
   {
-    NullCheck.notNull(package_name, "Package");
-    NullCheck.notNull(class_name, "Class");
+    Objects.requireNonNull(package_name, "Package");
+    Objects.requireNonNull(class_name, "Class");
 
     if (LOG.isTraceEnabled()) {
       LOG.trace("findClass: {}:{}", package_name, class_name);

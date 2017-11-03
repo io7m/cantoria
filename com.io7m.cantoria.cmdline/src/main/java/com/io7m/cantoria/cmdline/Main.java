@@ -18,10 +18,11 @@ package com.io7m.cantoria.cmdline;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import com.io7m.jnull.NullCheck;
 import io.vavr.collection.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 import static com.io7m.cantoria.cmdline.CommandStatus.COMMAND_FAILURE;
 
@@ -41,7 +42,7 @@ public final class Main
   private Main(
     final String[] in_args)
   {
-    this.args = NullCheck.notNull(in_args, "Arguments");
+    this.args = Objects.requireNonNull(in_args, "Arguments");
 
     final CommandCompare cc = new CommandCompare();
     this.commands = HashMap.of("compare", cc);
@@ -50,6 +51,19 @@ public final class Main
         .programName("cantoria")
         .addCommand(cc)
         .build();
+  }
+
+  /**
+   * Main entry point.
+   *
+   * @param args Command line arguments
+   */
+
+  public static void main(
+    final String[] args)
+  {
+    final Main main = new Main(args);
+    System.exit(main.run().exitCode());
   }
 
   /**
@@ -88,18 +102,5 @@ public final class Main
     final StringBuilder sb = new StringBuilder(128);
     this.jcommander.usage(sb);
     LOG.info("usage: {}", sb.toString());
-  }
-
-  /**
-   * Main entry point.
-   *
-   * @param args Command line arguments
-   */
-
-  public static void main(
-    final String[] args)
-  {
-    final Main main = new Main(args);
-    System.exit(main.run().exitCode());
   }
 }

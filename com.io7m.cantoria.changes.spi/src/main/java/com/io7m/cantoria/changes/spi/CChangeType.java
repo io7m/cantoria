@@ -16,7 +16,7 @@
 
 package com.io7m.cantoria.changes.spi;
 
-import com.io7m.jnull.NullCheck;
+import java.util.Objects;
 
 /**
  * The type of changes encountered when comparing modules.
@@ -95,7 +95,7 @@ public interface CChangeType
 
     Category(final Class<? extends CChangeType> type)
     {
-      this.type_class = NullCheck.notNull(type, "Category");
+      this.type_class = Objects.requireNonNull(type, "Category");
     }
 
     /**

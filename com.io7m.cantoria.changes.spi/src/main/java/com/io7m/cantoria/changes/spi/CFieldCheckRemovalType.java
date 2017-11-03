@@ -19,7 +19,8 @@ package com.io7m.cantoria.changes.spi;
 import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CField;
-import com.io7m.jnull.NullCheck;
+
+import java.util.Objects;
 
 /**
  * A check performed when a field is removed from a class.
@@ -57,10 +58,10 @@ public interface CFieldCheckRemovalType extends CChangeCheckType
     final CClass clazz,
     final CField field)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(registry, "Registry");
-    NullCheck.notNull(clazz, "Class");
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(registry, "Registry");
+    Objects.requireNonNull(clazz, "Class");
+    Objects.requireNonNull(field, "Field");
 
     this.checkFieldRemoval(receiver, registry, clazz, field);
   }

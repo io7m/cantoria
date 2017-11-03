@@ -17,12 +17,12 @@
 package com.io7m.cantoria.api;
 
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import org.objectweb.asm.tree.ClassNode;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -47,7 +47,7 @@ public final class CEnums
   public static CEnum enumValue(
     final CClass clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
 
     Preconditions.checkPrecondition(
       CClassModifiers.classIsEnum(clazz.node()),

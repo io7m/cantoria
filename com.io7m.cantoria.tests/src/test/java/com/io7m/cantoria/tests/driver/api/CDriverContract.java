@@ -120,12 +120,12 @@ import java.io.IOException;
 
 public abstract class CDriverContract
 {
-  private static final CClassName CLASS_NAME_X =
-    CClassName.of("x.y.z", "x.y.z.p", "X");
   public static final CClassName CLASS_NAME_Y = CClassName.of(
     "x.y.z",
     "x.y.z.p",
     "Y");
+  private static final CClassName CLASS_NAME_X =
+    CClassName.of("x.y.z", "x.y.z.p", "X");
 
   private static CClassRegistryType classRegistry(
     final CModuleType... modules)
@@ -148,6 +148,53 @@ public abstract class CDriverContract
   {
     return new FieldNode(
       Opcodes.ACC_PUBLIC, field_name, field_desc, null, null);
+  }
+
+  private static ClassNode anyClass()
+  {
+    return new ClassNode(Opcodes.ASM6);
+  }
+
+  private static CGClassSignature enumSignature(
+    final String long_name)
+  {
+    return CGClassSignature.builder()
+      .setSuperclass(
+        CGClassTypeSignature.builder()
+          .setTypeName("java.lang.Enum")
+          .setTypeArguments(CGTypeArguments.of(List.of(
+            CGTypeArgumentExactly.of(
+              CGFieldTypeSignatureClass.of(
+                CGClassTypeSignature.builder()
+                  .setTypeName(long_name)
+                  .setTypeArguments(CGTypeArguments.of(List.empty()))
+                  .build())))))
+          .build())
+      .build();
+  }
+
+  private static CGClassTypeSignature javaLangNumberSignature()
+  {
+    return CGClassTypeSignature.builder()
+      .setTypeName("java.lang.Number")
+      .setTypeArguments(CGTypeArguments.of(List.empty()))
+      .build();
+  }
+
+  private static CGClassTypeSignature javaLangIntegerSignature()
+  {
+    return CGClassTypeSignature.builder()
+      .setTypeName("java.lang.Integer")
+      .setTypeArguments(CGTypeArguments.of(List.empty()))
+      .build();
+  }
+
+  private static CGClassTypeSignature javaLangObjectSignature()
+  {
+    return CGClassTypeSignature.builder()
+      .setTypeName("java.lang.Object")
+      .setTypeArguments(CGTypeArguments.of(List.empty()))
+      .build();
   }
 
   protected abstract CComparisonDriverType driver();
@@ -708,11 +755,6 @@ public abstract class CDriverContract
     }};
   }
 
-  private static ClassNode anyClass()
-  {
-    return new ClassNode(Opcodes.ASM6);
-  }
-
   @Test
   public final void testClassAdded(
     final @Mocked CChangeReceiverType receiver)
@@ -1233,24 +1275,6 @@ public abstract class CDriverContract
       receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
       this.times = 7;
     }};
-  }
-
-  private static CGClassSignature enumSignature(
-    final String long_name)
-  {
-    return CGClassSignature.builder()
-      .setSuperclass(
-        CGClassTypeSignature.builder()
-          .setTypeName("java.lang.Enum")
-          .setTypeArguments(CGTypeArguments.of(List.of(
-            CGTypeArgumentExactly.of(
-              CGFieldTypeSignatureClass.of(
-                CGClassTypeSignature.builder()
-                  .setTypeName(long_name)
-                  .setTypeArguments(CGTypeArguments.of(List.empty()))
-                  .build())))))
-          .build())
-      .build();
   }
 
   @Test
@@ -3483,7 +3507,8 @@ public abstract class CDriverContract
                   .setParameters(List.of(
                     CGTypeParameter.builder()
                       .setName("A")
-                      .setType(CGFieldTypeSignatureClass.of(javaLangIntegerSignature()))
+                      .setType(CGFieldTypeSignatureClass.of(
+                        javaLangIntegerSignature()))
                       .build()))
                   .build())
               .build())
@@ -3500,7 +3525,8 @@ public abstract class CDriverContract
                   .setParameters(List.of(
                     CGTypeParameter.builder()
                       .setName("A")
-                      .setType(CGFieldTypeSignatureClass.of(javaLangNumberSignature()))
+                      .setType(CGFieldTypeSignatureClass.of(
+                        javaLangNumberSignature()))
                       .build()))
                   .build())
               .build())
@@ -3514,29 +3540,5 @@ public abstract class CDriverContract
       receiver.onChange((CChangeCheckType) this.any, (CChangeType) this.any);
       this.times = 1;
     }};
-  }
-
-  private static CGClassTypeSignature javaLangNumberSignature()
-  {
-    return CGClassTypeSignature.builder()
-      .setTypeName("java.lang.Number")
-      .setTypeArguments(CGTypeArguments.of(List.empty()))
-      .build();
-  }
-
-  private static CGClassTypeSignature javaLangIntegerSignature()
-  {
-    return CGClassTypeSignature.builder()
-      .setTypeName("java.lang.Integer")
-      .setTypeArguments(CGTypeArguments.of(List.empty()))
-      .build();
-  }
-
-  private static CGClassTypeSignature javaLangObjectSignature()
-  {
-    return CGClassTypeSignature.builder()
-      .setTypeName("java.lang.Object")
-      .setTypeArguments(CGTypeArguments.of(List.empty()))
-      .build();
   }
 }

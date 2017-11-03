@@ -17,12 +17,13 @@
 package com.io7m.cantoria.api;
 
 import com.io7m.jaffirm.core.Invariants;
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldNode;
+
+import java.util.Objects;
 
 /**
  * Functions to determine the modifiers of fields.
@@ -44,7 +45,7 @@ public final class CFieldModifiers
   public static boolean fieldIsPrivate(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
     return (field.access & Opcodes.ACC_PRIVATE) == Opcodes.ACC_PRIVATE;
   }
 
@@ -57,7 +58,7 @@ public final class CFieldModifiers
   public static boolean fieldIsPackagePrivate(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
     return (field.access & (Opcodes.ACC_PRIVATE | Opcodes.ACC_PUBLIC | Opcodes.ACC_PROTECTED)) == 0;
   }
 
@@ -70,7 +71,7 @@ public final class CFieldModifiers
   public static boolean fieldIsProtected(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
     return (field.access & Opcodes.ACC_PROTECTED) == Opcodes.ACC_PROTECTED;
   }
 
@@ -83,7 +84,7 @@ public final class CFieldModifiers
   public static boolean fieldIsPublic(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
     return (field.access & Opcodes.ACC_PUBLIC) == Opcodes.ACC_PUBLIC;
   }
 
@@ -96,7 +97,7 @@ public final class CFieldModifiers
   public static boolean fieldIsFinal(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
     return (field.access & Opcodes.ACC_FINAL) == Opcodes.ACC_FINAL;
   }
 
@@ -109,7 +110,7 @@ public final class CFieldModifiers
   public static boolean fieldIsStatic(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
     return (field.access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
   }
 
@@ -122,7 +123,7 @@ public final class CFieldModifiers
   public static CAccessibility fieldAccessibility(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
 
     if (fieldIsPublic(field)) {
       return CAccessibility.PUBLIC;
@@ -148,7 +149,7 @@ public final class CFieldModifiers
   public static Set<CModifier> fieldModifiers(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Method");
+    Objects.requireNonNull(field, "Method");
 
     Set<CModifier> m = HashSet.empty();
 
@@ -177,7 +178,7 @@ public final class CFieldModifiers
   public static boolean fieldIsTransient(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
     return (field.access & Opcodes.ACC_TRANSIENT) == Opcodes.ACC_TRANSIENT;
   }
 
@@ -190,7 +191,7 @@ public final class CFieldModifiers
   public static boolean fieldIsVolatile(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
     return (field.access & Opcodes.ACC_VOLATILE) == Opcodes.ACC_VOLATILE;
   }
 
@@ -203,7 +204,7 @@ public final class CFieldModifiers
   public static boolean fieldIsEnumMember(
     final FieldNode field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
     final int mix = fieldEnumMemberModifiers();
     return (field.access & mix) == mix;
   }

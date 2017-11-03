@@ -27,13 +27,13 @@ import com.io7m.cantoria.changes.spi.CChangeReceiverType;
 import com.io7m.cantoria.changes.spi.CClassCheckAdditionType;
 import com.io7m.cantoria.changes.spi.CClassCheckRemovalType;
 import com.io7m.jaffirm.core.Invariants;
-import com.io7m.jnull.NullCheck;
 import io.vavr.collection.SortedSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
@@ -90,10 +90,10 @@ public final class CModuleComparisons
     final CModuleType c_new)
     throws IOException
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(registry, "Registry");
-    NullCheck.notNull(c_old, "Module (old)");
-    NullCheck.notNull(c_new, "Module (new)");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(registry, "Registry");
+    Objects.requireNonNull(c_old, "Module (old)");
+    Objects.requireNonNull(c_new, "Module (new)");
 
     this.module_desc_comparisons.compareModuleDescriptors(
       receiver, c_old.descriptor(), c_new.descriptor());

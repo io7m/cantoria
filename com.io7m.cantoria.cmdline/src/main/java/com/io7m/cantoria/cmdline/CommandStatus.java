@@ -36,6 +36,12 @@ public enum CommandStatus
 
   private final int exit;
 
+  CommandStatus(
+    final int exitcode)
+  {
+    this.exit = exitcode;
+  }
+
   /**
    * @return The VM exit code implied by the status
    */
@@ -43,11 +49,5 @@ public enum CommandStatus
   public int exitCode()
   {
     return this.exit;
-  }
-
-  CommandStatus(
-    final int exitcode)
-  {
-    this.exit = exitcode;
   }
 }

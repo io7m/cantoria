@@ -16,9 +16,10 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import org.objectweb.asm.Type;
+
+import java.util.Objects;
 
 /**
  * Functions over field types.
@@ -42,7 +43,7 @@ public final class CFieldTypes
   public static String parseFieldType(
     final String signature)
   {
-    NullCheck.notNull(signature, "Signature");
+    Objects.requireNonNull(signature, "Signature");
     final Type r = Type.getType(signature);
     return r.getClassName();
   }

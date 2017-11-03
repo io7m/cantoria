@@ -100,7 +100,6 @@ import com.io7m.cantoria.changes.vanilla.api.CChangeModuleRequired;
 import com.io7m.cantoria.changes.vanilla.api.CChangeModuleServiceNoLongerProvided;
 import com.io7m.cantoria.changes.vanilla.api.CChangeModuleServiceProvided;
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 
 import java.io.BufferedWriter;
@@ -108,6 +107,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -1485,7 +1485,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
   private static String fieldStart(
     final String name)
   {
-    NullCheck.notNull(name, "Name");
+    Objects.requireNonNull(name, "Name");
     return String.format("%-36s ", name + ":");
   }
 
@@ -1565,9 +1565,9 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final OutputStream out)
     throws IOException
   {
-    NullCheck.notNull(originator, "Originator");
-    NullCheck.notNull(change, "Change");
-    NullCheck.notNull(out, "Output");
+    Objects.requireNonNull(originator, "Originator");
+    Objects.requireNonNull(change, "Change");
+    Objects.requireNonNull(out, "Output");
 
     final DescriberType text =
       this.types.get(change.getClass());

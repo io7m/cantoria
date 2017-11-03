@@ -24,7 +24,6 @@ import com.io7m.cantoria.changes.spi.CChangeReceiverType;
 import com.io7m.cantoria.changes.spi.CClassComparatorType;
 import com.io7m.cantoria.changes.spi.CEnumComparatorType;
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,10 +76,10 @@ public final class CClassComparisons
     final CClass class_old,
     final CClass class_new)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(registry, "Registry");
-    NullCheck.notNull(class_old, "Class (old)");
-    NullCheck.notNull(class_new, "Class (new)");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(registry, "Registry");
+    Objects.requireNonNull(class_old, "Class (old)");
+    Objects.requireNonNull(class_new, "Class (new)");
 
     Preconditions.checkPrecondition(
       class_new.name(),
@@ -119,10 +118,10 @@ public final class CClassComparisons
     final CEnum enum_old,
     final CEnum enum_new)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(registry, "Registry");
-    NullCheck.notNull(enum_old, "Class (old)");
-    NullCheck.notNull(enum_new, "Class (new)");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(registry, "Registry");
+    Objects.requireNonNull(enum_old, "Class (old)");
+    Objects.requireNonNull(enum_new, "Class (new)");
 
     Preconditions.checkPrecondition(
       enum_new.name(),

@@ -18,7 +18,6 @@ package com.io7m.cantoria.changes.spi;
 
 import com.io7m.cantoria.api.CModuleDescriptor;
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 
 import java.util.Objects;
 
@@ -54,9 +53,9 @@ public interface CModuleDescriptorComparatorType extends CChangeCheckType
     final CModuleDescriptor md_old,
     final CModuleDescriptor md_new)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(md_old, "Module (old)");
-    NullCheck.notNull(md_new, "Module (new)");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(md_old, "Module (old)");
+    Objects.requireNonNull(md_new, "Module (new)");
 
     Preconditions.checkPrecondition(
       md_old.name(),

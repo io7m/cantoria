@@ -16,9 +16,9 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +43,7 @@ public final class CConstructors
   public static String show(
     final CConstructor constructor)
   {
-    NullCheck.notNull(constructor, "Constructor");
+    Objects.requireNonNull(constructor, "Constructor");
 
     final StringBuilder sb = new StringBuilder(64);
     final String kw = constructor.accessibility().keyword();

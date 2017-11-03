@@ -18,7 +18,8 @@ package com.io7m.cantoria.changes.spi;
 
 import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CClassRegistryType;
-import com.io7m.jnull.NullCheck;
+
+import java.util.Objects;
 
 /**
  * A check performed when a class is added to a module.
@@ -52,9 +53,9 @@ public interface CClassCheckAdditionType extends CChangeCheckType
     final CClassRegistryType registry,
     final CClass clazz)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(registry, "Registry");
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(registry, "Registry");
+    Objects.requireNonNull(clazz, "Class");
 
     this.checkClassAddition(receiver, registry, clazz);
   }

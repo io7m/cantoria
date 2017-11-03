@@ -19,10 +19,10 @@ package com.io7m.cantoria.driver;
 import com.io7m.cantoria.api.CModuleDescriptor;
 import com.io7m.cantoria.changes.spi.CChangeReceiverType;
 import com.io7m.cantoria.changes.spi.CModuleDescriptorComparatorType;
-import com.io7m.jnull.NullCheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.ServiceLoader;
 
 /**
@@ -63,9 +63,9 @@ public final class CModuleDescriptorComparisons
     final CModuleDescriptor md_old,
     final CModuleDescriptor md_new)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(md_old, "Module descriptor (old)");
-    NullCheck.notNull(md_new, "Module descriptor (new)");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(md_old, "Module descriptor (old)");
+    Objects.requireNonNull(md_new, "Module descriptor (new)");
 
     this.services.forEach(
       check -> {

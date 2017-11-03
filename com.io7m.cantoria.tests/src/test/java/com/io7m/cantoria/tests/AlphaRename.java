@@ -1,8 +1,8 @@
 package com.io7m.cantoria.tests;
 
 import com.io7m.cantoria.api.CGClassSignature;
-import com.io7m.cantoria.api.CGenericsUniqueNames;
 import com.io7m.cantoria.api.CGenericsParsing;
+import com.io7m.cantoria.api.CGenericsUniqueNames;
 
 import java.io.BufferedReader;
 import java.io.IOException;

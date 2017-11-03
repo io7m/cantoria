@@ -16,7 +16,7 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
+import java.util.Objects;
 
 /**
  * The accessibility of a language element such as a class, field, or method.
@@ -56,7 +56,7 @@ public enum CAccessibility
     final String in_keyword)
   {
     this.accessibility = in_access;
-    this.keyword = NullCheck.notNull(in_keyword, "Keyword");
+    this.keyword = Objects.requireNonNull(in_keyword, "Keyword");
   }
 
   /**

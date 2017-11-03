@@ -16,9 +16,10 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import org.immutables.value.Value;
 import org.immutables.vavr.encodings.VavrEncodingEnabled;
+
+import java.util.Objects;
 
 /**
  * <p>The version number of an archive.</p>
@@ -78,7 +79,7 @@ public interface CVersionType extends Comparable<CVersionType>
   default int compareTo(
     final CVersionType other)
   {
-    NullCheck.notNull(other, "Other");
+    Objects.requireNonNull(other, "Other");
 
     final int r_major =
       Integer.compareUnsigned(this.major(), other.major());

@@ -16,9 +16,9 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,7 +53,7 @@ public final class CVersions
   public static String showVersion(
     final CVersion v)
   {
-    NullCheck.notNull(v, "Version");
+    Objects.requireNonNull(v, "Version");
 
     final StringBuilder sb = new StringBuilder(32);
     sb.append(v.major());
@@ -107,7 +107,7 @@ public final class CVersions
   public static CVersion parse(
     final String text)
   {
-    NullCheck.notNull(text, "Text");
+    Objects.requireNonNull(text, "Text");
 
     {
       final Matcher m = THREE_PART.matcher(text);

@@ -16,7 +16,7 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
+import java.util.Objects;
 
 /**
  * The modifiers for a field, class, or method.
@@ -83,7 +83,7 @@ public enum CModifier
   CModifier(
     final String in_keyword)
   {
-    this.keyword = NullCheck.notNull(in_keyword, "Keyword");
+    this.keyword = Objects.requireNonNull(in_keyword, "Keyword");
   }
 
   /**

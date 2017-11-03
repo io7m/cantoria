@@ -17,7 +17,6 @@
 package com.io7m.cantoria.api;
 
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnimplementedCodeException;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.List;
@@ -27,6 +26,7 @@ import org.objectweb.asm.signature.SignatureVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -56,7 +56,7 @@ public final class CGenericsParsing
   public static CGClassSignature parseClassSignature(
     final String signature)
   {
-    NullCheck.notNull(signature, "Signature");
+    Objects.requireNonNull(signature, "Signature");
 
     LOG.trace("parseClassTypeSignature: {}", signature);
 
@@ -120,7 +120,7 @@ public final class CGenericsParsing
         in_depth);
 
       this.on_completion =
-        NullCheck.notNull(in_on_completion, "On completion");
+        Objects.requireNonNull(in_on_completion, "On completion");
 
       this.type_arguments = List.empty();
     }
@@ -188,7 +188,7 @@ public final class CGenericsParsing
       this.type_arguments =
         List.empty();
       this.on_completion =
-        NullCheck.notNull(in_on_completion, "On completion");
+        Objects.requireNonNull(in_on_completion, "On completion");
     }
 
     @Override
@@ -254,7 +254,7 @@ public final class CGenericsParsing
     {
       super(Opcodes.ASM6);
       this.depth = in_depth;
-      this.logger = NullCheck.notNull(in_logger, "Logger");
+      this.logger = Objects.requireNonNull(in_logger, "Logger");
       this.onStart();
     }
 
@@ -407,7 +407,7 @@ public final class CGenericsParsing
         in_depth);
 
       this.array_builder = CGFieldTypeSignatureArray.builder();
-      this.on_completion = NullCheck.notNull(in_on_completion, "Consumer");
+      this.on_completion = Objects.requireNonNull(in_on_completion, "Consumer");
       this.type_arguments = List.empty();
     }
 
@@ -511,7 +511,7 @@ public final class CGenericsParsing
       this.collecting_inners = false;
 
       this.on_completion =
-        NullCheck.notNull(in_on_completion, "On completion");
+        Objects.requireNonNull(in_on_completion, "On completion");
     }
 
     @Override
@@ -740,7 +740,7 @@ public final class CGenericsParsing
         in_depth);
 
       this.on_completion =
-        NullCheck.notNull(in_on_completion, "On completion");
+        Objects.requireNonNull(in_on_completion, "On completion");
 
       this.type_arguments = List.empty();
       this.type_arguments_inner = List.empty();
@@ -856,9 +856,9 @@ public final class CGenericsParsing
         in_depth);
 
       this.argument_kind =
-        NullCheck.notNull(in_wildcard_type, "Kind");
+        Objects.requireNonNull(in_wildcard_type, "Kind");
       this.on_completion =
-        NullCheck.notNull(in_on_completion, "On completion");
+        Objects.requireNonNull(in_on_completion, "On completion");
 
       this.class_type_arguments = List.empty();
     }

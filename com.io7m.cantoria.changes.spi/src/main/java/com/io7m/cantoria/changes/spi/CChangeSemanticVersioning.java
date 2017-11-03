@@ -16,8 +16,9 @@
 
 package com.io7m.cantoria.changes.spi;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
+
+import java.util.Objects;
 
 /**
  * The compatibility according to semantic versioning
@@ -56,8 +57,8 @@ public enum CChangeSemanticVersioning
     final CChangeSemanticVersioning x,
     final CChangeSemanticVersioning y)
   {
-    NullCheck.notNull(x, "x");
-    NullCheck.notNull(y, "y");
+    Objects.requireNonNull(x, "x");
+    Objects.requireNonNull(y, "y");
 
     switch (x) {
       case SEMANTIC_MAJOR: {

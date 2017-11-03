@@ -19,7 +19,6 @@ package com.io7m.cantoria.changes.spi;
 import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 
 import java.util.Objects;
 
@@ -59,10 +58,10 @@ public interface CClassComparatorType extends CChangeCheckType
     final CClass clazz_old,
     final CClass clazz_new)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(registry, "Registry");
-    NullCheck.notNull(clazz_old, "Class (old)");
-    NullCheck.notNull(clazz_new, "Class (new)");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(registry, "Registry");
+    Objects.requireNonNull(clazz_old, "Class (old)");
+    Objects.requireNonNull(clazz_new, "Class (new)");
 
     Preconditions.checkPrecondition(
       clazz_new.node().name,

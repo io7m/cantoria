@@ -26,7 +26,6 @@ import com.io7m.cantoria.changes.spi.CMethodCheckAdditionType;
 import com.io7m.cantoria.changes.spi.CMethodCheckRemovalType;
 import com.io7m.cantoria.changes.spi.CMethodOverloadComparatorType;
 import com.io7m.jaffirm.core.Invariants;
-import com.io7m.jnull.NullCheck;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
@@ -36,6 +35,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.ServiceLoader;
 
 /**
@@ -104,9 +104,9 @@ public final class CMethodComparisons
     final CClass class_old,
     final CClass class_new)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(class_old, "Class (old)");
-    NullCheck.notNull(class_new, "Class (new)");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(class_old, "Class (old)");
+    Objects.requireNonNull(class_new, "Class (new)");
 
     final TreeMap<String, Map<String, CMethod>> methods_old =
       collectMethods(class_old);

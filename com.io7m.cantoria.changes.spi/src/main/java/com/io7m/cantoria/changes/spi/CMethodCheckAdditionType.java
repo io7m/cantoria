@@ -20,7 +20,6 @@ import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CMethod;
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 import io.vavr.collection.Map;
 
 import java.util.Objects;
@@ -71,12 +70,12 @@ public interface CMethodCheckAdditionType extends CChangeCheckType
     final CMethod method,
     final Map<String, CMethod> overloads)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(registry, "Registry");
-    NullCheck.notNull(class_old, "Class (old)");
-    NullCheck.notNull(class_new, "Class (new)");
-    NullCheck.notNull(method, "Method");
-    NullCheck.notNull(overloads, "Overloads");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(registry, "Registry");
+    Objects.requireNonNull(class_old, "Class (old)");
+    Objects.requireNonNull(class_new, "Class (new)");
+    Objects.requireNonNull(method, "Method");
+    Objects.requireNonNull(overloads, "Overloads");
 
     Preconditions.checkPrecondition(
       overloads.filter(

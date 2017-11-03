@@ -19,6 +19,8 @@ package com.io7m.cantoria.api;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.List;
 
+import java.util.Objects;
+
 /**
  * Functions to compare type signatures.
  */
@@ -47,6 +49,9 @@ public final class CGenericsComparison
     final List<CGTypeParameter> a,
     final List<CGTypeParameter> b)
   {
+    Objects.requireNonNull(a, "A");
+    Objects.requireNonNull(b, "B");
+
     final CGenericsUniqueNames.UniqueNamesType names_a =
       CGenericsUniqueNames.emptyUniqueNames();
     final List<CGTypeParameter> ap =

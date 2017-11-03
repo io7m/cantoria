@@ -18,6 +18,5 @@
  * Test for the changes SPI.
  */
 
-@com.io7m.jnull.NonNullByDefault
 package com.io7m.cantoria.tests.changes.spi;
 

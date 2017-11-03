@@ -26,7 +26,6 @@ import com.io7m.cantoria.changes.spi.CFieldCheckAdditionType;
 import com.io7m.cantoria.changes.spi.CFieldCheckRemovalType;
 import com.io7m.cantoria.changes.spi.CFieldComparatorType;
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 import io.vavr.collection.List;
 import io.vavr.collection.SortedMap;
 import io.vavr.collection.SortedSet;
@@ -84,11 +83,11 @@ public final class CFieldComparisons
     final CClass c_new,
     final CField field_new)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(c_old, "Class (old)");
-    NullCheck.notNull(field_old, "Field (old)");
-    NullCheck.notNull(c_new, "Class (new)");
-    NullCheck.notNull(field_new, "Field (new)");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(c_old, "Class (old)");
+    Objects.requireNonNull(field_old, "Field (old)");
+    Objects.requireNonNull(c_new, "Class (new)");
+    Objects.requireNonNull(field_new, "Field (new)");
 
     Preconditions.checkPrecondition(
       c_new.node().name,
@@ -118,9 +117,9 @@ public final class CFieldComparisons
     final CClass c_old,
     final CClass c_new)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(c_old, "Class (old)");
-    NullCheck.notNull(c_new, "Class (new)");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(c_old, "Class (old)");
+    Objects.requireNonNull(c_new, "Class (new)");
 
     Preconditions.checkPrecondition(
       c_new.node().name,

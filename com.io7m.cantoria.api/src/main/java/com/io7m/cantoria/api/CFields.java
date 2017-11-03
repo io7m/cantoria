@@ -16,7 +16,6 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -53,8 +52,8 @@ public final class CFields
     final CClass clazz,
     final String name)
   {
-    NullCheck.notNull(clazz, "Clazz");
-    NullCheck.notNull(name, "Name");
+    Objects.requireNonNull(clazz, "Clazz");
+    Objects.requireNonNull(name, "Name");
 
     return clazz.node().fields.stream()
       .filter(m -> Objects.equals(m.name, name))
@@ -79,9 +78,9 @@ public final class CFields
     final String name,
     final String type)
   {
-    NullCheck.notNull(clazz, "Clazz");
-    NullCheck.notNull(name, "Name");
-    NullCheck.notNull(type, "Type");
+    Objects.requireNonNull(clazz, "Clazz");
+    Objects.requireNonNull(name, "Name");
+    Objects.requireNonNull(type, "Type");
 
     return clazz.node().fields.stream()
       .filter(m -> Objects.equals(m.name, name) && Objects.equals(m.desc, type))
@@ -109,9 +108,9 @@ public final class CFields
     final String name)
     throws IOException
   {
-    NullCheck.notNull(class_registry, "Class registry");
-    NullCheck.notNull(clazz, "Clazz");
-    NullCheck.notNull(name, "Name");
+    Objects.requireNonNull(class_registry, "Class registry");
+    Objects.requireNonNull(clazz, "Clazz");
+    Objects.requireNonNull(name, "Name");
 
     return CClasses.superclassesOf(class_registry, clazz)
       .map(c -> Tuple.of(c, findFieldsWithName(c, name)))
@@ -143,10 +142,10 @@ public final class CFields
     final String type)
     throws IOException
   {
-    NullCheck.notNull(class_registry, "Class registry");
-    NullCheck.notNull(clazz, "Clazz");
-    NullCheck.notNull(name, "Name");
-    NullCheck.notNull(type, "Type");
+    Objects.requireNonNull(class_registry, "Class registry");
+    Objects.requireNonNull(clazz, "Clazz");
+    Objects.requireNonNull(name, "Name");
+    Objects.requireNonNull(type, "Type");
 
     return CClasses.superclassesOf(class_registry, clazz)
       .map(c -> Tuple.of(c, findFieldsWithNameAndType(c, name, type)))
@@ -167,8 +166,8 @@ public final class CFields
     final CClassName clazz,
     final FieldNode field)
   {
-    NullCheck.notNull(clazz, "Class");
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(clazz, "Class");
+    Objects.requireNonNull(field, "Field");
 
     return CField.builder()
       .setAccessibility(CFieldModifiers.fieldAccessibility(field))
@@ -191,7 +190,7 @@ public final class CFields
   public static String show(
     final CField field)
   {
-    NullCheck.notNull(field, "Field");
+    Objects.requireNonNull(field, "Field");
 
     final StringBuilder sb = new StringBuilder(64);
     final String kw = field.accessibility().keyword();

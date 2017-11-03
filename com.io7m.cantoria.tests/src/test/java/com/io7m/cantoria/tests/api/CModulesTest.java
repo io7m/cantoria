@@ -28,15 +28,6 @@ import java.util.Optional;
 
 public final class CModulesTest
 {
-  @Test
-  public void testJavaBase()
-    throws Exception
-  {
-    try (CModuleType m = CModules.openPlatformModule("java.base")) {
-      checkBase(m);
-    }
-  }
-
   private static void checkBase(final CModuleType m)
     throws IOException
   {
@@ -58,6 +49,15 @@ public final class CModulesTest
       final CClass object = object_opt.get();
       Assertions.assertEquals("Object", object.name().className());
       Assertions.assertEquals("java.lang", object.name().packageName());
+    }
+  }
+
+  @Test
+  public void testJavaBase()
+    throws Exception
+  {
+    try (CModuleType m = CModules.openPlatformModule("java.base")) {
+      checkBase(m);
     }
   }
 

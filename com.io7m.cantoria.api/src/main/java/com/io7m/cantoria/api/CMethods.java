@@ -16,7 +16,6 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -53,8 +52,8 @@ public final class CMethods
     final CClass clazz,
     final String name)
   {
-    NullCheck.notNull(clazz, "Clazz");
-    NullCheck.notNull(name, "Name");
+    Objects.requireNonNull(clazz, "Clazz");
+    Objects.requireNonNull(name, "Name");
 
     return List.ofAll(
       clazz.node().methods.stream()
@@ -79,9 +78,9 @@ public final class CMethods
     final String name,
     final String descriptor)
   {
-    NullCheck.notNull(clazz, "Clazz");
-    NullCheck.notNull(name, "Name");
-    NullCheck.notNull(descriptor, "Descriptor");
+    Objects.requireNonNull(clazz, "Clazz");
+    Objects.requireNonNull(name, "Name");
+    Objects.requireNonNull(descriptor, "Descriptor");
 
     return clazz.node().methods.stream()
       .filter(m -> Objects.equals(m.name, name)
@@ -110,9 +109,9 @@ public final class CMethods
     final String name)
     throws IOException
   {
-    NullCheck.notNull(class_registry, "Class registry");
-    NullCheck.notNull(clazz, "Clazz");
-    NullCheck.notNull(name, "Name");
+    Objects.requireNonNull(class_registry, "Class registry");
+    Objects.requireNonNull(clazz, "Clazz");
+    Objects.requireNonNull(name, "Name");
 
     return CClasses.superclassesOf(class_registry, clazz)
       .map(c -> Tuple.of(c, findMethodsWithName(c, name)))
@@ -143,10 +142,10 @@ public final class CMethods
     final String descriptor)
     throws IOException
   {
-    NullCheck.notNull(class_registry, "Class registry");
-    NullCheck.notNull(clazz, "Clazz");
-    NullCheck.notNull(name, "Name");
-    NullCheck.notNull(descriptor, "Descriptor");
+    Objects.requireNonNull(class_registry, "Class registry");
+    Objects.requireNonNull(clazz, "Clazz");
+    Objects.requireNonNull(name, "Name");
+    Objects.requireNonNull(descriptor, "Descriptor");
 
     return CClasses.superclassesOf(class_registry, clazz)
       .map(c -> Tuple.of(c, findMethodWithNameAndType(c, name, descriptor)))
@@ -165,7 +164,7 @@ public final class CMethods
   public static String show(
     final CMethod method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
 
     final StringBuilder sb = new StringBuilder(64);
     final String kw = method.accessibility().keyword();

@@ -17,7 +17,6 @@
 package com.io7m.cantoria.api;
 
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.SortedSet;
 import io.vavr.collection.TreeSet;
@@ -34,6 +33,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -77,9 +77,9 @@ public final class CModules
     final ZipFile input)
     throws IOException
   {
-    NullCheck.notNull(path, "Path");
-    NullCheck.notNull(version, "Version");
-    NullCheck.notNull(input, "Input");
+    Objects.requireNonNull(path, "Path");
+    Objects.requireNonNull(version, "Version");
+    Objects.requireNonNull(input, "Input");
 
     final CArchiveDescriptor archive_descriptor =
       CArchiveDescriptor.of(path, version);
@@ -113,8 +113,8 @@ public final class CModules
     final CVersion version)
     throws IOException
   {
-    NullCheck.notNull(path, "Path");
-    NullCheck.notNull(version, "Version");
+    Objects.requireNonNull(path, "Path");
+    Objects.requireNonNull(version, "Version");
     return openFromZip(path, version, new ZipFile(path.toFile()));
   }
 
@@ -197,9 +197,9 @@ public final class CModules
       final CArchiveDescriptor in_descriptor)
     {
       this.zip =
-        NullCheck.notNull(in_zip, "Zip");
+        Objects.requireNonNull(in_zip, "Zip");
       this.descriptor =
-        NullCheck.notNull(in_descriptor, "Descriptor");
+        Objects.requireNonNull(in_descriptor, "Descriptor");
     }
 
     @Override
@@ -238,7 +238,7 @@ public final class CModules
       final CArchiveDescriptor in_descriptor)
     {
       this.descriptor =
-        NullCheck.notNull(in_descriptor, "Descriptor");
+        Objects.requireNonNull(in_descriptor, "Descriptor");
     }
 
     @Override
@@ -281,13 +281,13 @@ public final class CModules
       final CModuleDescriptor in_module_desc)
     {
       this.archive =
-        NullCheck.notNull(in_archive, "Archive");
+        Objects.requireNonNull(in_archive, "Archive");
       this.module_path =
-        NullCheck.notNull(in_module_path, "Module path");
+        Objects.requireNonNull(in_module_path, "Module path");
       this.module_node =
-        NullCheck.notNull(in_module_node, "Module node");
+        Objects.requireNonNull(in_module_node, "Module node");
       this.module_desc =
-        NullCheck.notNull(in_module_desc, "Module descriptor");
+        Objects.requireNonNull(in_module_desc, "Module descriptor");
     }
 
     private static boolean looksLikeClassFile(
@@ -326,8 +326,8 @@ public final class CModules
       final String class_name)
       throws IOException
     {
-      NullCheck.notNull(package_name, "Package");
-      NullCheck.notNull(class_name, "Class");
+      Objects.requireNonNull(package_name, "Package");
+      Objects.requireNonNull(class_name, "Class");
 
       Preconditions.checkPrecondition(
         !this.isClosed(), "Module archive must be open");
@@ -349,8 +349,8 @@ public final class CModules
       final String class_name)
       throws IOException
     {
-      NullCheck.notNull(package_name, "Package");
-      NullCheck.notNull(class_name, "Class");
+      Objects.requireNonNull(package_name, "Package");
+      Objects.requireNonNull(class_name, "Class");
 
       Preconditions.checkPrecondition(
         !this.isClosed(), "Module archive must be open");
@@ -374,7 +374,7 @@ public final class CModules
     public SortedSet<String> classesInPackage(
       final String package_name)
     {
-      NullCheck.notNull(package_name, "Package");
+      Objects.requireNonNull(package_name, "Package");
 
       Preconditions.checkPrecondition(
         !this.isClosed(), "Module archive must be open");
@@ -412,11 +412,11 @@ public final class CModules
       final ModuleNode in_module_node)
     {
       this.archive =
-        NullCheck.notNull(in_archive, "Archive");
+        Objects.requireNonNull(in_archive, "Archive");
       this.module_desc =
-        NullCheck.notNull(in_module_descriptor, "Module descriptor");
+        Objects.requireNonNull(in_module_descriptor, "Module descriptor");
       this.module_node =
-        NullCheck.notNull(in_module_node, "Module node");
+        Objects.requireNonNull(in_module_node, "Module node");
     }
 
     private static String parseClassName(
@@ -455,8 +455,8 @@ public final class CModules
       final String class_name)
       throws IOException
     {
-      NullCheck.notNull(package_name, "Package name");
-      NullCheck.notNull(class_name, "Class name");
+      Objects.requireNonNull(package_name, "Package name");
+      Objects.requireNonNull(class_name, "Class name");
 
       Preconditions.checkPrecondition(
         !this.isClosed(), "Module archive must be open");
@@ -485,8 +485,8 @@ public final class CModules
       final String class_name)
       throws IOException
     {
-      NullCheck.notNull(package_name, "Package");
-      NullCheck.notNull(class_name, "Class");
+      Objects.requireNonNull(package_name, "Package");
+      Objects.requireNonNull(class_name, "Class");
 
       Preconditions.checkPrecondition(
         !this.isClosed(), "Module archive must be open");
@@ -510,7 +510,7 @@ public final class CModules
     public SortedSet<String> classesInPackage(
       final String package_name)
     {
-      NullCheck.notNull(package_name, "Package");
+      Objects.requireNonNull(package_name, "Package");
 
       Preconditions.checkPrecondition(
         !this.isClosed(), "Module archive must be open");

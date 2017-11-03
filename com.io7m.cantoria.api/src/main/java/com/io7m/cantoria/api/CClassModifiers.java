@@ -16,12 +16,13 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+
+import java.util.Objects;
 
 /**
  * Functions to determine the modifiers of classes.
@@ -43,7 +44,7 @@ public final class CClassModifiers
   public static boolean classIsPrivate(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
     return (clazz.access & Opcodes.ACC_PRIVATE) == Opcodes.ACC_PRIVATE;
   }
 
@@ -56,7 +57,7 @@ public final class CClassModifiers
   public static boolean classIsEnum(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
     return (clazz.access & Opcodes.ACC_ENUM) == Opcodes.ACC_ENUM;
   }
 
@@ -69,7 +70,7 @@ public final class CClassModifiers
   public static boolean classIsPackagePrivate(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
     return (clazz.access & (Opcodes.ACC_PRIVATE | Opcodes.ACC_PUBLIC | Opcodes.ACC_PROTECTED)) == 0;
   }
 
@@ -82,7 +83,7 @@ public final class CClassModifiers
   public static boolean classIsProtected(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
     return (clazz.access & Opcodes.ACC_PROTECTED) == Opcodes.ACC_PROTECTED;
   }
 
@@ -95,7 +96,7 @@ public final class CClassModifiers
   public static boolean classIsPublic(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
     return (clazz.access & Opcodes.ACC_PUBLIC) == Opcodes.ACC_PUBLIC;
   }
 
@@ -108,7 +109,7 @@ public final class CClassModifiers
   public static boolean classIsFinal(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
     return (clazz.access & Opcodes.ACC_FINAL) == Opcodes.ACC_FINAL;
   }
 
@@ -121,7 +122,7 @@ public final class CClassModifiers
   public static boolean classIsAbstract(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
     return (clazz.access & Opcodes.ACC_ABSTRACT) == Opcodes.ACC_ABSTRACT;
   }
 
@@ -134,7 +135,7 @@ public final class CClassModifiers
   public static boolean classIsStatic(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
     return (clazz.access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
   }
 
@@ -147,7 +148,7 @@ public final class CClassModifiers
   public static boolean classIsInterface(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
     return (clazz.access & Opcodes.ACC_INTERFACE) == Opcodes.ACC_INTERFACE;
   }
 
@@ -160,7 +161,7 @@ public final class CClassModifiers
   public static Set<CModifier> classModifiers(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
 
     Set<CModifier> m = HashSet.empty();
 
@@ -192,7 +193,7 @@ public final class CClassModifiers
   public static CAccessibility classAccessibility(
     final ClassNode clazz)
   {
-    NullCheck.notNull(clazz, "Class");
+    Objects.requireNonNull(clazz, "Class");
 
     if (classIsPublic(clazz)) {
       return CAccessibility.PUBLIC;

@@ -17,7 +17,6 @@
 package com.io7m.cantoria.api;
 
 import com.io7m.jaffirm.core.Invariants;
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
@@ -46,7 +45,7 @@ public final class CMethodModifiers
   public static boolean methodIsPrivate(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return (method.access & Opcodes.ACC_PRIVATE) == Opcodes.ACC_PRIVATE;
   }
 
@@ -59,7 +58,7 @@ public final class CMethodModifiers
   public static boolean methodIsPackagePrivate(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return (method.access & (Opcodes.ACC_PRIVATE | Opcodes.ACC_PUBLIC | Opcodes.ACC_PROTECTED)) == 0;
   }
 
@@ -72,7 +71,7 @@ public final class CMethodModifiers
   public static boolean methodIsProtected(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return (method.access & Opcodes.ACC_PROTECTED) == Opcodes.ACC_PROTECTED;
   }
 
@@ -85,7 +84,7 @@ public final class CMethodModifiers
   public static boolean methodIsPublic(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return (method.access & Opcodes.ACC_PUBLIC) == Opcodes.ACC_PUBLIC;
   }
 
@@ -98,7 +97,7 @@ public final class CMethodModifiers
   public static boolean methodIsFinal(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return (method.access & Opcodes.ACC_FINAL) == Opcodes.ACC_FINAL;
   }
 
@@ -111,7 +110,7 @@ public final class CMethodModifiers
   public static boolean methodIsStatic(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return (method.access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
   }
 
@@ -124,7 +123,7 @@ public final class CMethodModifiers
   public static boolean methodIsAbstract(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return (method.access & Opcodes.ACC_ABSTRACT) == Opcodes.ACC_ABSTRACT;
   }
 
@@ -137,7 +136,7 @@ public final class CMethodModifiers
   public static CAccessibility methodAccessibility(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
 
     if (methodIsPublic(method)) {
       return CAccessibility.PUBLIC;
@@ -163,7 +162,7 @@ public final class CMethodModifiers
   public static boolean methodIsInstanceConstructor(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return Objects.equals(method.name, "<init>");
   }
 
@@ -176,7 +175,7 @@ public final class CMethodModifiers
   public static boolean methodIsStaticInitializer(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return Objects.equals(method.name, "<clinit>");
   }
 
@@ -189,7 +188,7 @@ public final class CMethodModifiers
   public static Set<CModifier> methodModifiers(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
 
     Set<CModifier> m = HashSet.empty();
 
@@ -221,7 +220,7 @@ public final class CMethodModifiers
   public static boolean methodIsSynchronized(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return (method.access & Opcodes.ACC_SYNCHRONIZED) == Opcodes.ACC_SYNCHRONIZED;
   }
 
@@ -234,7 +233,7 @@ public final class CMethodModifiers
   public static boolean methodIsVarArgs(
     final MethodNode method)
   {
-    NullCheck.notNull(method, "Method");
+    Objects.requireNonNull(method, "Method");
     return (method.access & Opcodes.ACC_VARARGS) == Opcodes.ACC_VARARGS;
   }
 }

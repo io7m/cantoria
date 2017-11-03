@@ -17,8 +17,9 @@
 package com.io7m.cantoria.changes.spi;
 
 import com.io7m.cantoria.api.CVersion;
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
+
+import java.util.Objects;
 
 import static com.io7m.cantoria.changes.spi.CChangeBinaryCompatibility.BINARY_INCOMPATIBLE;
 import static com.io7m.cantoria.changes.spi.CChangeSemanticVersioning.maximum;
@@ -60,7 +61,7 @@ public final class CCompatibilityTracker
   public void onChange(
     final CChangeType c)
   {
-    NullCheck.notNull(c, "Change");
+    Objects.requireNonNull(c, "Change");
 
     this.semver = maximum(this.semver, c.semanticVersioning());
     if (c.binaryCompatibility() == BINARY_INCOMPATIBLE) {

@@ -16,10 +16,11 @@
 
 package com.io7m.cantoria.api;
 
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.List;
 import org.objectweb.asm.Type;
+
+import java.util.Objects;
 
 /**
  * Functions over method types.
@@ -45,7 +46,7 @@ public final class CMethodTypes
   public static List<String> parseParameterTypesFromSignature(
     final String signature)
   {
-    NullCheck.notNull(signature, "Signature");
+    Objects.requireNonNull(signature, "Signature");
     final Type r = Type.getMethodType(signature);
     return List.of(r.getArgumentTypes()).map(Type::getClassName);
   }
@@ -63,7 +64,7 @@ public final class CMethodTypes
   public static String parseReturnTypeFromSignature(
     final String signature)
   {
-    NullCheck.notNull(signature, "Signature");
+    Objects.requireNonNull(signature, "Signature");
     final Type r = Type.getReturnType(signature);
     return r.getClassName();
   }

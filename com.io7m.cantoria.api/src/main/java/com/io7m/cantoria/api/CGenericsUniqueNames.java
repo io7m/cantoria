@@ -17,13 +17,13 @@
 package com.io7m.cantoria.api;
 
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -53,8 +53,8 @@ public final class CGenericsUniqueNames
     final UniqueNamesType names,
     final CGClassSignature signature)
   {
-    NullCheck.notNull(names, "Names");
-    NullCheck.notNull(signature, "Signature");
+    Objects.requireNonNull(names, "Names");
+    Objects.requireNonNull(signature, "Signature");
 
     return CGClassSignature.of(
       uniqueTypeParameters(names, signature.parameters()),
@@ -76,8 +76,8 @@ public final class CGenericsUniqueNames
     final UniqueNamesType names,
     final List<CGTypeParameter> a)
   {
-    NullCheck.notNull(names, "Names");
-    NullCheck.notNull(a, "Parameters");
+    Objects.requireNonNull(names, "Names");
+    Objects.requireNonNull(a, "Parameters");
 
     return a.map(p -> uniqueBindingsTypeParameter(names, p));
   }

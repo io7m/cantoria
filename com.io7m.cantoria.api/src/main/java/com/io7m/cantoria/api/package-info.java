@@ -18,6 +18,5 @@
  * Cantoria API
  */
 
-@com.io7m.jnull.NonNullByDefault
 package com.io7m.cantoria.api;
 

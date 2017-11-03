@@ -20,7 +20,6 @@ import com.io7m.cantoria.api.CClass;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CField;
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.jnull.NullCheck;
 
 import java.util.Objects;
 
@@ -68,12 +67,12 @@ public interface CFieldComparatorType extends CChangeCheckType
     final CClass clazz_new,
     final CField field_new)
   {
-    NullCheck.notNull(receiver, "Receiver");
-    NullCheck.notNull(registry, "Registry");
-    NullCheck.notNull(clazz_old, "Class (old)");
-    NullCheck.notNull(field_old, "Field (old)");
-    NullCheck.notNull(clazz_new, "Class (new)");
-    NullCheck.notNull(field_new, "Field (new)");
+    Objects.requireNonNull(receiver, "Receiver");
+    Objects.requireNonNull(registry, "Registry");
+    Objects.requireNonNull(clazz_old, "Class (old)");
+    Objects.requireNonNull(field_old, "Field (old)");
+    Objects.requireNonNull(clazz_new, "Class (new)");
+    Objects.requireNonNull(field_new, "Field (new)");
 
     Preconditions.checkPrecondition(
       clazz_new.node().name,
