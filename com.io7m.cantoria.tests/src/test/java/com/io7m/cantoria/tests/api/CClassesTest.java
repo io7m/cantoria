@@ -21,7 +21,7 @@ import com.io7m.cantoria.api.CClassRegistry;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CClasses;
 import com.io7m.cantoria.api.CModuleType;
-import com.io7m.cantoria.api.CModules;
+import com.io7m.cantoria.modules.api.CModuleLoaderType;
 import com.io7m.cantoria.tests.CTestUtilities;
 import io.vavr.collection.List;
 import org.junit.jupiter.api.Assertions;
@@ -43,12 +43,14 @@ public final class CClassesTest
   public void testSuperclassesInternal()
     throws Exception
   {
+    final CModuleLoaderType loader = CTestUtilities.defaultModuleLoader();
+
     final CModuleType module0 =
       CTestUtilities.module("class_superclass_changed/before");
 
     final CClassRegistryType er =
       classRegistry(List.of(
-        CModules.openPlatformModule("java.base"),
+        loader.openPlatformModule("java.base"),
         module0));
 
     final CClass clazz =
@@ -62,12 +64,14 @@ public final class CClassesTest
   public void testSuperclassesExternal()
     throws Exception
   {
+    final CModuleLoaderType loader = CTestUtilities.defaultModuleLoader();
+
     final CModuleType module0 =
       CTestUtilities.module("class_superclass_changed_external/after");
 
     final CClassRegistryType er =
       classRegistry(List.of(
-        CModules.openPlatformModule("java.base"),
+        loader.openPlatformModule("java.base"),
         module0));
 
     final CClass clazz =
@@ -81,12 +85,14 @@ public final class CClassesTest
   public void testGenerics()
     throws Exception
   {
+    final CModuleLoaderType loader = CTestUtilities.defaultModuleLoader();
+
     final CModuleType module0 =
       CTestUtilities.module("class_generics_added/after");
 
     final CClassRegistryType er =
       classRegistry(List.of(
-        CModules.openPlatformModule("java.base"),
+        loader.openPlatformModule("java.base"),
         module0));
 
     final CClass clazz =

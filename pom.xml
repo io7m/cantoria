@@ -33,6 +33,8 @@
     <module>com.io7m.cantoria.driver</module>
     <module>com.io7m.cantoria.cmdline</module>
     <module>com.io7m.cantoria.driver.api</module>
+    <module>com.io7m.cantoria.modules.api</module>
+    <module>com.io7m.cantoria.modules.vanilla</module>
   </modules>
 
   <properties>

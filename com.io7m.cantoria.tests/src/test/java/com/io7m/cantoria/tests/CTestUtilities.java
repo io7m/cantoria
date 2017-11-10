@@ -17,8 +17,8 @@
 package com.io7m.cantoria.tests;
 
 import com.io7m.cantoria.api.CModuleType;
-import com.io7m.cantoria.api.CModules;
 import com.io7m.cantoria.api.CVersion;
+import com.io7m.cantoria.modules.api.CModuleLoaderType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +28,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.ServiceLoader;
 import java.util.zip.ZipFile;
 
 public final class CTestUtilities
@@ -69,9 +70,16 @@ public final class CTestUtilities
       }
     }
 
-    return CModules.openFromZip(
+    return defaultModuleLoader().openFromZip(
       f,
       CVersion.of(1, 0, 0, ""),
       new ZipFile(f.toFile()));
+  }
+
+  public static CModuleLoaderType defaultModuleLoader()
+  {
+    return ServiceLoader.load(CModuleLoaderType.class)
+      .findFirst()
+      .get();
   }
 }

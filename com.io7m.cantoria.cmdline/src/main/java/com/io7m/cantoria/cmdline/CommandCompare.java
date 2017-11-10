@@ -22,7 +22,6 @@ import com.io7m.cantoria.api.CClassRegistry;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CModuleType;
 import com.io7m.cantoria.api.CModuleWeaklyCaching;
-import com.io7m.cantoria.api.CModules;
 import com.io7m.cantoria.api.CVersion;
 import com.io7m.cantoria.api.CVersions;
 import com.io7m.cantoria.changes.api.CChangeType;
@@ -31,6 +30,7 @@ import com.io7m.cantoria.changes.spi.CChangeCheckType;
 import com.io7m.cantoria.changes.spi.CChangeDescriberType;
 import com.io7m.cantoria.driver.api.CComparisonDriverProviderType;
 import com.io7m.cantoria.driver.api.CComparisonDriverType;
+import com.io7m.cantoria.modules.api.CModuleLoaderType;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import org.slf4j.Logger;
@@ -257,13 +257,23 @@ public final class CommandCompare implements CCommandType
       return COMMAND_FAILURE;
     }
 
+    final Optional<CModuleLoaderType> modules_opt =
+      ServiceLoader.load(CModuleLoaderType.class).findFirst();
+    if (!modules_opt.isPresent()) {
+      LOG.error("No module loader implementations available.");
+      return COMMAND_FAILURE;
+    }
+
+    final CModuleLoaderType module_loader = modules_opt.get();
+    LOG.debug("using module loader {}", module_loader.name());
+
     final CComparisonDriverProviderType driver_provider = driver_opt.get();
     final CComparisonDriverType driver = driver_provider.create();
 
-    try (CModuleType module_old = CModules.open(mo_path, mo_version)) {
-      try (CModuleType module_new = CModules.open(mn_path, mn_version)) {
+    try (CModuleType module_old = module_loader.open(mo_path, mo_version)) {
+      try (CModuleType module_new = module_loader.open(mn_path, mn_version)) {
         try {
-          if (this.loadModules() == COMMAND_FAILURE) {
+          if (this.loadModules(module_loader) == COMMAND_FAILURE) {
             return COMMAND_FAILURE;
           }
 
@@ -318,12 +328,15 @@ public final class CommandCompare implements CCommandType
     });
   }
 
-  private CommandStatus loadModules()
+  private CommandStatus loadModules(
+    final CModuleLoaderType module_loader)
   {
-    if (this.loadPlatformModules(this.opened_modules) == COMMAND_FAILURE) {
+    if (this.loadPlatformModules(
+      module_loader, this.opened_modules) == COMMAND_FAILURE) {
       return COMMAND_FAILURE;
     }
-    if (this.loadExtraModules(this.opened_modules) == COMMAND_FAILURE) {
+    if (this.loadExtraModules(
+      module_loader, this.opened_modules) == COMMAND_FAILURE) {
       return COMMAND_FAILURE;
     }
 
@@ -331,13 +344,15 @@ public final class CommandCompare implements CCommandType
   }
 
   private CommandStatus loadPlatformModules(
+    final CModuleLoaderType module_loader,
     final Collection<CModuleType> modules)
   {
     CommandStatus status = COMMAND_SUCCESS;
 
     for (final String name : this.platform_modules) {
       try {
-        modules.add(CModuleWeaklyCaching.wrap(CModules.openPlatformModule(name)));
+        modules.add(CModuleWeaklyCaching.wrap(
+          module_loader.openPlatformModule(name)));
       } catch (final IOException e) {
         LOG.error(
           "Failed to load module {}: {}: ",
@@ -351,6 +366,7 @@ public final class CommandCompare implements CCommandType
   }
 
   private CommandStatus loadExtraModules(
+    final CModuleLoaderType module_loader,
     final Collection<CModuleType> modules)
   {
     CommandStatus status = COMMAND_SUCCESS;
@@ -373,7 +389,7 @@ public final class CommandCompare implements CCommandType
 
       for (final Path archive : archives) {
         try {
-          modules.add(CModuleWeaklyCaching.wrap(CModules.openFromZip(
+          modules.add(CModuleWeaklyCaching.wrap(module_loader.openFromZip(
             archive,
             CVersion.of(0, 0, 0, ""),
             new ZipFile(archive.toFile()))));

@@ -14,10 +14,21 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.api;
+package com.io7m.cantoria.modules.vanilla;
 
+import com.io7m.cantoria.api.CArchiveDescriptor;
+import com.io7m.cantoria.api.CArchiveType;
+import com.io7m.cantoria.api.CClass;
+import com.io7m.cantoria.api.CClassName;
+import com.io7m.cantoria.api.CClassNames;
+import com.io7m.cantoria.api.CClasses;
+import com.io7m.cantoria.api.CModuleDescriptor;
+import com.io7m.cantoria.api.CModuleDescriptors;
+import com.io7m.cantoria.api.CModuleType;
+import com.io7m.cantoria.api.CVersion;
+import com.io7m.cantoria.api.CVersions;
+import com.io7m.cantoria.modules.api.CModuleLoaderType;
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.SortedSet;
 import io.vavr.collection.TreeSet;
 import org.objectweb.asm.tree.ClassNode;
@@ -46,7 +57,7 @@ import java.util.zip.ZipFile;
  * Functions to load modules.
  */
 
-public final class CModules
+public final class CModules implements CModuleLoaderType
 {
   private static final Logger LOG =
     LoggerFactory.getLogger(CModules.class);
@@ -54,9 +65,14 @@ public final class CModules
   private static final Pattern MATCH_CLASS_NAME =
     Pattern.compile("\\.class$");
 
-  private CModules()
+  /**
+   * Instantiate a module loader. This method is intended to be used by
+   * {@link java.util.ServiceLoader}.
+   */
+
+  public CModules()
   {
-    throw new UnreachableCodeException();
+
   }
 
   /**
@@ -71,7 +87,8 @@ public final class CModules
    * @throws IOException On I/O errors
    */
 
-  public static CModuleType openFromZip(
+  @Override
+  public CModuleType openFromZip(
     final Path path,
     final CVersion version,
     final ZipFile input)
@@ -108,14 +125,21 @@ public final class CModules
    * @throws IOException On I/O errors
    */
 
-  public static CModuleType open(
+  @Override
+  public CModuleType open(
     final Path path,
     final CVersion version)
     throws IOException
   {
     Objects.requireNonNull(path, "Path");
     Objects.requireNonNull(version, "Version");
-    return openFromZip(path, version, new ZipFile(path.toFile()));
+    return this.openFromZip(path, version, new ZipFile(path.toFile()));
+  }
+
+  @Override
+  public String name()
+  {
+    return CModules.class.getCanonicalName();
   }
 
   /**
@@ -126,7 +150,8 @@ public final class CModules
    * @throws IOException On I/O errors
    */
 
-  public static SortedSet<String> listPlatformModules()
+  @Override
+  public SortedSet<String> listPlatformModules()
     throws IOException
   {
     TreeSet<String> names = TreeSet.empty();
@@ -153,7 +178,8 @@ public final class CModules
    * @throws IOException On I/O errors
    */
 
-  public static CModuleType openPlatformModule(
+  @Override
+  public CModuleType openPlatformModule(
     final String name)
     throws IOException
   {

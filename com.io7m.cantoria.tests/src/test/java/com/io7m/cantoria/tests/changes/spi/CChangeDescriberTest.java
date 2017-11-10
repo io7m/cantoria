@@ -20,7 +20,6 @@ import com.io7m.cantoria.api.CClassRegistry;
 import com.io7m.cantoria.api.CClassRegistryType;
 import com.io7m.cantoria.api.CModuleType;
 import com.io7m.cantoria.api.CModuleWeaklyCaching;
-import com.io7m.cantoria.api.CModules;
 import com.io7m.cantoria.changes.api.CChangeType;
 import com.io7m.cantoria.changes.spi.CChangeCheckType;
 import com.io7m.cantoria.changes.spi.CChangeDescriberType;
@@ -57,7 +56,8 @@ public final class CChangeDescriberTest
   {
     return CClassRegistry.create(
       io.vavr.collection.List.of(modules)
-        .prepend(CModules.openPlatformModule("java.base"))
+        .prepend(CTestUtilities.defaultModuleLoader()
+                   .openPlatformModule("java.base"))
         .map(CModuleWeaklyCaching::wrap));
   }
 

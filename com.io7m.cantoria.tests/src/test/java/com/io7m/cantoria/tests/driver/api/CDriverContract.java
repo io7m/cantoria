@@ -37,7 +37,6 @@ import com.io7m.cantoria.api.CModifier;
 import com.io7m.cantoria.api.CModuleProvides;
 import com.io7m.cantoria.api.CModuleType;
 import com.io7m.cantoria.api.CModuleWeaklyCaching;
-import com.io7m.cantoria.api.CModules;
 import com.io7m.cantoria.changes.api.CChangeType;
 import com.io7m.cantoria.changes.spi.CChangeCheckType;
 import com.io7m.cantoria.changes.spi.CChangeReceiverType;
@@ -103,6 +102,7 @@ import com.io7m.cantoria.changes.vanilla.api.CChangeModuleRequired;
 import com.io7m.cantoria.changes.vanilla.api.CChangeModuleServiceNoLongerProvided;
 import com.io7m.cantoria.changes.vanilla.api.CChangeModuleServiceProvided;
 import com.io7m.cantoria.driver.api.CComparisonDriverType;
+import com.io7m.cantoria.modules.api.CModuleLoaderType;
 import com.io7m.cantoria.tests.CTestUtilities;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
@@ -124,16 +124,19 @@ public abstract class CDriverContract
     "x.y.z",
     "x.y.z.p",
     "Y");
+
   private static final CClassName CLASS_NAME_X =
     CClassName.of("x.y.z", "x.y.z.p", "X");
 
-  private static CClassRegistryType classRegistry(
+  protected abstract CModuleLoaderType moduleLoader();
+
+  private CClassRegistryType classRegistry(
     final CModuleType... modules)
     throws IOException
   {
     return CClassRegistry.create(
       List.of(modules)
-        .prepend(CModules.openPlatformModule("java.base"))
+        .prepend(this.moduleLoader().openPlatformModule("java.base"))
         .map(CModuleWeaklyCaching::wrap));
   }
 
@@ -211,7 +214,7 @@ public abstract class CDriverContract
       CTestUtilities.module(
         "module_requires_transitive_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -242,7 +245,7 @@ public abstract class CDriverContract
       CTestUtilities.module(
         "module_requires_transitive_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -273,7 +276,7 @@ public abstract class CDriverContract
       CTestUtilities.module(
         "module_requires_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -304,7 +307,7 @@ public abstract class CDriverContract
       CTestUtilities.module(
         "module_requires_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -335,7 +338,7 @@ public abstract class CDriverContract
       CTestUtilities.module(
         "module_package_export_unqualified_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -364,7 +367,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("module_package_export_unqualified_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -393,7 +396,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("module_package_export_qualified_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -422,7 +425,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("module_package_export_qualified_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -453,7 +456,7 @@ public abstract class CDriverContract
       CTestUtilities.module(
         "module_package_export_qualified_to_unqualified/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -484,7 +487,7 @@ public abstract class CDriverContract
       CTestUtilities.module(
         "module_package_export_unqualified_to_qualified/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -522,7 +525,7 @@ public abstract class CDriverContract
       CTestUtilities.module(
         "module_package_opens_unqualified_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -552,7 +555,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("module_package_opens_unqualified_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -581,7 +584,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("module_package_opens_qualified_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -610,7 +613,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("module_package_opens_qualified_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -641,7 +644,7 @@ public abstract class CDriverContract
       CTestUtilities.module(
         "module_package_opens_qualified_to_unqualified/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -672,7 +675,7 @@ public abstract class CDriverContract
       CTestUtilities.module(
         "module_package_opens_unqualified_to_qualified/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -705,7 +708,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("module_service_provided/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -735,7 +738,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("module_service_no_longer_provided/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -765,7 +768,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -800,7 +803,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -835,7 +838,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_no_longer_public/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -880,7 +883,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_became_public/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -925,7 +928,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_became_interface/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -995,7 +998,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_no_longer_interface/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1081,7 +1084,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_private_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1107,7 +1110,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_bytecode_changed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1152,7 +1155,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_became_enum/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1287,7 +1290,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_became_non_enum/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1398,7 +1401,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_became_final/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1444,7 +1447,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_no_longer_final/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1490,7 +1493,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_became_abstract/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1536,7 +1539,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_no_longer_abstract/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1582,7 +1585,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_became_non_final/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1633,7 +1636,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_became_final/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1685,7 +1688,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_became_non_varargs/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1736,7 +1739,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_became_varargs/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1787,7 +1790,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_public_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1827,7 +1830,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_public_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1867,7 +1870,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_private_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1893,7 +1896,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_private_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1919,7 +1922,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_added_exceptions/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -1970,7 +1973,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_removed_exceptions/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2021,7 +2024,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_overload_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2061,7 +2064,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_overload_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2101,7 +2104,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_override_became_less_accessible/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2152,7 +2155,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2190,7 +2193,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_moved_to_superclass/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2237,7 +2240,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_became_less_accessible_0/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2284,7 +2287,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_became_less_accessible_1/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2331,7 +2334,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_became_static/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2378,7 +2381,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_became_non_static/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2425,7 +2428,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_became_final/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2472,7 +2475,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_became_non_final/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2519,7 +2522,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_became_more_accessible_0/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2566,7 +2569,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_became_more_accessible_1/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2613,7 +2616,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_changed_type/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2660,7 +2663,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_override_changed_static/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2725,7 +2728,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("field_override_became_less_accessible/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2772,7 +2775,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("interface_method_abstract_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2812,7 +2815,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("interface_method_abstract_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2852,7 +2855,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("interface_method_default_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2892,7 +2895,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("interface_method_default_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2932,7 +2935,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("interface_method_static_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -2972,7 +2975,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("interface_method_static_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -3012,7 +3015,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("constructor_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -3069,7 +3072,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("constructor_added_overload/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -3110,7 +3113,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("constructor_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -3167,7 +3170,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("constructor_removed_overload/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -3208,7 +3211,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("enum_member_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     final CClass class0 =
       module0.classValue("x.y.z.p", "X").get();
@@ -3256,7 +3259,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("enum_member_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     final CClass class0 =
       module0.classValue("x.y.z.p", "X").get();
@@ -3304,7 +3307,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("method_became_less_accessible/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -3351,7 +3354,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_generics_added/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -3406,7 +3409,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_generics_removed/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -3461,7 +3464,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_generics_changed_compatible/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{
@@ -3487,7 +3490,7 @@ public abstract class CDriverContract
     final CModuleType module1 =
       CTestUtilities.module("class_generics_changed_incompatible/after");
 
-    final CClassRegistryType er = classRegistry(module0, module1);
+    final CClassRegistryType er = this.classRegistry(module0, module1);
 
     new Expectations()
     {{

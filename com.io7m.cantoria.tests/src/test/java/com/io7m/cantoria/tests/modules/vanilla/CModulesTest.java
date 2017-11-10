@@ -14,30 +14,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.cantoria.tests.driver;
+package com.io7m.cantoria.tests.modules.vanilla;
 
-import com.io7m.cantoria.driver.api.CComparisonDriverProviderType;
-import com.io7m.cantoria.driver.api.CComparisonDriverType;
-import com.io7m.cantoria.modules.api.CModuleLoaderType;
-import com.io7m.cantoria.tests.CTestUtilities;
-import com.io7m.cantoria.tests.driver.api.CDriverContract;
-
-import java.util.ServiceLoader;
-
-public final class CDriverTest extends CDriverContract
+public final class CModulesTest
 {
-  @Override
-  protected CModuleLoaderType moduleLoader()
-  {
-    return CTestUtilities.defaultModuleLoader();
-  }
 
-  @Override
-  protected CComparisonDriverType driver()
-  {
-    return ServiceLoader.load(CComparisonDriverProviderType.class)
-      .findFirst()
-      .get()
-      .create();
-  }
 }

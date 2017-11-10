@@ -12,11 +12,11 @@
     <version>0.0.1</version>
   </parent>
 
-  <artifactId>com.io7m.cantoria.cmdline</artifactId>
+  <artifactId>com.io7m.cantoria.modules.vanilla</artifactId>
   <packaging>jar</packaging>
 
-  <name>com.io7m.cantoria.cmdline</name>
-  <description>Java 9+ API Analysis tool (Command-line tools)</description>
+  <name>com.io7m.cantoria.modules.vanilla</name>
+  <description>Java 9+ API Analysis tool (Modules implementation)</description>
   <url>http://io7m.github.io/cantoria/</url>
 
   <dependencies>
@@ -27,42 +27,13 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.cantoria.driver.api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.cantoria.driver</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.cantoria.changes.vanilla.api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.cantoria.changes.vanilla</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.cantoria.modules.api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.cantoria.modules.vanilla</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>com.beust</groupId>
-      <artifactId>jcommander</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
+      <groupId>io.vavr</groupId>
+      <artifactId>vavr</artifactId>
     </dependency>
   </dependencies>
 
@@ -81,7 +52,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <Automatic-Module-Name>com.io7m.cantoria.cmdline</Automatic-Module-Name>
+              <Automatic-Module-Name>com.io7m.cantoria.modules.vanilla</Automatic-Module-Name>
             </manifestEntries>
           </archive>
         </configuration>

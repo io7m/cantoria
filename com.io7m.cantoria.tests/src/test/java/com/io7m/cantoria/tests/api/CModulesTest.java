@@ -16,65 +16,28 @@
 
 package com.io7m.cantoria.tests.api;
 
-import com.io7m.cantoria.api.CClass;
-import com.io7m.cantoria.api.CModuleType;
-import com.io7m.cantoria.api.CModuleWeaklyCaching;
-import com.io7m.cantoria.api.CModules;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import com.io7m.cantoria.modules.api.CModuleLoaderType;
+import com.io7m.cantoria.tests.modules.api.CModulesContract;
 
-import java.io.IOException;
-import java.util.Optional;
+import java.util.Objects;
+import java.util.ServiceLoader;
 
-public final class CModulesTest
+public final class CModulesTest extends CModulesContract
 {
-  private static void checkBase(final CModuleType m)
-    throws IOException
+  private static boolean hasCorrectName(
+    final CModuleLoaderType p)
   {
-    Assertions.assertEquals("java.base", m.descriptor().name());
-    Assertions.assertFalse(m.isClosed());
-    Assertions.assertFalse(m.archive().isClosed());
-
-    {
-      final Optional<CClass> object_opt =
-        m.classValue("java.lang", "Object");
-      final CClass object = object_opt.get();
-      Assertions.assertEquals("Object", object.name().className());
-      Assertions.assertEquals("java.lang", object.name().packageName());
-    }
-
-    {
-      final Optional<CClass> object_opt =
-        m.classValue("java.lang", "Object");
-      final CClass object = object_opt.get();
-      Assertions.assertEquals("Object", object.name().className());
-      Assertions.assertEquals("java.lang", object.name().packageName());
-    }
+    return Objects.equals(p.name(), "com.io7m.cantoria.modules.vanilla.CModules");
   }
 
-  @Test
-  public void testJavaBase()
-    throws Exception
+  @Override
+  protected CModuleLoaderType loader()
   {
-    try (CModuleType m = CModules.openPlatformModule("java.base")) {
-      checkBase(m);
-    }
-  }
-
-  @Test
-  public void testJavaBaseWeaklyCached()
-    throws Exception
-  {
-    try (CModuleType m = CModuleWeaklyCaching.wrap(
-      CModules.openPlatformModule("java.base"))) {
-      checkBase(m);
-    }
-  }
-
-  @Test
-  public void testPlatformModules()
-    throws Exception
-  {
-    Assertions.assertTrue(CModules.listPlatformModules().contains("java.base"));
+    return ServiceLoader.load(CModuleLoaderType.class)
+      .stream()
+      .map(ServiceLoader.Provider::get)
+      .filter(CModulesTest::hasCorrectName)
+      .findFirst()
+      .get();
   }
 }
