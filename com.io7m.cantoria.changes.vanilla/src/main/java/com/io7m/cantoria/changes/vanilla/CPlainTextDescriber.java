@@ -18,11 +18,9 @@ package com.io7m.cantoria.changes.vanilla;
 
 import com.io7m.cantoria.api.CClassNames;
 import com.io7m.cantoria.api.CConstructors;
-import com.io7m.cantoria.api.CField;
 import com.io7m.cantoria.api.CFields;
 import com.io7m.cantoria.api.CGClassSignature;
 import com.io7m.cantoria.api.CGenericsType;
-import com.io7m.cantoria.api.CMethod;
 import com.io7m.cantoria.api.CMethods;
 import com.io7m.cantoria.api.CModifier;
 import com.io7m.cantoria.changes.api.CChangeClassType;
@@ -135,211 +133,141 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     this.titles =
       ResourceBundle.getBundle("com.io7m.cantoria.changes.vanilla.Titles");
 
-    this.types = new HashMap<>(64);
-    this.add(
-      CChangeClassAddedPublic.class,
-      this::onClassAddedPublic);
-    this.add(
-      CChangeClassBecameAbstract.class,
-      this::onClassBecameAbstract);
-    this.add(
-      CChangeClassBecameEnum.class,
-      this::onClassBecameEnum);
-    this.add(
-      CChangeClassBecameFinal.class,
-      this::onClassBecameFinal);
-    this.add(
-      CChangeClassBecameInterface.class,
-      this::onClassBecameInterface);
-    this.add(
-      CChangeClassBecameNonAbstract.class,
-      this::onClassBecameNonAbstract);
-    this.add(
-      CChangeClassBecameNonEnum.class,
-      this::onClassBecameNonEnum);
-    this.add(
-      CChangeClassBecameNonFinal.class,
-      this::onClassBecameNonFinal);
-    this.add(
-      CChangeClassBecameNonInterface.class,
-      this::onClassBecameNonInterface);
-    this.add(
-      CChangeClassBecameNonPublic.class,
-      this::onClassBecameNonPublic);
-    this.add(
-      CChangeClassBecamePublic.class,
-      this::onClassBecamePublic);
+    this.types = addAllChanges(this);
+  }
 
-    this.add(
-      CChangeClassBytecodeVersionChanged.class,
-      this::onClassBytecodeVersionChanged);
+  private static HashMap<Class<?>, DescriberType> addAllChanges(
+    final CPlainTextDescriber d)
+  {
+    final var types = new HashMap<Class<?>, DescriberType>(64);
+    addClassChanges(d, types);
+    addEnumChanges(d, types);
+    addInterfaceMethodChanges(d, types);
+    addModuleChanges(d, types);
+    return types;
+  }
 
-    this.add(
-      CChangeClassConstructorAdded.class,
-      this::onClassConstructorAdded);
-    this.add(
-      CChangeClassConstructorRemoved.class,
-      this::onClassConstructorRemoved);
+  private static void addClassChanges(
+    final CPlainTextDescriber d,
+    final HashMap<Class<?>, DescriberType> types)
+  {
+    addClassModifierChanges(d, types);
+    add(types, CChangeClassBytecodeVersionChanged.class, d::onClassBytecodeVersionChanged);
+    add(types, CChangeClassConstructorAdded.class, d::onClassConstructorAdded);
+    add(types, CChangeClassConstructorRemoved.class, d::onClassConstructorRemoved);
+    addClassFieldChanges(d, types);
+    add(types, CChangeClassGenericsChanged.class, d::onClassGenericsChanged);
+    addClassMethodChanges(d, types);
+    add(types, CChangeClassRemovedPublic.class, d::onClassRemovedPublic);
+    add(types, CChangeClassStaticInitializerAdded.class, d::onClassStaticInitializerAdded);
+  }
 
-    this.add(
-      CChangeClassFieldAddedPublic.class,
-      this::onClassFieldAddedPublic);
-    this.add(
-      CChangeClassFieldBecameFinal.class,
-      this::onClassFieldBecameFinal);
-    this.add(
-      CChangeClassFieldBecameLessAccessible.class,
-      this::onClassFieldBecameLessAccessible);
-    this.add(
-      CChangeClassFieldBecameMoreAccessible.class,
-      this::onClassFieldBecameMoreAccessible);
-    this.add(
-      CChangeClassFieldBecameNonFinal.class,
-      this::onClassFieldBecameNonFinal);
-    this.add(
-      CChangeClassFieldBecameNonStatic.class,
-      this::onClassFieldBecameNonStatic);
-    this.add(
-      CChangeClassFieldBecameStatic.class,
-      this::onClassFieldBecameStatic);
-    this.add(
-      CChangeClassFieldMovedToSuperclass.class,
-      this::onClassFieldMovedToSuperclass);
-    this.add(
-      CChangeClassFieldOverrideBecameLessAccessible.class,
-      this::onChangeClassFieldOverrideBecameLessAccessible);
-    this.add(
-      CChangeClassFieldOverrideChangedStatic.class,
-      this::onClassFieldOverrideChangedStatic);
-    this.add(
-      CChangeClassFieldRemovedPublic.class,
-      this::onClassFieldRemovedPublic);
-    this.add(
-      CChangeClassFieldTypeChanged.class,
-      this::onClassFieldTypeChanged);
+  private static void addEnumChanges(
+    final CPlainTextDescriber d,
+    final HashMap<Class<?>, DescriberType> types)
+  {
+    add(types, CChangeEnumAddedMembers.class, d::onEnumAddedMembers);
+    add(types, CChangeEnumRemovedMembers.class, d::onEnumRemovedMembers);
+  }
 
-    this.add(
-      CChangeClassGenericsChanged.class,
-      this::onClassGenericsChanged);
+  private static void addClassFieldChanges(
+    final CPlainTextDescriber d,
+    final HashMap<Class<?>, DescriberType> types)
+  {
+    add(types, CChangeClassFieldAddedPublic.class, d::onClassFieldAddedPublic);
+    add(types, CChangeClassFieldBecameFinal.class, d::onClassFieldBecameFinal);
+    add(types, CChangeClassFieldBecameLessAccessible.class, d::onClassFieldBecameLessAccessible);
+    add(types, CChangeClassFieldBecameMoreAccessible.class, d::onClassFieldBecameMoreAccessible);
+    add(types, CChangeClassFieldBecameNonFinal.class, d::onClassFieldBecameNonFinal);
+    add(types, CChangeClassFieldBecameNonStatic.class, d::onClassFieldBecameNonStatic);
+    add(types, CChangeClassFieldBecameStatic.class, d::onClassFieldBecameStatic);
+    add(types, CChangeClassFieldMovedToSuperclass.class, d::onClassFieldMovedToSuperclass);
+    add(types,
+        CChangeClassFieldOverrideBecameLessAccessible.class,
+        d::onChangeClassFieldOverrideBecameLessAccessible);
+    add(types, CChangeClassFieldOverrideChangedStatic.class, d::onClassFieldOverrideChangedStatic);
+    add(types, CChangeClassFieldRemovedPublic.class, d::onClassFieldRemovedPublic);
+    add(types, CChangeClassFieldTypeChanged.class, d::onClassFieldTypeChanged);
+  }
 
-    this.add(
-      CChangeClassMethodAdded.class,
-      this::onClassMethodAdded);
-    this.add(
-      CChangeClassMethodBecameLessAccessible.class,
-      this::onClassMethodBecameLessAccessible);
-    this.add(
-      CChangeClassMethodBecameMoreAccessible.class,
-      this::onClassMethodBecameMoreAccessible);
-    this.add(
-      CChangeClassMethodBecameFinal.class,
-      this::onClassMethodBecameFinal);
-    this.add(
-      CChangeClassMethodBecameNonFinal.class,
-      this::onClassMethodBecameNonFinal);
-    this.add(
-      CChangeClassMethodBecameVarArgs.class,
-      this::onClassMethodBecameVarArgs);
-    this.add(
-      CChangeClassMethodBecameNonVarArgs.class,
-      this::onClassMethodBecameNonVarArgs);
-    this.add(
-      CChangeClassMethodExceptionsChanged.class,
-      this::onClassMethodExceptionsChanged);
-    this.add(
-      CChangeClassMethodMovedToSuperclass.class,
-      this::onClassMethodMovedToSuperclass);
-    this.add(
-      CChangeClassMethodOverloadAdded.class,
-      this::onClassMethodOverloadAdded);
-    this.add(
-      CChangeClassMethodOverloadRemoved.class,
-      this::onClassMethodOverloadRemoved);
-    this.add(
-      CChangeClassMethodOverrideBecameLessAccessible.class,
-      this::onClassMethodOverrideBecameLessAccessible);
-    this.add(
-      CChangeClassMethodOverrideChangedStatic.class,
-      this::onClassMethodOverrideChangedStatic);
-    this.add(
-      CChangeClassMethodRemoved.class,
-      this::onClassMethodRemoved);
+  private static void addModuleChanges(
+    final CPlainTextDescriber d,
+    final HashMap<Class<?>, DescriberType> types)
+  {
+    add(types, CChangeModuleNoLongerRequired.class, d::onModuleNoLongerRequired);
+    add(types,
+        CChangeModulePackageNoLongerQualifiedExported.class, d::onModuleNoLongerQualifiedExported);
+    add(types,
+        CChangeModulePackageNoLongerQualifiedOpened.class, d::onModuleNoLongerQualifiedOpened);
+    add(types,
+        CChangeModulePackageNoLongerTransitivelyExported.class,
+        d::onModuleNoLongerTransitivelyExported);
+    add(types,
+        CChangeModulePackageNoLongerUnqualifiedExported.class,
+        d::onModuleNoLongerUnqualifiedExported);
+    add(types,
+        CChangeModulePackageNoLongerUnqualifiedOpened.class, d::onModuleNoLongerUnqualifiedOpened);
+    add(types, CChangeModulePackageQualifiedExported.class, d::onModuleQualifiedExported);
+    add(types, CChangeModulePackageQualifiedOpened.class, d::onModuleQualifiedOpened);
+    add(types, CChangeModulePackageTransitivelyExported.class, d::onModuleTransitivelyExported);
+    add(types, CChangeModulePackageUnqualifiedExported.class, d::onModuleUnqualifiedExported);
+    add(types, CChangeModulePackageUnqualifiedOpened.class, d::onModuleUnqualifiedOpened);
+    add(types, CChangeModuleRequired.class, d::onModuleRequired);
+    add(types, CChangeModuleServiceNoLongerProvided.class, d::onModuleServiceNoLongerProvided);
+    add(types, CChangeModuleServiceProvided.class, d::onModuleServiceProvided);
+  }
 
-    this.add(
-      CChangeClassRemovedPublic.class,
-      this::onClassRemovedPublic);
-    this.add(
-      CChangeClassStaticInitializerAdded.class,
-      this::onClassStaticInitializerAdded);
+  private static void addInterfaceMethodChanges(
+    final CPlainTextDescriber d,
+    final HashMap<Class<?>, DescriberType> types)
+  {
+    add(types, CChangeInterfaceMethodAbstractAdded.class, d::onInterfaceMethodAbstractAdded);
+    add(types, CChangeInterfaceMethodAbstractRemoved.class, d::onInterfaceMethodAbstractRemoved);
+    add(types, CChangeInterfaceMethodDefaultAdded.class, d::onInterfaceMethodDefaultAdded);
+    add(types, CChangeInterfaceMethodDefaultRemoved.class, d::onInterfaceMethodDefaultRemoved);
+    add(types, CChangeInterfaceMethodStaticAdded.class, d::onInterfaceMethodStaticAdded);
+    add(types, CChangeInterfaceMethodStaticRemoved.class, d::onInterfaceMethodStaticRemoved);
+  }
 
-    this.add(
-      CChangeEnumAddedMembers.class,
-      this::onEnumAddedMembers);
-    this.add(
-      CChangeEnumRemovedMembers.class,
-      this::onEnumRemovedMembers);
+  private static void addClassMethodChanges(
+    final CPlainTextDescriber d,
+    final HashMap<Class<?>, DescriberType> types)
+  {
+    add(types, CChangeClassMethodAdded.class, d::onClassMethodAdded);
+    add(types, CChangeClassMethodBecameLessAccessible.class, d::onClassMethodBecameLessAccessible);
+    add(types, CChangeClassMethodBecameMoreAccessible.class, d::onClassMethodBecameMoreAccessible);
+    add(types, CChangeClassMethodBecameFinal.class, d::onClassMethodBecameFinal);
+    add(types, CChangeClassMethodBecameNonFinal.class, d::onClassMethodBecameNonFinal);
+    add(types, CChangeClassMethodBecameVarArgs.class, d::onClassMethodBecameVarArgs);
+    add(types, CChangeClassMethodBecameNonVarArgs.class, d::onClassMethodBecameNonVarArgs);
+    add(types, CChangeClassMethodExceptionsChanged.class, d::onClassMethodExceptionsChanged);
+    add(types, CChangeClassMethodMovedToSuperclass.class, d::onClassMethodMovedToSuperclass);
+    add(types, CChangeClassMethodOverloadAdded.class, d::onClassMethodOverloadAdded);
+    add(types, CChangeClassMethodOverloadRemoved.class, d::onClassMethodOverloadRemoved);
+    add(types,
+        CChangeClassMethodOverrideBecameLessAccessible.class,
+        d::onClassMethodOverrideBecameLessAccessible);
+    add(types,
+        CChangeClassMethodOverrideChangedStatic.class,
+        d::onClassMethodOverrideChangedStatic);
+    add(types, CChangeClassMethodRemoved.class, d::onClassMethodRemoved);
+  }
 
-    this.add(
-      CChangeInterfaceMethodAbstractAdded.class,
-      this::onInterfaceMethodAbstractAdded);
-    this.add(
-      CChangeInterfaceMethodAbstractRemoved.class,
-      this::onInterfaceMethodAbstractRemoved);
-    this.add(
-      CChangeInterfaceMethodDefaultAdded.class,
-      this::onInterfaceMethodDefaultAdded);
-    this.add(
-      CChangeInterfaceMethodDefaultRemoved.class,
-      this::onInterfaceMethodDefaultRemoved);
-    this.add(
-      CChangeInterfaceMethodStaticAdded.class,
-      this::onInterfaceMethodStaticAdded);
-    this.add(
-      CChangeInterfaceMethodStaticRemoved.class,
-      this::onInterfaceMethodStaticRemoved);
-
-    this.add(
-      CChangeModuleNoLongerRequired.class,
-      this::onModuleNoLongerRequired);
-    this.add(
-      CChangeModulePackageNoLongerQualifiedExported.class,
-      this::onModuleNoLongerQualifiedExported);
-    this.add(
-      CChangeModulePackageNoLongerQualifiedOpened.class,
-      this::onModuleNoLongerQualifiedOpened);
-    this.add(
-      CChangeModulePackageNoLongerTransitivelyExported.class,
-      this::onModuleNoLongerTransitivelyExported);
-    this.add(
-      CChangeModulePackageNoLongerUnqualifiedExported.class,
-      this::onModuleNoLongerUnqualifiedExported);
-    this.add(
-      CChangeModulePackageNoLongerUnqualifiedOpened.class,
-      this::onModuleNoLongerUnqualifiedOpened);
-    this.add(
-      CChangeModulePackageQualifiedExported.class,
-      this::onModuleQualifiedExported);
-    this.add(
-      CChangeModulePackageQualifiedOpened.class,
-      this::onModuleQualifiedOpened);
-    this.add(
-      CChangeModulePackageTransitivelyExported.class,
-      this::onModuleTransitivelyExported);
-    this.add(
-      CChangeModulePackageUnqualifiedExported.class,
-      this::onModuleUnqualifiedExported);
-    this.add(
-      CChangeModulePackageUnqualifiedOpened.class,
-      this::onModuleUnqualifiedOpened);
-    this.add(
-      CChangeModuleRequired.class,
-      this::onModuleRequired);
-    this.add(
-      CChangeModuleServiceNoLongerProvided.class,
-      this::onModuleServiceNoLongerProvided);
-    this.add(
-      CChangeModuleServiceProvided.class,
-      this::onModuleServiceProvided);
+  private static void addClassModifierChanges(
+    final CPlainTextDescriber d,
+    final HashMap<Class<?>, DescriberType> types)
+  {
+    add(types, CChangeClassAddedPublic.class, d::onClassAddedPublic);
+    add(types, CChangeClassBecameAbstract.class, d::onClassBecameAbstract);
+    add(types, CChangeClassBecameEnum.class, d::onClassBecameEnum);
+    add(types, CChangeClassBecameFinal.class, d::onClassBecameFinal);
+    add(types, CChangeClassBecameInterface.class, d::onClassBecameInterface);
+    add(types, CChangeClassBecameNonAbstract.class, d::onClassBecameNonAbstract);
+    add(types, CChangeClassBecameNonEnum.class, d::onClassBecameNonEnum);
+    add(types, CChangeClassBecameNonFinal.class, d::onClassBecameNonFinal);
+    add(types, CChangeClassBecameNonInterface.class, d::onClassBecameNonInterface);
+    add(types, CChangeClassBecameNonPublic.class, d::onClassBecameNonPublic);
+    add(types, CChangeClassBecamePublic.class, d::onClassBecamePublic);
   }
 
   private static String bytecodeVersion(
@@ -387,8 +315,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassGenericsChanged cc = (CChangeClassGenericsChanged) c;
-
+    final var cc = (CChangeClassGenericsChanged) c;
     this.change(w, "the.generic.type.parameters.of.a.class.have.changed");
     this.showGenerics(w, cc.classPrevious().signature(), Revision.PREVIOUS);
   }
@@ -408,9 +335,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodBecameLessAccessible cc =
-      (CChangeClassMethodBecameLessAccessible) c;
-
+    final var cc = (CChangeClassMethodBecameLessAccessible) c;
     this.change(w, "a.method.became.less.accessible");
 
     w.append(this.fieldStart("method.previous"));
@@ -423,9 +348,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodBecameMoreAccessible cc =
-      (CChangeClassMethodBecameMoreAccessible) c;
-
+    final var cc = (CChangeClassMethodBecameMoreAccessible) c;
     this.change(w, "a.method.became.more.accessible");
 
     w.append(this.fieldStart("method.previous"));
@@ -454,8 +377,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeEnumAddedMembers cc = (CChangeEnumAddedMembers) c;
-
+    final var cc = (CChangeEnumAddedMembers) c;
     this.change(w, "one.or.more.members.cases.were.added.to.an.enum");
 
     w.append(this.fieldStart("enum.added.members"));
@@ -468,8 +390,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeEnumRemovedMembers cc = (CChangeEnumRemovedMembers) c;
-
+    final var cc = (CChangeEnumRemovedMembers) c;
     this.change(w, "one.or.more.members.cases.were.removed.from.an.enum");
 
     w.append(this.fieldStart("enum.removed.members"));
@@ -482,9 +403,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModulePackageUnqualifiedOpened cc =
-      (CChangeModulePackageUnqualifiedOpened) c;
-
+    final var cc = (CChangeModulePackageUnqualifiedOpened) c;
     this.change(w, "a.package.is.now.opened.unqualified");
 
     w.append(this.fieldStart("package.opened"));
@@ -497,9 +416,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModulePackageUnqualifiedExported cc =
-      (CChangeModulePackageUnqualifiedExported) c;
-
+    final var cc = (CChangeModulePackageUnqualifiedExported) c;
     this.change(w, "a.package.is.now.exported.unqualified");
 
     w.append(this.fieldStart("package.exported"));
@@ -512,11 +429,8 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModulePackageTransitivelyExported cc =
-      (CChangeModulePackageTransitivelyExported) c;
-
-    this.change(
-      w, "a.module.is.now.transitively.exported.by.a.requires.directive");
+    final var cc = (CChangeModulePackageTransitivelyExported) c;
+    this.change(w, "a.module.is.now.transitively.exported.by.a.requires.directive");
 
     w.append(this.fieldStart("module.required"));
     w.append(cc.moduleRequired());
@@ -528,9 +442,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModuleNoLongerRequired cc =
-      (CChangeModuleNoLongerRequired) c;
-
+    final var cc = (CChangeModuleNoLongerRequired) c;
     this.change(w, "a.module.no.longer.requires.another.module");
 
     w.append(this.fieldStart("module.required"));
@@ -544,9 +456,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModulePackageNoLongerQualifiedExported cc =
-      (CChangeModulePackageNoLongerQualifiedExported) c;
-
+    final var cc = (CChangeModulePackageNoLongerQualifiedExported) c;
     this.change(w, "a.package.is.no.longer.exported.qualified.by.a.module");
 
     w.append(this.fieldStart("package.exported"));
@@ -561,9 +471,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModulePackageNoLongerQualifiedOpened cc =
-      (CChangeModulePackageNoLongerQualifiedOpened) c;
-
+    final var cc = (CChangeModulePackageNoLongerQualifiedOpened) c;
     this.change(w, "a.package.is.no.longer.opened.qualified.by.a.module");
 
     w.append(this.fieldStart("package.opened"));
@@ -578,9 +486,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModulePackageNoLongerTransitivelyExported cc =
-      (CChangeModulePackageNoLongerTransitivelyExported) c;
-
+    final var cc = (CChangeModulePackageNoLongerTransitivelyExported) c;
     this.change(w, "a.package.is.no.transitively.exported.by.a.module");
 
     w.append(this.fieldStart("module.exported"));
@@ -593,9 +499,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModulePackageNoLongerUnqualifiedExported cc =
-      (CChangeModulePackageNoLongerUnqualifiedExported) c;
-
+    final var cc = (CChangeModulePackageNoLongerUnqualifiedExported) c;
     this.change(w, "a.package.is.no.longer.exported.unqualified.by.a.module");
 
     w.append(this.fieldStart("package.exported"));
@@ -608,9 +512,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModulePackageNoLongerUnqualifiedOpened cc =
-      (CChangeModulePackageNoLongerUnqualifiedOpened) c;
-
+    final var cc = (CChangeModulePackageNoLongerUnqualifiedOpened) c;
     this.change(w, "a.package.is.no.longer.opened.unqualified.by.a.module");
 
     w.append(this.fieldStart("package.opened"));
@@ -623,9 +525,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModulePackageQualifiedExported cc =
-      (CChangeModulePackageQualifiedExported) c;
-
+    final var cc = (CChangeModulePackageQualifiedExported) c;
     this.change(w, "a.package.is.exported.qualified.by.a.module");
 
     w.append(this.fieldStart("package.exported"));
@@ -640,9 +540,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModulePackageQualifiedOpened cc =
-      (CChangeModulePackageQualifiedOpened) c;
-
+    final var cc = (CChangeModulePackageQualifiedOpened) c;
     this.change(w, "a.package.is.opened.qualified.by.a.module");
 
     w.append(this.fieldStart("package.opened"));
@@ -657,9 +555,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModuleRequired cc =
-      (CChangeModuleRequired) c;
-
+    final var cc = (CChangeModuleRequired) c;
     this.change(w, "a.module.now.requires.another.module");
 
     w.append(this.fieldStart("module.required"));
@@ -673,9 +569,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModuleServiceProvided cc =
-      (CChangeModuleServiceProvided) c;
-
+    final var cc = (CChangeModuleServiceProvided) c;
     this.change(w, "a.module.now.provides.a.service");
 
     w.append(this.fieldStart("service.provided"));
@@ -690,9 +584,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeModuleServiceNoLongerProvided cc =
-      (CChangeModuleServiceNoLongerProvided) c;
-
+    final var cc = (CChangeModuleServiceNoLongerProvided) c;
     this.change(w, "a.module.no.longer.provides.a.service");
 
     w.append(this.fieldStart("service.provided"));
@@ -763,13 +655,9 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodOverrideBecameLessAccessible cc =
-      (CChangeClassMethodOverrideBecameLessAccessible) c;
-
-    final CMethod method_ancestor = cc.methodAncestor();
-    this.change(
-      w,
-      "a.method.declaration.reduces.the.accessibility.of.an.overridden.method");
+    final var cc = (CChangeClassMethodOverrideBecameLessAccessible) c;
+    final var method_ancestor = cc.methodAncestor();
+    this.change(w, "a.method.declaration.reduces.the.accessibility.of.an.overridden.method");
 
     w.append(this.fieldStart("class.ancestor"));
     w.append(CClassNames.show(method_ancestor.className()));
@@ -784,11 +672,9 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodOverrideChangedStatic cc =
-      (CChangeClassMethodOverrideChangedStatic) c;
-
-    final CMethod method_ancestor = cc.methodAncestor();
-    final CMethod method_current = cc.method();
+    final var cc = (CChangeClassMethodOverrideChangedStatic) c;
+    final var method_ancestor = cc.methodAncestor();
+    final var method_current = cc.method();
 
     w.append(this.fieldStart("change"));
     if (method_current.modifiers().contains(CModifier.STATIC)
@@ -815,9 +701,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodOverloadRemoved cc =
-      (CChangeClassMethodOverloadRemoved) c;
-
+    final var cc = (CChangeClassMethodOverloadRemoved) c;
     this.change(w, "a.method.overload.was.removed");
   }
 
@@ -826,9 +710,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodOverloadAdded cc =
-      (CChangeClassMethodOverloadAdded) c;
-
+    final var cc = (CChangeClassMethodOverloadAdded) c;
     this.change(w, "a.method.overload.was.added");
   }
 
@@ -837,9 +719,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodMovedToSuperclass cc =
-      (CChangeClassMethodMovedToSuperclass) c;
-
+    final var cc = (CChangeClassMethodMovedToSuperclass) c;
     this.change(w, "a.method.was.moved.to.an.ancestor.class");
 
     w.append(this.fieldStart("class.ancestor"));
@@ -856,9 +736,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodExceptionsChanged cc =
-      (CChangeClassMethodExceptionsChanged) c;
-
+    final var cc = (CChangeClassMethodExceptionsChanged) c;
     this.change(w, "the.declared.thrown.exceptions.for.a.method.have.changed");
 
     w.append(this.fieldStart("method.previous"));
@@ -871,9 +749,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodBecameNonFinal cc =
-      (CChangeClassMethodBecameNonFinal) c;
-
+    final var cc = (CChangeClassMethodBecameNonFinal) c;
     this.change(w, "a.previously.final.method.became.non.final");
 
     w.append(this.fieldStart("method.previous"));
@@ -886,9 +762,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodBecameFinal cc =
-      (CChangeClassMethodBecameFinal) c;
-
+    final var cc = (CChangeClassMethodBecameFinal) c;
     this.change(w, "a.previously.non.final.method.became.final");
 
     w.append(this.fieldStart("method.previous"));
@@ -901,9 +775,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodBecameNonVarArgs cc =
-      (CChangeClassMethodBecameNonVarArgs) c;
-
+    final var cc = (CChangeClassMethodBecameNonVarArgs) c;
     this.change(w, "a.previously.final.method.became.non.variadic");
 
     w.append(this.fieldStart("method.previous"));
@@ -916,9 +788,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassMethodBecameVarArgs cc =
-      (CChangeClassMethodBecameVarArgs) c;
-
+    final var cc = (CChangeClassMethodBecameVarArgs) c;
     this.change(w, "a.previously.non.final.method.became.variadic");
 
     w.append(this.fieldStart("method.previous"));
@@ -931,9 +801,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassFieldTypeChanged cc =
-      (CChangeClassFieldTypeChanged) c;
-
+    final var cc = (CChangeClassFieldTypeChanged) c;
     this.change(w, "the.type.of.a.non.private.field.changed");
 
     w.append(this.fieldStart("field.previous"));
@@ -954,9 +822,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassFieldMovedToSuperclass cc =
-      (CChangeClassFieldMovedToSuperclass) c;
-
+    final var cc = (CChangeClassFieldMovedToSuperclass) c;
     this.change(w, "a.field.moved.to.an.ancestor.class");
 
     w.append(this.fieldStart("class.ancestor"));
@@ -973,9 +839,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassFieldBecameStatic cc =
-      (CChangeClassFieldBecameStatic) c;
-
+    final var cc = (CChangeClassFieldBecameStatic) c;
     this.change(w, "a.previously.non.static.field.became.static");
 
     w.append(this.fieldStart("field.previous"));
@@ -988,9 +852,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassFieldBecameNonStatic cc =
-      (CChangeClassFieldBecameNonStatic) c;
-
+    final var cc = (CChangeClassFieldBecameNonStatic) c;
     this.change(w, "a.previously.static.field.became.non.static");
 
     w.append(this.fieldStart("field.previous"));
@@ -1003,9 +865,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassFieldBecameNonFinal cc =
-      (CChangeClassFieldBecameNonFinal) c;
-
+    final var cc = (CChangeClassFieldBecameNonFinal) c;
     this.change(w, "a.previously.final.field.became.non.final");
 
     w.append(this.fieldStart("field.previous"));
@@ -1018,9 +878,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassFieldBecameMoreAccessible cc =
-      (CChangeClassFieldBecameMoreAccessible) c;
-
+    final var cc = (CChangeClassFieldBecameMoreAccessible) c;
     this.change(w, "the.accessibility.of.a.field.was.increased");
 
     w.append(this.fieldStart("field.previous"));
@@ -1033,9 +891,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassFieldBecameLessAccessible cc =
-      (CChangeClassFieldBecameLessAccessible) c;
-
+    final var cc = (CChangeClassFieldBecameLessAccessible) c;
     this.change(w, "the.accessibility.of.a.field.was.reduced");
 
     w.append(this.fieldStart("field.previous"));
@@ -1048,9 +904,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassFieldBecameFinal cc =
-      (CChangeClassFieldBecameFinal) c;
-
+    final var cc = (CChangeClassFieldBecameFinal) c;
     this.change(w, "a.non.final.field.became.final");
 
     w.append(this.fieldStart("field.previous"));
@@ -1071,9 +925,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassBytecodeVersionChanged cc =
-      (CChangeClassBytecodeVersionChanged) c;
-
+    final var cc = (CChangeClassBytecodeVersionChanged) c;
     this.change(w, "the.bytecode.version.of.a.public.class.has.changed");
 
     w.append(this.fieldStart("bytecode.version.previous"));
@@ -1202,13 +1054,9 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassFieldOverrideBecameLessAccessible cc =
-      (CChangeClassFieldOverrideBecameLessAccessible) c;
-
-    final CField field_ancestor = cc.fieldAncestor();
-    this.change(
-      w,
-      "a.field.declaration.reduces.the.accessibility.of.an.overridden.field");
+    final var cc = (CChangeClassFieldOverrideBecameLessAccessible) c;
+    final var field_ancestor = cc.fieldAncestor();
+    this.change(w, "a.field.declaration.reduces.the.accessibility.of.an.overridden.field");
 
     w.append(this.fieldStart("class.ancestor"));
     w.append(CClassNames.show(field_ancestor.className()));
@@ -1223,11 +1071,9 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     final CChangeType c)
     throws IOException
   {
-    final CChangeClassFieldOverrideChangedStatic cc =
-      (CChangeClassFieldOverrideChangedStatic) c;
-
-    final CField field_ancestor = cc.fieldAncestor();
-    final CField field_current = cc.field();
+    final var cc = (CChangeClassFieldOverrideChangedStatic) c;
+    final var field_ancestor = cc.fieldAncestor();
+    final var field_current = cc.field();
 
     w.append(this.fieldStart("change"));
     if (field_current.modifiers().contains(CModifier.STATIC)
@@ -1259,73 +1105,32 @@ public final class CPlainTextDescriber implements CChangeDescriberType
   {
     switch (change.category()) {
       case CHANGE_FIELD: {
-        final CChangeFieldType c = (CChangeFieldType) change;
-        final CField f = c.field();
-
-        w.append(this.fieldStart("class"));
-        w.append(CClassNames.show(f.className()));
-        w.newLine();
-
-        w.append(this.fieldStart("field.current"));
-        w.append(CFields.show(f));
-        w.newLine();
+        this.showChangeDetailsField((CChangeFieldType) change, w);
         break;
       }
 
       case CHANGE_CLASS: {
-        final CChangeClassType c = (CChangeClassType) change;
-
-        w.append(this.fieldStart("class"));
-        w.append(CClassNames.show(c.classValue().name()));
-        w.newLine();
-
-        this.showGenerics(w, c.classValue().signature(), Revision.CURRENT);
+        this.showChangeDetailsClass((CChangeClassType) change, w);
         break;
       }
 
       case CHANGE_CONSTRUCTOR: {
-        final CChangeConstructorType c = (CChangeConstructorType) change;
-
-        w.append(this.fieldStart("class"));
-        w.append(CClassNames.show(c.className()));
-        w.newLine();
-
-        w.append(this.fieldStart("constructor.current"));
-        w.append(CConstructors.show(c.constructor()));
-        w.newLine();
+        this.showChangeDetailsConstructor((CChangeConstructorType) change, w);
         break;
       }
 
       case CHANGE_METHOD: {
-        final CChangeMethodType c = (CChangeMethodType) change;
-
-        w.append(this.fieldStart("class"));
-        w.append(CClassNames.show(c.className()));
-        w.newLine();
-
-        w.append(this.fieldStart("method.current"));
-        w.append(CMethods.show(c.method()));
-        w.newLine();
+        this.showChangeDetailsMethod((CChangeMethodType) change, w);
         break;
       }
 
       case CHANGE_MODULE: {
-        final CChangeModuleType c = (CChangeModuleType) change;
-
-        w.append(this.fieldStart("module"));
-        w.append(c.module());
-        w.newLine();
+        this.showChangeDetailsModule((CChangeModuleType) change, w);
         break;
       }
 
       case CHANGE_ENUM: {
-        final CChangeEnumType c = (CChangeEnumType) change;
-
-        w.append(this.fieldStart("class"));
-        w.append(CClassNames.show(c.enumType().name()));
-        w.newLine();
-
-        this.showGenerics(w, c.enumType().signature(), Revision.CURRENT);
+        this.showChangeDetailsEnum((CChangeEnumType) change, w);
         break;
       }
     }
@@ -1349,6 +1154,84 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     }
   }
 
+  private void showChangeDetailsEnum(
+    final CChangeEnumType change,
+    final BufferedWriter w)
+    throws IOException
+  {
+    w.append(this.fieldStart("class"));
+    w.append(CClassNames.show(change.enumType().name()));
+    w.newLine();
+
+    this.showGenerics(w, change.enumType().signature(), Revision.CURRENT);
+  }
+
+  private void showChangeDetailsModule(
+    final CChangeModuleType change,
+    final BufferedWriter w)
+    throws IOException
+  {
+    w.append(this.fieldStart("module"));
+    w.append(change.module());
+    w.newLine();
+  }
+
+  private void showChangeDetailsMethod(
+    final CChangeMethodType change,
+    final BufferedWriter w)
+    throws IOException
+  {
+    w.append(this.fieldStart("class"));
+    w.append(CClassNames.show(change.className()));
+    w.newLine();
+
+    w.append(this.fieldStart("method.current"));
+    w.append(CMethods.show(change.method()));
+    w.newLine();
+  }
+
+  private void showChangeDetailsConstructor(
+    final CChangeConstructorType change,
+    final BufferedWriter w)
+    throws IOException
+  {
+    w.append(this.fieldStart("class"));
+    w.append(CClassNames.show(change.className()));
+    w.newLine();
+
+    w.append(this.fieldStart("constructor.current"));
+    w.append(CConstructors.show(change.constructor()));
+    w.newLine();
+  }
+
+  private void showChangeDetailsClass(
+    final CChangeClassType change,
+    final BufferedWriter w)
+    throws IOException
+  {
+    w.append(this.fieldStart("class"));
+    w.append(CClassNames.show(change.classValue().name()));
+    w.newLine();
+
+    this.showGenerics(w, change.classValue().signature(), Revision.CURRENT);
+  }
+
+  private void showChangeDetailsField(
+    final CChangeFieldType change,
+    final BufferedWriter w)
+    throws IOException
+  {
+    final var f = change.field();
+
+    w.append(this.fieldStart("class"));
+    w.append(CClassNames.show(f.className()));
+    w.newLine();
+
+    w.append(this.fieldStart("field.current"));
+    w.append(CFields.show(f));
+    w.newLine();
+  }
+
   private void showGenerics(
     final BufferedWriter w,
     final Optional<CGClassSignature> sig_opt,
@@ -1367,7 +1250,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     }
 
     if (sig_opt.isPresent()) {
-      final CGClassSignature sig = sig_opt.get();
+      final var sig = sig_opt.get();
       if (!sig.parameters().isEmpty()) {
         w.append("<");
         w.append(sig.parameters()
@@ -1386,8 +1269,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
   private String fieldStart(
     final String name)
   {
-    final String title =
-      this.titles.getString(Objects.requireNonNull(name, "Name"));
+    final var title = this.titles.getString(Objects.requireNonNull(name, "Name"));
     return String.format("%-36s ", title + ":");
   }
 
@@ -1444,14 +1326,15 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     throw new UnreachableCodeException();
   }
 
-  private void add(
+  private static void add(
+    final HashMap<Class<?>, DescriberType> types,
     final Class<?> c,
     final DescriberType d)
   {
     Preconditions.checkPrecondition(
-      !this.types.containsKey(c),
+      !types.containsKey(c),
       "Describer for " + c + " must not already be registered");
-    this.types.put(c, d);
+    types.put(c, d);
   }
 
   @Override
@@ -1478,7 +1361,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
     Objects.requireNonNull(change, "Change");
     Objects.requireNonNull(out, "Output");
 
-    final DescriberType text =
+    final var text =
       this.types.get(change.getClass());
 
     if (text == null) {
@@ -1486,7 +1369,7 @@ public final class CPlainTextDescriber implements CChangeDescriberType
         "No describer for type: " + change.getClass().getCanonicalName());
     }
 
-    final BufferedWriter w = makeWriter(out);
+    final var w = makeWriter(out);
     text.describe(w, change);
     this.showChangeDetails(originator, change, w);
     w.newLine();
